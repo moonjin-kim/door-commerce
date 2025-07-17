@@ -23,4 +23,12 @@ public class PointService {
         return Point.charge(user, amount, currentBalance);
     }
 
+    public Optional<Point> getLastPoint(User user) {
+        if(user == null) {
+            return Optional.empty();
+        }
+
+        return pointRepository.findLastByUser(user);
+    }
+
 }

@@ -12,4 +12,10 @@ public interface PointV1ApiSpec {
     )
     ApiResponse<PointV1ResponseDto.PointBalanceResponse> register(String account, PointV1RequestDto.PointChargeRequest chargeRequest);
 
+
+    @Operation(
+            summary = "포인트 잔액 조회",
+            description = "현재 유저의 포인트 잔액을 조회한다"
+    )
+    ApiResponse<PointV1ResponseDto.PointBalanceResponse> getBalance(String userId);
 }

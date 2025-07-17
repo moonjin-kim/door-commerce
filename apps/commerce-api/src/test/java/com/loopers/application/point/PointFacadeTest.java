@@ -1,9 +1,11 @@
-package com.loopers.domain.point;
+package com.loopers.application.point;
 
+import com.loopers.domain.point.Point;
 import com.loopers.domain.user.User;
 import com.loopers.fixture.UserFixture;
 import com.loopers.infrastructure.point.PointJpaRepository;
 import com.loopers.infrastructure.user.UserJpaRepository;
+import com.loopers.interfaces.api.point.PointV1RequestDto;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
@@ -13,22 +15,19 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
-public class PointServiceIntegrationTest {
-    @MockitoSpyBean
+class PointFacadeTest {
+    @Autowired
     private UserJpaRepository userJpaRepository;
     @Autowired
     private PointJpaRepository pointJpaRepository;
     @Autowired
-    private PointService pointService;
+    private PointFacade pointFacade;
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
 
@@ -37,25 +36,25 @@ public class PointServiceIntegrationTest {
         databaseCleanUp.truncateAllTables();
     }
 
-    @DisplayName("포인트를 충전할 때")
+    @DisplayName("유저가 포인트 충전 시,")
     @Nested
-    class ChargePoint {
+    class chargePoint {
+
         @DisplayName("해당 ID에 포인트가 충전된다.")
         @Test
         void returnPoint(){
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
-            int amount = 10000;
+            var chargeRequest = new PointV1RequestDto.PointChargeRequest(1000);
 
             //when
-            Point result = pointService.chargePoint(user, amount);
+            PointBalanceInfo result = pointFacade.chargePoint(user.getAccount(), chargeRequest);
 
             //then
             assertAll(
                     () -> assertThat(result).isNotNull(),
-                    () -> assertThat(result.getUser().getId()).isEqualTo(user.getId()),
-                    () -> assertThat(result.getAmount()).isEqualTo(amount),
-                    () -> assertThat(result.getBalance()).isEqualTo(0 + amount)
+                    () -> assertThat(result.account()).isEqualTo(user.getAccount()),
+                    () -> assertThat(result.balance()).isEqualTo(chargeRequest.amount())
             );
         }
 
@@ -67,85 +66,73 @@ public class PointServiceIntegrationTest {
             Point chargedPoint = pointJpaRepository.save(
                     Point.charge(user, 1000, 0)
             );
-            int amount = 10000;
+            var chargeRequest = new PointV1RequestDto.PointChargeRequest(1000);
 
             //when
-            Point result = pointService.chargePoint(user, amount);
+            PointBalanceInfo result = pointFacade.chargePoint(user.getAccount(), chargeRequest);
 
             //then
             assertAll(
                     () -> assertThat(result).isNotNull(),
-                    () -> assertThat(result.getUser().getId()).isEqualTo(user.getId()),
-                    () -> assertThat(result.getAmount()).isEqualTo(amount),
-                    () -> assertThat(result.getBalance()).isEqualTo(chargedPoint.getBalance() + amount)
+                    () -> assertThat(result.account()).isEqualTo(user.getAccount()),
+                    () -> assertThat(result.balance()).isEqualTo(chargedPoint.getBalance() + chargeRequest.amount())
             );
         }
 
-        @DisplayName("0원 이하의 포인트를 충전 요청하면, BAD_REQUEST 예외가 발생한다.")
+        @DisplayName("존재하지 않는 유저 ID 로 충전을 시도한 경우, 실패한다.")
         @Test
-        void throwBadRequest_whenZeroPoint(){
+        void throwException_whenInvalidIdIsProvided(){
             //given
-            User user = userJpaRepository.save(UserFixture.createMember());
-            int amount = 0;
+            var chargeRequest = new PointV1RequestDto.PointChargeRequest(1000);
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                pointService.chargePoint(user, amount);
+                pointFacade.chargePoint("human", chargeRequest);
             });
 
             //then
-            assertThat(exception.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+            assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
         }
     }
 
-
-    @DisplayName("포인트 조회시")
+    @DisplayName("포인트 잔액을 조회할 때")
     @Nested
     class getBalance {
 
-        @DisplayName("보유 포인트가 존재하면, 보유 포인트가 반환된다.")
+        @DisplayName("해당 ID 의 회원이 존재할 경우, 보유 포인트가 반환된다.")
         @Test
-        void returnLastPoint_whenValidIdIsProvided(){
+        void returnPoint_whenValidIdIsProvided(){
             //given
             User user = userJpaRepository.save(
                     UserFixture.createMember()
             );
-            Point point = pointJpaRepository.save(
+            Point chargedPoint = pointJpaRepository.save(
                     Point.charge(user, 10000, 0)
             );
 
             //when
-            Point result = pointService.getLastPoint(user).orElse(null);
+            PointBalanceInfo result = pointFacade.getBalance(user.getAccount());
 
             //then
-            assertThat(result.balance).isEqualTo(point.balance);
-        }
-
-        @DisplayName("보유 포인트가 존재하지 않으면, null이 반환된다.")
-        @Test
-        void returnNullPoint_whenValidIdIsProvidedAndNoChargeHistory(){
-            //given
-            User user = userJpaRepository.save(
-                    UserFixture.createMember()
+            assertAll(
+                    () -> assertThat(result).isNotNull(),
+                    () -> assertThat(result.account()).isEqualTo(user.getAccount()),
+                    () -> assertThat(result.balance()).isEqualTo(chargedPoint.getBalance())
             );
-
-            //when
-            Optional<Point> result = pointService.getLastPoint(user);
-
-            //then
-            assertThat(result.isPresent()).isFalse();
         }
 
-        @DisplayName("존재하지 않는 유저이면, null이 반환된다.")
+        @DisplayName("해당 ID 의 회원이 존재하지 않을 경우, NOT_FOUND 예외가 발생한다.")
         @Test
-        void returnNullPoint_whenUserNotExist(){
+        void throwException_whenInValidIdIsProvided(){
             //given
 
             //when
-            Optional<Point> result = pointService.getLastPoint(null);
+            CoreException exception = assertThrows(CoreException.class, () -> {
+                pointFacade.getBalance("human");
+            });
 
             //then
-            assertThat(result.isPresent()).isFalse();
+            assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
         }
     }
 }
