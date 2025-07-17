@@ -81,4 +81,44 @@ class UserServiceIntegrationTest {
             assertThat(exception.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
         }
     }
+
+    @DisplayName("회원정보를 조회할 때")
+    @Nested
+    class getUser {
+        @DisplayName("해당 ID 의 회원이 존재할 경우, 회원 정보가 반환된다.")
+        @Test
+        void returnsUser_whenValidIdIsProvided(){
+            //given
+            User user = userJpaRepository.save(
+                    UserFixture.createMember()
+            );
+
+            //when
+            User result = userService.getUser(user.getAccount()).orElse(null);
+
+            //then
+
+            assertAll(
+                    () -> assertThat(result).isNotNull(),
+                    () -> assertThat(result.getId()).isEqualTo(user.getId()),
+                    () -> assertThat(result.getName()).isEqualTo(user.getName()),
+                    () -> assertThat(result.getAccount()).isEqualTo(user.getAccount()),
+                    () -> assertThat(result.getEmail()).isEqualTo(user.getEmail()),
+                    () -> assertThat(result.getBirthday()).isEqualTo(user.getBirthday()),
+                    () -> assertThat(result.getGender()).isEqualTo(user.getGender())
+            );
+        }
+
+        @DisplayName("존재하지 않는 유저 ID를 주면, null을 반환한다.")
+        @Test
+        void throwsException_whenInvalidIdIsProvided(){
+            //given
+
+            //when
+            Optional<User> result = userService.getUser("human");
+
+            // assert
+            assertThat(result.isPresent()).isFalse();
+        }
+    }
 }
