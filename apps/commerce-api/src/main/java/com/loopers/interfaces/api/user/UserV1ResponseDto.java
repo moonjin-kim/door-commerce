@@ -1,5 +1,6 @@
 package com.loopers.interfaces.api.user;
 
+import com.loopers.application.user.UserInfo;
 import com.loopers.domain.user.Gender;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
@@ -14,6 +15,15 @@ public class UserV1ResponseDto {
             LocalDate birthday,
             GenderResponse gender
     ){
+        public static UserResponse from(UserInfo info) {
+            return new UserResponse(
+                    info.id(),
+                    info.account(),
+                    info.email(),
+                    info.birthday(),
+                    GenderResponse.from(info.sex())
+            );
+        }
     }
 
     public enum GenderResponse {
@@ -23,9 +33,9 @@ public class UserV1ResponseDto {
         // 변환 로직을 Enum 내부에 구현
         public static GenderResponse from(Gender gender) {
             switch (gender) {
-                case Gender.MALE:
+                case MALE:
                     return MALE;
-                case Gender.FEMALE:
+                case FEMALE:
                     return FEMALE;
                 default:
                     throw new CoreException(ErrorType.BAD_REQUEST, "생년월일은 비어있을 수 없습니다.");

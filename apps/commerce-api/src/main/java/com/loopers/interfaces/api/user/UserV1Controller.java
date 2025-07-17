@@ -1,4 +1,23 @@
 package com.loopers.interfaces.api.user;
 
-public class UserV1Controller {
+import com.loopers.application.user.UserFacade;
+import com.loopers.application.user.UserInfo;
+import com.loopers.interfaces.api.ApiResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/api/v1/users")
+public class UserV1Controller implements UserV1ApiSpec {
+
+    private final UserFacade userFacade;
+
+    @PostMapping("")
+    @Override
+    public ApiResponse<UserV1ResponseDto.UserResponse> register(@RequestBody UserV1RequestDto.Register body) {
+        UserInfo info = userFacade.registerUser(body);
+        UserV1ResponseDto.UserResponse response = UserV1ResponseDto.UserResponse.from(info);
+        return ApiResponse.success(response);
+    }
 }
