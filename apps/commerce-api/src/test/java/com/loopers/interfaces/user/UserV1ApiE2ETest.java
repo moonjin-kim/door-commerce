@@ -116,4 +116,68 @@ class UserV1ApiE2ETest {
         }
     }
 
+    @DisplayName("Get /api/v1/users/me")
+    @Nested
+    class GetUsers {
+        private static final String ENDPOINT_GET_ME = "/api/v1/users/me";
+
+        @DisplayName("내 정보 조회에 성공할 경우, 해당하는 유저 정보를 응답으로 반환한다.")
+        @Test
+        void returnsUserInfo_whenValidIdIsProvided() {
+            //given
+            User user = userJpaRepository.save(
+                    UserFixture.createMember()
+            );
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("X-USER-ID", user.getAccount());
+
+            //when
+            ParameterizedTypeReference<ApiResponse<UserV1ResponseDto.UserResponse>> responseType = new ParameterizedTypeReference<>() {
+            };
+            ResponseEntity<ApiResponse<UserV1ResponseDto.UserResponse>> response =
+                    testRestTemplate.exchange(
+                            ENDPOINT_GET_ME,
+                            HttpMethod.GET,
+                            new HttpEntity<>(null, headers),
+                            responseType
+                    );
+
+            //then
+            assertAll(
+                    () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
+                    () -> assertThat(response.getBody().data().id()).isEqualTo(user.getId()),
+                    () -> assertThat(response.getBody().data().account()).isEqualTo(user.getAccount()),
+                    () -> assertThat(response.getBody().data().birthday()).isEqualTo(user.getBirthday()),
+                    () -> assertThat(response.getBody().data().email()).isEqualTo(user.getEmail()),
+                    () -> assertThat(response.getBody().data().gender()).isEqualTo(UserV1ResponseDto.GenderResponse.from(user.getGender()))
+            );
+        }
+
+        @DisplayName("존재하지 않는 ID로 조회할 경우, 404 Not Found 응답을 반환한다.")
+        @Test
+        void throwsException_whenInvalidIdIsProvided() {
+            //given
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("X-USER-ID", "-1");
+
+            //when
+            ParameterizedTypeReference<ApiResponse<UserV1ResponseDto.UserResponse>> responseType = new ParameterizedTypeReference<>() {
+            };
+            ResponseEntity<ApiResponse<UserV1ResponseDto.UserResponse>> response =
+                    testRestTemplate.exchange(
+                            ENDPOINT_GET_ME,
+                            HttpMethod.GET,
+                            new HttpEntity<>(null, headers),
+                            responseType
+                    );
+
+            //then
+            assertAll(
+                    () -> assertTrue(response.getStatusCode().is4xxClientError()),
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND)
+            );
+        }
+    }
 }

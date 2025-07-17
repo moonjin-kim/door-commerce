@@ -11,4 +11,10 @@ public interface UserV1ApiSpec {
             description = "ID, 이메일, 생년월일, 성별로 회원가입한다."
     )
     ApiResponse<UserV1ResponseDto.UserResponse> register(UserV1RequestDto.Register requestBody);
+
+    @Operation(
+            summary = "회원조회",
+            description = "ID로 유저를 조회합니다."
+    )
+    ApiResponse<UserV1ResponseDto.UserResponse> me(String account);
 }
