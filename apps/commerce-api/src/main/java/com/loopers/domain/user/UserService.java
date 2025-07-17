@@ -23,6 +23,11 @@ public class UserService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public Optional<User> getUser(String account) {
+        return userRepository.findBy(account);
+    }
+
     private void checkDuplicateAccount(String account) {
         if (userRepository.findBy(account).isPresent()) {
             throw new CoreException(ErrorType.BAD_REQUEST,"이미 존재하는 아이디입니다: " + account);
