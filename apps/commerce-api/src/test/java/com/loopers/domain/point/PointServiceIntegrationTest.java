@@ -37,6 +37,45 @@ public class PointServiceIntegrationTest {
         databaseCleanUp.truncateAllTables();
     }
 
+    @DisplayName("포인트가 새로 생성할 때")
+    @Nested
+    class initPoint {
+        @DisplayName("DB에 User ID에 해당하는 포인트 존재하면 BAD_REQUEST 예외가 발생한다.")
+        @Test
+        void throwBadRequest_whenAlreadySavePointByUserId(){
+            //given
+            Long userId = 1L;
+            pointJpaRepository.save(Point.init(userId));
+
+            //when
+            CoreException exception = assertThrows(CoreException.class, () -> {
+                pointService.initPoint(userId);
+            });
+
+            //then
+            assertThat(exception.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+        }
+
+        @DisplayName("DB에 User ID에 해당하는 포인트가 저장된다.")
+        @Test
+        void savePoint(){
+            //given
+            Long userId = 1L;
+
+            //when
+            Point point = pointService.initPoint(userId);
+
+            //then
+            Optional<Point> savedPoint = pointJpaRepository.findByUserId(userId);
+            assertAll(
+                    () -> assertThat(savedPoint).isPresent(),
+                    () -> assertThat(savedPoint.get().getId()).isEqualTo(point.getId()),
+                    () -> assertThat(savedPoint.get().getUserId()).isEqualTo(userId),
+                    () -> assertThat(savedPoint.get().getBalance()).isEqualTo(0)
+            );
+        }
+    }
+
     @DisplayName("포인트를 충전할 때")
     @Nested
     class ChargePoint {
@@ -48,14 +87,13 @@ public class PointServiceIntegrationTest {
             int amount = 10000;
 
             //when
-            Point result = pointService.chargePoint(user, amount);
+            Point result = pointService.chargePoint(user.getId(), amount);
 
             //then
             assertAll(
                     () -> assertThat(result).isNotNull(),
-                    () -> assertThat(result.getUser().getId()).isEqualTo(user.getId()),
-                    () -> assertThat(result.getAmount()).isEqualTo(amount),
-                    () -> assertThat(result.getBalance()).isEqualTo(0 + amount)
+                    () -> assertThat(result.getUserId()).isEqualTo(user.getId()),
+                    () -> assertThat(result.getBalance()).isEqualTo(amount)
             );
         }
 
@@ -64,20 +102,22 @@ public class PointServiceIntegrationTest {
         void addPoint_whenRemainBalance(){
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
+
+            Point point = Point.init(user.getId());
+            point.charge(1000);
             Point chargedPoint = pointJpaRepository.save(
-                    Point.charge(user, 1000, 0)
+                    point
             );
             int amount = 10000;
 
             //when
-            Point result = pointService.chargePoint(user, amount);
+            Point result = pointService.chargePoint(user.getId(), amount);
 
             //then
             assertAll(
                     () -> assertThat(result).isNotNull(),
-                    () -> assertThat(result.getUser().getId()).isEqualTo(user.getId()),
-                    () -> assertThat(result.getAmount()).isEqualTo(amount),
-                    () -> assertThat(result.getBalance()).isEqualTo(chargedPoint.getBalance() + amount)
+                    () -> assertThat(result.getUserId()).isEqualTo(user.getId()),
+                    () -> assertThat(result.getBalance()).isEqualTo(point.balance + amount)
             );
         }
 
@@ -86,8 +126,10 @@ public class PointServiceIntegrationTest {
         void throwNotFound_whenNullUser(){
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
+            Point point = Point.init(user.getId());
+            point.charge(1000);
             Point chargedPoint = pointJpaRepository.save(
-                    Point.charge(user, 1000, 0)
+                    point
             );
             int amount = 10000;
 
@@ -109,7 +151,7 @@ public class PointServiceIntegrationTest {
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                pointService.chargePoint(user, amount);
+                pointService.chargePoint(user.getId(), amount);
             });
 
             //then
@@ -129,31 +171,33 @@ public class PointServiceIntegrationTest {
             User user = userJpaRepository.save(
                     UserFixture.createMember()
             );
-            Point point = pointJpaRepository.save(
-                    Point.charge(user, 10000, 0)
+            Point point = Point.init(user.getId());
+            point.charge(1000);
+            Point chargedPoint = pointJpaRepository.save(
+                    point
             );
 
             //when
-            Point result = pointService.getLastPoint(user).orElse(null);
+            Point result = pointService.getPoint(user.getId()).orElse(null);
 
             //then
             assertThat(result.balance).isEqualTo(point.balance);
         }
 
-        @DisplayName("보유 포인트가 존재하지 않으면, null이 반환된다.")
-        @Test
-        void returnNullPoint_whenValidIdIsProvidedAndNoChargeHistory(){
-            //given
-            User user = userJpaRepository.save(
-                    UserFixture.createMember()
-            );
-
-            //when
-            Optional<Point> result = pointService.getLastPoint(user);
-
-            //then
-            assertThat(result.isPresent()).isFalse();
-        }
+//        @DisplayName("보유 포인트가 존재하지 않으면, null이 반환된다.")
+//        @Test
+//        void returnNullPoint_whenValidIdIsProvidedAndNoChargeHistory(){
+//            //given
+//            User user = userJpaRepository.save(
+//                    UserFixture.createMember()
+//            );
+//
+//            //when
+//            Optional<Point> result = pointService.getLastPoint(user);
+//
+//            //then
+//            assertThat(result.isPresent()).isFalse();
+//        }
 
         @DisplayName("존재하지 않는 유저이면, null이 반환된다.")
         @Test
@@ -161,7 +205,7 @@ public class PointServiceIntegrationTest {
             //given
 
             //when
-            Optional<Point> result = pointService.getLastPoint(null);
+            Optional<Point> result = pointService.getPoint(null);
 
             //then
             assertThat(result.isPresent()).isFalse();

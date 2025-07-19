@@ -5,5 +5,6 @@ import com.loopers.domain.user.User;
 import java.util.Optional;
 
 public interface PointRepository {
-    Optional<Point> findLastByUser(User user);
+    Point save(Point point);
+    Optional<Point> findBy(Long userId);
 }

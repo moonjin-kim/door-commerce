@@ -1,6 +1,5 @@
 package com.loopers.domain.point;
 
-import com.loopers.domain.user.User;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -15,25 +14,41 @@ import java.util.Optional;
 public class PointService {
     private final PointRepository pointRepository;
 
-    public Point chargePoint(User user, int amount) {
-        // Point Service에서 user를 Null 체크할 이유가 있을까?
-        if(user == null) {
+    @Transactional
+    public Point initPoint(Long userId) {
+        if(userId == null) {
             throw new CoreException(ErrorType.NOT_FOUND, "유저 정보가 없습니다.");
         }
+        Optional<Point> point = pointRepository.findBy(userId);
+        if(point.isPresent()) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "포인트 정보가 없습니다.");
+        }
 
-        // 포인트 충전한 후에 다시 포인트 내역을 조회해서 잔액을 조회하는 것 보다 그냥 잔액을 초기에 조회해서 컬럼으로 넣는게 더 효율적일 것 같음
-        Optional<Point> lastPoint = pointRepository.findLastByUser(user);
-        int currentBalance = lastPoint.map(Point::getBalance).orElse(0);
-
-        return Point.charge(user, amount, currentBalance);
+        return pointRepository.save(Point.init(userId));
     }
 
-    public Optional<Point> getLastPoint(User user) {
-        if(user == null) {
+    @Transactional
+    public Point chargePoint(Long userId, int amount) {
+        // Point Service에서 user를 Null 체크할 이유가 있을까?
+        if(userId == null) {
+            throw new CoreException(ErrorType.NOT_FOUND, "유저 정보가 없습니다.");
+        }
+        Point point = pointRepository.findBy(userId).orElseGet(() ->
+            initPoint(userId) // 유저가 처음 포인트를 충전하는 경우
+        );
+
+        point.charge(amount);
+
+        return point;
+    }
+
+    @Transactional
+    public Optional<Point> getPoint(Long userId) {
+        if(userId == null) {
             return Optional.empty();
         }
 
-        return pointRepository.findLastByUser(user);
+        return pointRepository.findBy(userId);
     }
 
 }

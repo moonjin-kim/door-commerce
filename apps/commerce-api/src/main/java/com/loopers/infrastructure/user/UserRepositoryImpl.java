@@ -21,4 +21,7 @@ public class UserRepositoryImpl implements UserRepository {
     public Optional<User> findBy(String account) {
         return userJpaRepository.findByAccount(account);
     }
+    public Optional<User> findBy(Long userId) {
+        return userJpaRepository.findById(userId);
+    }
 }
