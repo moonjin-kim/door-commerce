@@ -48,7 +48,7 @@ class PointFacadeTest {
             var chargeRequest = new PointV1RequestDto.PointChargeRequest(1000);
 
             //when
-            PointBalanceInfo result = pointFacade.chargePoint(user.getAccount(), chargeRequest);
+            PointInfo result = pointFacade.chargePoint(user.getAccount(), chargeRequest);
 
             //then
             assertAll(
@@ -69,7 +69,7 @@ class PointFacadeTest {
             var chargeRequest = new PointV1RequestDto.PointChargeRequest(1000);
 
             //when
-            PointBalanceInfo result = pointFacade.chargePoint(user.getAccount(), chargeRequest);
+            PointInfo result = pointFacade.chargePoint(user.getAccount(), chargeRequest);
 
             //then
             assertAll(
@@ -111,7 +111,7 @@ class PointFacadeTest {
             );
 
             //when
-            PointBalanceInfo result = pointFacade.getBalance(user.getAccount());
+            PointInfo result = pointFacade.getBalance(user.getAccount());
 
             //then
             assertAll(
