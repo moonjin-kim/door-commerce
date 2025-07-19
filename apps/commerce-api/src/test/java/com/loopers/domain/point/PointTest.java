@@ -25,7 +25,7 @@ class PointTest {
             int balance = 0;
 
             //when
-            Point point = Point.charge(user, amount, balance);
+            Point point = Point.charge(user.getId(), amount, balance);
 
             //then
             assertThat(point.getAmount()).isEqualTo(amount);
@@ -43,11 +43,11 @@ class PointTest {
 
             //when
             CoreException result = assertThrows(CoreException.class, () -> {
-                Point.charge(user, amount, balance);
+                Point.charge(user.getId(), amount, balance);
             });
 
             //then
-            assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+            assertThat(result.getErrorType()).isEqualTo(ErrorType.INVALID_POINT_AMOUNT);
         }
     }
 }

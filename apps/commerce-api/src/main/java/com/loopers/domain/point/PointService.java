@@ -1,6 +1,8 @@
 package com.loopers.domain.point;
 
 import com.loopers.domain.user.User;
+import com.loopers.support.error.CoreException;
+import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +17,9 @@ public class PointService {
 
     public Point chargePoint(User user, int amount) {
         // Point Service에서 user를 Null 체크할 이유가 있을까?
+        if(user == null) {
+            throw new CoreException(ErrorType.NOT_FOUND, "유저 정보가 없습니다.");
+        }
 
         // 포인트 충전한 후에 다시 포인트 내역을 조회해서 잔액을 조회하는 것 보다 그냥 잔액을 초기에 조회해서 컬럼으로 넣는게 더 효율적일 것 같음
         Optional<Point> lastPoint = pointRepository.findLastByUser(user);

@@ -81,9 +81,28 @@ public class PointServiceIntegrationTest {
             );
         }
 
-        @DisplayName("0원 이하의 포인트를 충전 요청하면, BAD_REQUEST 예외가 발생한다.")
+        @DisplayName("유저가 null이면, NOT_FOUND 예외가 발생한다.")
         @Test
-        void throwBadRequest_whenZeroPoint(){
+        void throwNotFound_whenNullUser(){
+            //given
+            User user = userJpaRepository.save(UserFixture.createMember());
+            Point chargedPoint = pointJpaRepository.save(
+                    Point.charge(user, 1000, 0)
+            );
+            int amount = 10000;
+
+            //when
+            CoreException exception = assertThrows(CoreException.class, () -> {
+                pointService.chargePoint(null, amount);
+            });
+
+            //then
+            assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
+        }
+
+        @DisplayName("0원 이하의 포인트를 충전 요청하면, INVALID_POINT_AMOUNT 예외가 발생한다.")
+        @Test
+        void throwInvalidPointAmount_whenZeroPoint(){
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
             int amount = 0;
@@ -94,7 +113,7 @@ public class PointServiceIntegrationTest {
             });
 
             //then
-            assertThat(exception.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+            assertThat(exception.getErrorType()).isEqualTo(ErrorType.INVALID_POINT_AMOUNT);
         }
     }
 
