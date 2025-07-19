@@ -84,16 +84,16 @@ public class PointServiceIntegrationTest {
         void returnPoint(){
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
-            int amount = 10000;
+            PointCommand.Charge chargeCommand = PointCommand.Charge.of(user.getId(), 10000);
 
             //when
-            Point result = pointService.chargePoint(user.getId(), amount);
+            Point result = pointService.chargePoint(chargeCommand);
 
             //then
             assertAll(
                     () -> assertThat(result).isNotNull(),
                     () -> assertThat(result.getUserId()).isEqualTo(user.getId()),
-                    () -> assertThat(result.getBalance()).isEqualTo(amount)
+                    () -> assertThat(result.getBalance()).isEqualTo(chargeCommand.amount())
             );
         }
 
@@ -108,16 +108,16 @@ public class PointServiceIntegrationTest {
             Point chargedPoint = pointJpaRepository.save(
                     point
             );
-            int amount = 10000;
+            PointCommand.Charge chargeCommand = PointCommand.Charge.of(user.getId(), 10000);
 
             //when
-            Point result = pointService.chargePoint(user.getId(), amount);
+            Point result = pointService.chargePoint(chargeCommand);
 
             //then
             assertAll(
                     () -> assertThat(result).isNotNull(),
                     () -> assertThat(result.getUserId()).isEqualTo(user.getId()),
-                    () -> assertThat(result.getBalance()).isEqualTo(point.balance + amount)
+                    () -> assertThat(result.getBalance()).isEqualTo(point.balance + chargeCommand.amount())
             );
         }
 
@@ -131,11 +131,11 @@ public class PointServiceIntegrationTest {
             Point chargedPoint = pointJpaRepository.save(
                     point
             );
-            int amount = 10000;
+            PointCommand.Charge chargeCommand = PointCommand.Charge.of(null, 10000);
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                pointService.chargePoint(null, amount);
+                pointService.chargePoint(chargeCommand);
             });
 
             //then
@@ -147,15 +147,36 @@ public class PointServiceIntegrationTest {
         void throwInvalidPointAmount_whenZeroPoint(){
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
-            int amount = 0;
+            PointCommand.Charge chargeCommand = PointCommand.Charge.of(user.getId(), 0);
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                pointService.chargePoint(user.getId(), amount);
+                pointService.chargePoint(chargeCommand);
             });
 
             //then
             assertThat(exception.getErrorType()).isEqualTo(ErrorType.INVALID_POINT_AMOUNT);
+        }
+
+
+        @DisplayName("포인트가 존재하지 않을때, 포인트가 생성된 후 포인트를 충전한다.")
+        @Test
+        void saveNewPointAndCharge_whenPointExist(){
+            //given
+            User user = userJpaRepository.save(UserFixture.createMember());
+            int amount = 1000;
+            PointCommand.Charge chargeCommand = PointCommand.Charge.of(user.getId(), amount);
+
+            //when
+            Point result = pointService.chargePoint(chargeCommand);
+
+            //then
+            Optional<Point> savedPoint = pointJpaRepository.findByUserId(user.getId());
+            assertAll(
+                    () -> assertThat(savedPoint).isPresent(),
+                    () -> assertThat(savedPoint.get().getUserId()).isEqualTo(user.getId()),
+                    () -> assertThat(savedPoint.get().getBalance()).isEqualTo(amount)
+            );
         }
     }
 
@@ -183,21 +204,6 @@ public class PointServiceIntegrationTest {
             //then
             assertThat(result.balance).isEqualTo(point.balance);
         }
-
-//        @DisplayName("보유 포인트가 존재하지 않으면, null이 반환된다.")
-//        @Test
-//        void returnNullPoint_whenValidIdIsProvidedAndNoChargeHistory(){
-//            //given
-//            User user = userJpaRepository.save(
-//                    UserFixture.createMember()
-//            );
-//
-//            //when
-//            Optional<Point> result = pointService.getLastPoint(user);
-//
-//            //then
-//            assertThat(result.isPresent()).isFalse();
-//        }
 
         @DisplayName("존재하지 않는 유저이면, null이 반환된다.")
         @Test

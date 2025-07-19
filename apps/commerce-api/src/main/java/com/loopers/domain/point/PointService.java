@@ -28,26 +28,22 @@ public class PointService {
     }
 
     @Transactional
-    public Point chargePoint(Long userId, int amount) {
+    public Point chargePoint(PointCommand.Charge chargeCommand) {
         // Point Service에서 user를 Null 체크할 이유가 있을까?
-        if(userId == null) {
+        if(chargeCommand.userId() == null) {
             throw new CoreException(ErrorType.NOT_FOUND, "유저 정보가 없습니다.");
         }
-        Point point = pointRepository.findBy(userId).orElseGet(() ->
-            initPoint(userId) // 유저가 처음 포인트를 충전하는 경우
+        Point point = pointRepository.findBy(chargeCommand.userId()).orElseGet(() ->
+            initPoint(chargeCommand.userId()) // 유저가 처음 포인트를 충전하는 경우
         );
 
-        point.charge(amount);
+        point.charge(chargeCommand.amount());
 
         return point;
     }
 
     @Transactional
     public Optional<Point> getPoint(Long userId) {
-        if(userId == null) {
-            return Optional.empty();
-        }
-
         return pointRepository.findBy(userId);
     }
 

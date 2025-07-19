@@ -23,7 +23,7 @@ public class PointFacade {
                 new CoreException(ErrorType.NOT_FOUND, "[account = " + userId + "] 존재하지 않는 회원입니다.")
         );
 
-        Point point = pointService.chargePoint(user.getId(), chargeRequest.amount());
+        Point point = pointService.chargePoint(chargeRequest.toCommand(user.getId()));
 
         return PointInfo.from(point);
     }

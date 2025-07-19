@@ -144,7 +144,7 @@ class PointFacadeTest {
             assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
         }
 
-        @DisplayName("유저의 포인트가 없는 경우, 새로 생성되고 조회된다.")
+        @DisplayName("유저의 포인트가 없는 경우, 포인트가 새로 생성되고 조회된다.")
         @Test
         void savePoint_whenPointDoesntExist(){
             //given
