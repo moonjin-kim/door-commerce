@@ -18,7 +18,7 @@ public class PointV1Controller implements PointV1ApiSpec{
             @RequestHeader("X-USER-ID") String account,
             @RequestBody PointV1RequestDto.PointChargeRequest body
     ) {
-        PointInfo info = pointFacade.chargePoint(account, body);
+        PointInfo info = pointFacade.charge(account, body);
         PointV1ResponseDto.PointBalanceResponse response = PointV1ResponseDto.PointBalanceResponse.from(info);
         return ApiResponse.success(response);
     }

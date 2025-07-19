@@ -48,7 +48,7 @@ class PointFacadeTest {
             var chargeRequest = new PointV1RequestDto.PointChargeRequest(1000);
 
             //when
-            PointInfo result = pointFacade.chargePoint(user.getAccount(), chargeRequest);
+            PointInfo result = pointFacade.charge(user.getAccount(), chargeRequest);
 
             //then
             assertAll(
@@ -69,7 +69,7 @@ class PointFacadeTest {
             var chargeRequest = new PointV1RequestDto.PointChargeRequest(1000);
 
             //when
-            PointInfo result = pointFacade.chargePoint(user.getAccount(), chargeRequest);
+            PointInfo result = pointFacade.charge(user.getAccount(), chargeRequest);
 
             //then
             assertAll(
@@ -87,7 +87,7 @@ class PointFacadeTest {
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                pointFacade.chargePoint("human", chargeRequest);
+                pointFacade.charge("human", chargeRequest);
             });
 
             //then

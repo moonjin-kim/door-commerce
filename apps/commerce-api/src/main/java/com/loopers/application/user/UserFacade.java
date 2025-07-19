@@ -17,9 +17,9 @@ public class UserFacade {
         return UserInfo.from(userService.registerMember(request));
     }
 
-    public UserInfo getMe(String account) {
-        User user = userService.getUser(account).orElseThrow(() ->
-                new CoreException(ErrorType.NOT_FOUND, "[account = " + account + "] 존재하지 않는 회원입니다.")
+    public UserInfo getMe(String userId) {
+        User user = userService.getUser(userId).orElseThrow(() ->
+                new CoreException(ErrorType.NOT_FOUND, "[account = " + userId + "] 존재하지 않는 회원입니다.")
         );
 
         return UserInfo.from(user);
