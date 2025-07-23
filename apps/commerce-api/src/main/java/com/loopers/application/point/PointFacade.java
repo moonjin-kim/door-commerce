@@ -18,26 +18,25 @@ public class PointFacade {
     private final PointService pointService;
     private final UserService userService;
 
-    public PointBalanceInfo chargePoint(String account, PointV1RequestDto.PointChargeRequest chargeRequest) {
-        User user = userService.getUser(account).orElseThrow(() ->
-                new CoreException(ErrorType.NOT_FOUND, "[account = " + account + "] 존재하지 않는 회원입니다.")
+    public PointInfo charge(Long userId, PointV1RequestDto.PointChargeRequest chargeRequest) {
+        User user = userService.getUser(userId).orElseThrow(() ->
+                new CoreException(ErrorType.NOT_FOUND, "[account = " + userId + "] 존재하지 않는 회원입니다.")
         );
 
-        Point point = pointService.chargePoint(user, chargeRequest.amount());
+        Point point = pointService.chargePoint(chargeRequest.toCommand(user.getId()));
 
-        return PointBalanceInfo.from(user, point);
+        return PointInfo.from(point);
     }
 
-    public PointBalanceInfo getBalance(String account) {
-        User user = userService.getUser(account).orElseThrow(() ->
-                new CoreException(ErrorType.NOT_FOUND, "[account = " + account + "] 존재하지 않는 회원입니다.")
+    public PointInfo getBalance(Long userId) {
+        User user = userService.getUser(userId).orElseThrow(() ->
+                new CoreException(ErrorType.NOT_FOUND, "[account = " + userId + "] 존재하지 않는 회원입니다.")
         );
 
-        Optional<Point> lastPoint = pointService.getLastPoint(user);
-        if (lastPoint.isEmpty()) {
-            return new PointBalanceInfo(user.getAccount(), 0);
-        }
+        Point point = pointService.getPoint(user.getId()).orElseGet(() ->
+                pointService.initPoint(user.getId())
+        );
 
-        return PointBalanceInfo.from(user, lastPoint.get());
+        return PointInfo.from(point);
     }
 }

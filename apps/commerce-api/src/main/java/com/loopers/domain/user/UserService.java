@@ -24,8 +24,8 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<User> getUser(String account) {
-        return userRepository.findBy(account);
+    public Optional<User> getUser(Long userId) {
+        return userRepository.findBy(userId);
     }
 
     private void checkDuplicateAccount(String account) {

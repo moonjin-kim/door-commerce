@@ -22,32 +22,33 @@ class PointTest {
             //given
             User user = UserFixture.createMember();
             int amount = 10000;
-            int balance = 0;
+
+            Point point = Point.init(user.getId());
+            point.charge(amount);
 
             //when
-            Point point = Point.charge(user, amount, balance);
+            point.charge(amount);
 
             //then
-            assertThat(point.getAmount()).isEqualTo(amount);
-            assertThat(point.getBalance()).isEqualTo(amount + balance);
-            assertThat(point.getStatus()).isEqualTo(PointStatus.CHARGE);
+            assertThat(point.getBalance()).isEqualTo(20000);
         }
 
-        @DisplayName("0 이하의 정수로 포인트를 충전 시 실패한다.")
+        @DisplayName("0 이하의 정수로 포인트를 충전 시 INVALID_POINT_AMOUNT 예외가 반환된다.")
         @Test
-        void throwsBadRequestException_whenAmountLessThanZero(){
+        void throwsInvalidPointAmountException_whenAmountLessThanZero(){
             //given
             User user = UserFixture.createMember();
             int amount = 0;
-            int balance = 0;
+
+            Point point = Point.init(user.getId());
 
             //when
             CoreException result = assertThrows(CoreException.class, () -> {
-                Point.charge(user, amount, balance);
+                point.charge(amount);
             });
 
             //then
-            assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+            assertThat(result.getErrorType()).isEqualTo(ErrorType.INVALID_POINT_AMOUNT);
         }
     }
 }

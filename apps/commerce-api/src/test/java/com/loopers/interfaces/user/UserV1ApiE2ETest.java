@@ -130,7 +130,7 @@ class UserV1ApiE2ETest {
             );
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("X-USER-ID", user.getAccount());
+            headers.set("X-USER-ID", String.valueOf(user.getId()));
 
             //when
             ParameterizedTypeReference<ApiResponse<UserV1ResponseDto.UserResponse>> responseType = new ParameterizedTypeReference<>() {

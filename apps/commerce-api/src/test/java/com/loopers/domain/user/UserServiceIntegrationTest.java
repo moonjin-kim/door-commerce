@@ -94,7 +94,7 @@ class UserServiceIntegrationTest {
             );
 
             //when
-            User result = userService.getUser(user.getAccount()).orElse(null);
+            User result = userService.getUser(user.getId()).orElse(null);
 
             //then
 
@@ -115,7 +115,7 @@ class UserServiceIntegrationTest {
             //given
 
             //when
-            Optional<User> result = userService.getUser("human");
+            Optional<User> result = userService.getUser(1L);
 
             // assert
             assertThat(result.isPresent()).isFalse();

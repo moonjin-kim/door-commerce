@@ -12,8 +12,14 @@ import java.util.Optional;
 @Component
 public class PointRepositoryImpl implements PointRepository {
     private final PointJpaRepository pointJpaRepository;
+
     @Override
-    public Optional<Point> findLastByUser(User user) {
-        return pointJpaRepository.findFirstByUserOrderByIdDesc(user);
+    public Point save(Point point) {
+        return pointJpaRepository.save(point);
+    }
+
+    @Override
+    public Optional<Point> findBy(Long userId) {
+        return pointJpaRepository.findByUserId(userId);
     }
 }

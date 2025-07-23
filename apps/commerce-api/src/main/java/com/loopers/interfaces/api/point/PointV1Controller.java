@@ -1,6 +1,6 @@
 package com.loopers.interfaces.api.point;
 
-import com.loopers.application.point.PointBalanceInfo;
+import com.loopers.application.point.PointInfo;
 import com.loopers.application.point.PointFacade;
 import com.loopers.interfaces.api.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +15,10 @@ public class PointV1Controller implements PointV1ApiSpec{
     @PostMapping("/charge")
     @Override
     public ApiResponse<PointV1ResponseDto.PointBalanceResponse> register(
-            @RequestHeader("X-USER-ID") String account,
+            @RequestHeader("X-USER-ID") Long userId,
             @RequestBody PointV1RequestDto.PointChargeRequest body
     ) {
-        PointBalanceInfo info = pointFacade.chargePoint(account, body);
+        PointInfo info = pointFacade.charge(userId, body);
         PointV1ResponseDto.PointBalanceResponse response = PointV1ResponseDto.PointBalanceResponse.from(info);
         return ApiResponse.success(response);
     }
@@ -26,8 +26,8 @@ public class PointV1Controller implements PointV1ApiSpec{
 
     @GetMapping("")
     @Override
-    public ApiResponse<PointV1ResponseDto.PointBalanceResponse> getBalance(@RequestHeader("X-USER-ID") String account) {
-        PointBalanceInfo info = pointFacade.getBalance(account);
+    public ApiResponse<PointV1ResponseDto.PointBalanceResponse> getBalance(@RequestHeader("X-USER-ID") Long userId) {
+        PointInfo info = pointFacade.getBalance(userId);
         PointV1ResponseDto.PointBalanceResponse response = PointV1ResponseDto.PointBalanceResponse.from(info);
         return ApiResponse.success(response);
     }

@@ -64,7 +64,7 @@ public class PointV1ApiE2ETest {
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("X-USER-ID", String.valueOf(user.getAccount()));
+            headers.set("X-USER-ID", String.valueOf(user.getId()));
 
             //when
             ParameterizedTypeReference<ApiResponse<PointV1ResponseDto.PointBalanceResponse>> responseType = new ParameterizedTypeReference<>() {
@@ -91,13 +91,16 @@ public class PointV1ApiE2ETest {
             User user = userJpaRepository.save(
                     UserFixture.createMember()
             );
+
+            int amount = 10000;
             Point point = pointJpaRepository.save(
-                    Point.charge(user, 10000, 0)
+                    Point.init(user.getId())
             );
-            var request = new PointV1RequestDto.PointChargeRequest(1000);
+            var request = new PointV1RequestDto.PointChargeRequest(amount);
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("X-USER-ID", String.valueOf(user.getAccount()));
+            headers.set("X-USER-ID", String.valueOf(user.getId()));
 
             //when
             ParameterizedTypeReference<ApiResponse<PointV1ResponseDto.PointBalanceResponse>> responseType = new ParameterizedTypeReference<>() {
@@ -113,7 +116,7 @@ public class PointV1ApiE2ETest {
             //then
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().balance()).isEqualTo(point.getBalance() + request.amount())
+                    () -> assertThat(response.getBody().data().balance()).isEqualTo(point.getBalance() + amount)
             );
         }
 
@@ -158,12 +161,17 @@ public class PointV1ApiE2ETest {
             User user = userJpaRepository.save(
                     UserFixture.createMember()
             );
-            Point point = pointJpaRepository.save(
-                    Point.charge(user, 10000, 0)
+
+            // 충전 이력을 생성
+            Point point = Point.init(user.getId());
+            point.charge(1000);
+            Point chargePoint = pointJpaRepository.save(
+                    point
             );
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("X-USER-ID", String.valueOf(user.getAccount()));
+            headers.set("X-USER-ID", String.valueOf(user.getId()));
 
             //when
             ParameterizedTypeReference<ApiResponse<PointV1ResponseDto.PointBalanceResponse>> responseType = new ParameterizedTypeReference<>() {
@@ -179,7 +187,7 @@ public class PointV1ApiE2ETest {
             //then
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().balance()).isEqualTo(point.getBalance())
+                    () -> assertThat(response.getBody().data().balance()).isEqualTo(chargePoint.getBalance())
             );
         }
 
@@ -192,7 +200,7 @@ public class PointV1ApiE2ETest {
             );
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("X-USER-ID", String.valueOf(user.getAccount()));
+            headers.set("X-USER-ID", String.valueOf(user.getId()));
 
             //when
             ParameterizedTypeReference<ApiResponse<PointV1ResponseDto.PointBalanceResponse>> responseType = new ParameterizedTypeReference<>() {
