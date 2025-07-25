@@ -46,6 +46,7 @@ classDiagram
         +Long id
         -User user
         -List~OrderItem~ items
+        +Long usedPoint
         +Long totalPrice
         order(): void
         cancel(): void
@@ -74,8 +75,8 @@ classDiagram
         +Long id
         -User user
         +int amount
-        increse(int point): void
-        decrease(int point): void
+        charge(int amount): void
+        use(int amount): void
     }
     
     class PointHistory {
@@ -101,5 +102,4 @@ Order "1" --* "1..*" Payment
 
 OrderItem "1" -- "1" Product
 
-PointHistory -- "0..1" Order
 ```
