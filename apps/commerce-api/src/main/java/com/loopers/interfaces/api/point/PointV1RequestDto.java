@@ -1,0 +1,16 @@
+package com.loopers.interfaces.api.point;
+
+import com.loopers.domain.point.PointCommand;
+import jakarta.validation.constraints.NotNull;
+
+public class PointV1RequestDto {
+    public record PointChargeRequest(
+            @NotNull
+            int amount
+    ) {
+
+        public PointCommand.Charge toCommand(Long userId) {
+            return PointCommand.Charge.of(userId, amount);
+        }
+    }
+}
