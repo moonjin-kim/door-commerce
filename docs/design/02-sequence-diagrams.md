@@ -36,7 +36,7 @@ sequenceDiagram
     ProductService->>+ProductRepository: findAll(page, size, sort, brandId)
     ProductRepository-->>-ProductService: return products
     ProductService->>+LikeService: findAllBy(productIds)
-    LikeService-->>-ProductService: return likeCountsMap
+    LikeService-->>-ProductService: return likeCounts
     alt 로그인 되지 않은 유저일 경우
         ProductService-->>ProductController: return productInfos
     else 로그인 된 유저일 경우
