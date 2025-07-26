@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.NaturalId;
 
 import java.time.LocalDate;
 
@@ -15,12 +16,15 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
 
-    @Column(length = 100, unique = true, nullable = false)
-    String account;
+//    @Column(length = 100, unique = true, nullable = false)
+    @Embedded
+    Account account;
     @Column(length = 100, unique = true, nullable = false)
     String name;
     @Column(length = 100, unique = true, nullable = false)
-    String email;
+    @Embedded
+    @NaturalId
+    Email email;
     @Column
     LocalDate birthday;
     @Enumerated(EnumType.STRING)
@@ -33,11 +37,12 @@ public class User extends BaseEntity {
         UserValidator.validateName(command.name());
         user.name = command.name();
 
-        UserValidator.validateAccount(command.account());
-        user.account = command.account();
+//        UserValidator.validateAccount(command.account());
+        user.account = new Account(command.account());
 
-        UserValidator.validateEmail(command.email());
-        user.email = command.email();
+
+        user.email = new Email(command.email());
+//        user.email = command.email();
 
         UserValidator.validateBirthday(command.birthday());
         user.birthday = LocalDate.parse(command.birthday());

@@ -1,5 +1,6 @@
 package com.loopers.infrastructure.user;
 
+import com.loopers.domain.user.Account;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<User> findBy(String account) {
-        return userJpaRepository.findByAccount(account);
+        return userJpaRepository.findByAccount(new Account(account));
     }
     public Optional<User> findBy(Long userId) {
         return userJpaRepository.findById(userId);

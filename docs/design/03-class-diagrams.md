@@ -4,7 +4,7 @@ classDiagram
 
     class User {
         +Long id
-        +String account
+        +Account account
         +String name
         +Email email
         +Gender gender
@@ -14,13 +14,22 @@ classDiagram
         -String address
         +validate(): boolean
     }
+    class Account {
+        +String address
+    }
     class Product {
         +Long id
         +String name
         +Long price
-        +varchar status
+        +ProdcutStatus status
         -Brand brand
         -Stock stock
+    }
+    class ProductStatus{
+        <<enum>>
+        SALE
+        SOLD_OUT
+        DISCONTINUED
     }
     
     class Stock {
@@ -33,7 +42,14 @@ classDiagram
 
     class Brand {
         +Long id
+        +BrandStatus status
         +String name
+    }
+    class BrandStatus {
+        <<enum>>
+        OPEN
+        PREPARING
+        SUSPENDED
     }
 
     class Like {
@@ -48,9 +64,15 @@ classDiagram
         -List~OrderItem~ items
         +Long usedPoint
         +Long totalPrice
-        order(): void
-        cancel(): void
-        getTotalPrice(): Long
+        +OrderStatus status
+        +order(): void
+        +cancel(): void
+        +getTotalPrice(): Long
+    }
+    class OrderStatus {
+        <<enum>>
+        DONE
+        CANCELED
     }
     
     class Payment {
@@ -59,7 +81,7 @@ classDiagram
         +Long amount
         +PaymentMethod method
         +PaymentStatus status
-        payment(): void
+        +payment(): void
     }
 
     class OrderItem {
@@ -68,7 +90,7 @@ classDiagram
         -String productName
         +Long orderPrice
         +int quantity
-        getTotalPrice(): Long
+        +getTotalPrice(): Long
     }
     
     class Point {
@@ -86,19 +108,30 @@ classDiagram
         +int amount
         +TransactionType type
     }
+    class TransactionType {
+        <<enum>>
+        CHARGE
+        USE
+    }
 User "1" --* "1" Point
 User "1" -- "0..*" Order
 User "1" -- "0..*" Like
 User "1" -- "1" Email
+User "1" -- "1" Account
 
 Product "1" -- "1" Stock
 Product "1" -- "0..*" Like
 Product "1" --o "1" Brand
+Product "1" --o "1" ProductStatus
+
+Brand "1" -- "1" BrandStatus
 
 Point "1" --* "0..*" PointHistory
+PointHistory "1" -- "1" TransactionType
 
 Order "1" --* "1..*" OrderItem
 Order "1" --* "1..*" Payment
+Order "1" --* "1" OrderStatus
 
 OrderItem "1" -- "1" Product
 

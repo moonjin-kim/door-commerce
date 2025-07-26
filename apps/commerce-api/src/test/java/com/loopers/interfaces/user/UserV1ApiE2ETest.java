@@ -147,9 +147,9 @@ class UserV1ApiE2ETest {
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
                     () -> assertThat(response.getBody().data().id()).isEqualTo(user.getId()),
-                    () -> assertThat(response.getBody().data().account()).isEqualTo(user.getAccount()),
+                    () -> assertThat(response.getBody().data().account()).isEqualTo(user.getAccount().value()),
                     () -> assertThat(response.getBody().data().birthday()).isEqualTo(user.getBirthday()),
-                    () -> assertThat(response.getBody().data().email()).isEqualTo(user.getEmail()),
+                    () -> assertThat(response.getBody().data().email()).isEqualTo(user.getEmail().value()),
                     () -> assertThat(response.getBody().data().gender()).isEqualTo(UserV1ResponseDto.GenderResponse.from(user.getGender()))
             );
         }

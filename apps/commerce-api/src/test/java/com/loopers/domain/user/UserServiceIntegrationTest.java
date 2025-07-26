@@ -56,8 +56,8 @@ class UserServiceIntegrationTest {
             assertAll(
                     () -> assertThat(savedUser.getId()).isEqualTo(user.getId()),
                     () -> assertThat(savedUser.getName()).isEqualTo(user.getName()),
-                    () -> assertThat(savedUser.getAccount()).isEqualTo(request.account()),
-                    () -> assertThat(savedUser.getEmail()).isEqualTo(request.email()),
+                    () -> assertThat(savedUser.getAccount().value()).isEqualTo(request.account()),
+                    () -> assertThat(savedUser.getEmail().value()).isEqualTo(request.email()),
                     () -> assertThat(savedUser.getBirthday()).isEqualTo(request.birthday()),
                     () -> assertThat(savedUser.getGender()).isEqualTo(user.gender)
             );
@@ -102,8 +102,8 @@ class UserServiceIntegrationTest {
                     () -> assertThat(result).isNotNull(),
                     () -> assertThat(result.getId()).isEqualTo(user.getId()),
                     () -> assertThat(result.getName()).isEqualTo(user.getName()),
-                    () -> assertThat(result.getAccount()).isEqualTo(user.getAccount()),
-                    () -> assertThat(result.getEmail()).isEqualTo(user.getEmail()),
+                    () -> assertThat(result.getAccount().value()).isEqualTo(user.getAccount().value()),
+                    () -> assertThat(result.getEmail().value()).isEqualTo(user.getEmail().value()),
                     () -> assertThat(result.getBirthday()).isEqualTo(user.getBirthday()),
                     () -> assertThat(result.getGender()).isEqualTo(user.getGender())
             );

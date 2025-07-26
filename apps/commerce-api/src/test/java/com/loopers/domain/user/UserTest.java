@@ -28,8 +28,8 @@ class UserTest {
             //then
             assertThat(user.getId()).isNotNull();
             assertThat(user.getName()).isEqualTo(request.name());
-            assertThat(user.getAccount()).isEqualTo(request.account());
-            assertThat(user.getEmail()).isEqualTo(request.email());
+            assertThat(user.getAccount().value()).isEqualTo(request.account());
+            assertThat(user.getEmail().value()).isEqualTo(request.email());
             assertThat(user.getBirthday()).isEqualTo(request.birthday());
             assertThat(user.getGender()).isEqualTo(request.gender());
 

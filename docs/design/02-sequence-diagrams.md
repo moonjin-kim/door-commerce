@@ -91,14 +91,8 @@ sequenceDiagram
     alt 상품이 존재하지 않을경우
         ProductReader->>LikeService: throw NotFoundException()
     else 상품이 존재할 경우
-        LikeService->>LikeRepository: exist(userId, productId)
-        alt 좋아요가 존재하지 않을 경우
-            LikeService->>LikeRepository: save()
-            LikeRepository-->>LikeService: return like
-        
-        else 이미 활성 상태일 경우 (멱등성)
-            LikeRepository-->>LikeService: return like
-    end
+        LikeService->>LikeRepository: save()
+        LikeRepository-->>LikeService: return like
 
     end
 ```
@@ -109,7 +103,6 @@ sequenceDiagram
     participant LikeController
     participant LikeService
     participant ProductService
-    participant ProductCommand
     participant LikeRepository
     
     User->>LikeController: DELETE /products/{productId}/likes
@@ -173,11 +166,11 @@ sequenceDiagram
     User->>OrderController: POST /orders
     OrderController->>+OrderService: createOrder(orderRequest)
     OrderService->>+PointService: usingPoint(userId, totalPrice)
-    alt 포인트 잔액이 부족하면
+    alt 포인트 잔액이 부족하면(롤백 발생)
         PointService-->>OrderService: throw InsufficientPointException()
-    else 포인트 잔액이 충분하면
+    else 포인트 잔액이 충분하면(롤백 발생)
         OrderService->>ProductService: deductStocks(orderItems)
-        alt 상품의 재고가 부족하여 차감되지 않은 경우
+        alt 상품의 재고가 부족하여 차감되지 않은 경우(롤백 발생)
             ProductService-->>OrderService: 400 Bad Request (OutOfStockException)
         else 상품의 재고가 존재하여 차감된 경우
             OrderService->>+OrderRepository: save(order)
