@@ -9,8 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public interface BrandV1ApiSpec
 {
     @Operation(
-            summary = "회원조회",
-            description = "ID로 유저를 조회합니다."
+            summary = "브랜드 조회",
+            description = "ID로 브랜드를 조회합니다."
     )
-    ApiResponse<UserV1ResponseDto.User> get(Long userId);
+    ApiResponse<BrandV1ResponseDto.Brand> get(Long brandId);
 }

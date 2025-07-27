@@ -1,6 +1,6 @@
 package com.loopers.interfaces.api.point;
 
-import com.loopers.application.point.PointInfo;
+import com.loopers.application.point.PointResult;
 import com.loopers.application.point.PointFacade;
 import com.loopers.interfaces.api.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ public class PointV1Controller implements PointV1ApiSpec{
             @RequestHeader("X-USER-ID") Long userId,
             @RequestBody PointV1RequestDto.PointChargeRequest body
     ) {
-        PointInfo info = pointFacade.charge(userId, body);
+        PointResult info = pointFacade.charge(userId, body);
         PointV1ResponseDto.PointBalance response = PointV1ResponseDto.PointBalance.from(info);
         return ApiResponse.success(response);
     }
@@ -27,7 +27,7 @@ public class PointV1Controller implements PointV1ApiSpec{
     @GetMapping("")
     @Override
     public ApiResponse<PointV1ResponseDto.PointBalance> getBalance(@RequestHeader("X-USER-ID") Long userId) {
-        PointInfo info = pointFacade.getBalance(userId);
+        PointResult info = pointFacade.getBalance(userId);
         PointV1ResponseDto.PointBalance response = PointV1ResponseDto.PointBalance.from(info);
         return ApiResponse.success(response);
     }

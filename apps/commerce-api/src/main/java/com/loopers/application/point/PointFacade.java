@@ -10,25 +10,23 @@ import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
 @RequiredArgsConstructor
 @Component
 public class PointFacade {
     private final PointService pointService;
     private final UserService userService;
 
-    public PointInfo charge(Long userId, PointV1RequestDto.PointChargeRequest chargeRequest) {
+    public PointResult charge(Long userId, PointV1RequestDto.PointChargeRequest chargeRequest) {
         User user = userService.getUser(userId).orElseThrow(() ->
                 new CoreException(ErrorType.NOT_FOUND, "[account = " + userId + "] 존재하지 않는 회원입니다.")
         );
 
         Point point = pointService.chargePoint(chargeRequest.toCommand(user.getId()));
 
-        return PointInfo.from(point);
+        return PointResult.from(point);
     }
 
-    public PointInfo getBalance(Long userId) {
+    public PointResult getBalance(Long userId) {
         User user = userService.getUser(userId).orElseThrow(() ->
                 new CoreException(ErrorType.NOT_FOUND, "[account = " + userId + "] 존재하지 않는 회원입니다.")
         );
@@ -37,6 +35,6 @@ public class PointFacade {
                 pointService.initPoint(user.getId())
         );
 
-        return PointInfo.from(point);
+        return PointResult.from(point);
     }
 }

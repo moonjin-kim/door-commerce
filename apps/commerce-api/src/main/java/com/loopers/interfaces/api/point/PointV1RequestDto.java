@@ -10,7 +10,7 @@ public class PointV1RequestDto {
     ) {
 
         public PointCommand.Charge toCommand(Long userId) {
-            return PointCommand.Charge.of(userId, amount);
+            return new PointCommand.Charge(userId, amount);
         }
     }
 }
