@@ -15,19 +15,19 @@ public class UserV1Controller implements UserV1ApiSpec {
 
     @PostMapping("")
     @Override
-    public ApiResponse<UserV1ResponseDto.UserResponse> register(
+    public ApiResponse<UserV1ResponseDto.User> register(
             @RequestBody UserV1RequestDto.Register body
     ) {
         UserInfo info = userFacade.registerUser(body);
-        return ApiResponse.success(UserV1ResponseDto.UserResponse.from(info));
+        return ApiResponse.success(UserV1ResponseDto.User.from(info));
     }
 
     @GetMapping("/me")
     @Override
-    public ApiResponse<UserV1ResponseDto.UserResponse> me(
+    public ApiResponse<UserV1ResponseDto.User> me(
             @RequestHeader("X-USER-ID") Long userId
     ) {
         UserInfo info = userFacade.getMe(userId);
-        return ApiResponse.success(UserV1ResponseDto.UserResponse.from(info));
+        return ApiResponse.success(UserV1ResponseDto.User.from(info));
     }
 }

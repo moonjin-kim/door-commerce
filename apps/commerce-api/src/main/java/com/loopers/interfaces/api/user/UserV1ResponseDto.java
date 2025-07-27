@@ -8,15 +8,15 @@ import com.loopers.support.error.ErrorType;
 import java.time.LocalDate;
 
 public class UserV1ResponseDto {
-    public record UserResponse(
+    public record User(
             Long id,
             String account,
             String email,
             LocalDate birthday,
             GenderResponse gender
     ){
-        public static UserResponse from(UserInfo info) {
-            return new UserResponse(
+        public static User from(UserInfo info) {
+            return new User(
                     info.id(),
                     info.account(),
                     info.email(),

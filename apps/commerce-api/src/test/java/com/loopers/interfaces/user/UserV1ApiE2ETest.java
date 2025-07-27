@@ -63,9 +63,9 @@ class UserV1ApiE2ETest {
             );
 
             //when
-            ParameterizedTypeReference<ApiResponse<UserV1ResponseDto.UserResponse>> responseType = new ParameterizedTypeReference<>() {
+            ParameterizedTypeReference<ApiResponse<UserV1ResponseDto.User>> responseType = new ParameterizedTypeReference<>() {
             };
-            ResponseEntity<ApiResponse<UserV1ResponseDto.UserResponse>> response =
+            ResponseEntity<ApiResponse<UserV1ResponseDto.User>> response =
                     testRestTemplate.exchange(
                             ENDPOINT_REGISTER,
                             HttpMethod.POST,
@@ -133,9 +133,9 @@ class UserV1ApiE2ETest {
             headers.set("X-USER-ID", String.valueOf(user.getId()));
 
             //when
-            ParameterizedTypeReference<ApiResponse<UserV1ResponseDto.UserResponse>> responseType = new ParameterizedTypeReference<>() {
+            ParameterizedTypeReference<ApiResponse<UserV1ResponseDto.User>> responseType = new ParameterizedTypeReference<>() {
             };
-            ResponseEntity<ApiResponse<UserV1ResponseDto.UserResponse>> response =
+            ResponseEntity<ApiResponse<UserV1ResponseDto.User>> response =
                     testRestTemplate.exchange(
                             ENDPOINT_GET_ME,
                             HttpMethod.GET,
@@ -163,9 +163,9 @@ class UserV1ApiE2ETest {
             headers.set("X-USER-ID", "-1");
 
             //when
-            ParameterizedTypeReference<ApiResponse<UserV1ResponseDto.UserResponse>> responseType = new ParameterizedTypeReference<>() {
+            ParameterizedTypeReference<ApiResponse<UserV1ResponseDto.User>> responseType = new ParameterizedTypeReference<>() {
             };
-            ResponseEntity<ApiResponse<UserV1ResponseDto.UserResponse>> response =
+            ResponseEntity<ApiResponse<UserV1ResponseDto.User>> response =
                     testRestTemplate.exchange(
                             ENDPOINT_GET_ME,
                             HttpMethod.GET,
