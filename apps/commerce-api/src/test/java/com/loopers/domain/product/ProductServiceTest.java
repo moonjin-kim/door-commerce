@@ -1,5 +1,6 @@
 package com.loopers.domain.product;
 
+import com.loopers.application.product.ProductResult;
 import com.loopers.infrastructure.product.ProductJpaRepository;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -67,6 +69,123 @@ class ProductServiceTest {
             assertAll(
                     () -> assertTrue(foundProduct.isPresent()),
                     () -> assertEquals(product, foundProduct.get())
+            );
+        }
+    }
+
+    @DisplayName("상품을 검색할 때")
+    @Nested
+    class Search {
+        @DisplayName("검색 조건이 주어지면 해당 조건에 맞는 상품 페이지를 반환한다.")
+        @Test
+        void returnProductPage_whenSearchQueryIsProvided() {
+            //given
+            var product1 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 티셔츠",
+                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/t-shirt.png",
+                            20000L
+                    ))
+            );
+            var product2 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 후드티",
+                            "루퍼스의 공식 후드티입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/hoodie.png",
+                            30000L
+                    ))
+            );
+
+            ProductQuery.Search query = new ProductQuery.Search(10,0,null, null);
+
+            //when
+            ProductInfo.ProductPage productPage = productService.search(query);
+
+            //then
+            assertAll(
+                    () -> assertThat(productPage.totalElements()).isEqualTo(2),
+                    () -> assertThat(productPage.limit()).isEqualTo(10),
+                    () -> assertThat(productPage.offset()).isEqualTo(0),
+                    () -> assertThat(productPage.items()).hasSize(2)
+            );
+        }
+
+        @DisplayName("특정 브랜드ID가 주어지면 해당 브랜드의 상품 페이지를 반환한다.")
+        @Test
+        void returnProductPage_when() {
+            //given
+            var product1 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 티셔츠",
+                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/t-shirt.png",
+                            20000L
+                    ))
+            );
+            var product2 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            2L,
+                            "루퍼스 공식 후드티",
+                            "루퍼스의 공식 후드티입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/hoodie.png",
+                            30000L
+                    ))
+            );
+
+            ProductQuery.Search query = new ProductQuery.Search(10,0,null, 1L);
+
+            //when
+            ProductInfo.ProductPage productPage = productService.search(query);
+
+            //then
+            assertAll(
+                    () -> assertThat(productPage.totalElements()).isEqualTo(1),
+                    () -> assertThat(productPage.limit()).isEqualTo(10),
+                    () -> assertThat(productPage.offset()).isEqualTo(0),
+                    () -> assertThat(productPage.items()).hasSize(1),
+                    () -> assertThat(productPage.items().get(0).getId()).isEqualTo(ProductResult.ProductDto.of(product1).id())
+            );
+        }
+
+        @DisplayName("가격순으로 정렬 옵션이 주어지면 상품 리스트가 가격순으로 정렬된다.")
+        @Test
+        void returnProductPage_whenPriceAscIsProvicer() {
+            //given
+            var product1 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 티셔츠",
+                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/t-shirt.png",
+                            20000L
+                    ))
+            );
+            var product2 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            2L,
+                            "루퍼스 공식 후드티",
+                            "루퍼스의 공식 후드티입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/hoodie.png",
+                            10000L
+                    ))
+            );
+
+            ProductQuery.Search query = new ProductQuery.Search(10,0,"price_asc", null);
+
+            //when
+            ProductInfo.ProductPage productPage = productService.search(query);
+
+            //then
+            assertAll(
+                    () -> assertThat(productPage.totalElements()).isEqualTo(2),
+                    () -> assertThat(productPage.limit()).isEqualTo(10),
+                    () -> assertThat(productPage.offset()).isEqualTo(0),
+                    () -> assertThat(productPage.items()).hasSize(2),
+                    () -> assertThat(productPage.items().get(0).getId()).isEqualTo(ProductResult.ProductDto.of(product2).id())
             );
         }
     }

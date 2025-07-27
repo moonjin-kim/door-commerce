@@ -1,10 +1,7 @@
 package com.loopers.domain.product;
 
 import com.loopers.domain.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -17,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class Product extends BaseEntity {
     @Column(unique = true)
     private String name;
-    @Column(unique = true)
+    @Column()
     private Long brandId;
     @Column(unique = true)
     private String description;
@@ -25,8 +22,10 @@ public class Product extends BaseEntity {
     private String imageUrl;
     @Embedded
     private Amount price;
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status;
 
-    protected Product(String name, Long brandId, String description, String imageUrl, Long price) {
+    protected Product(String name, Long brandId, String description, String imageUrl, Long price, ProductStatus status) {
         ProductValidator.validateName(name);
         this.name = name;
 
@@ -41,6 +40,8 @@ public class Product extends BaseEntity {
 
 
         this.price = new Amount(price);
+
+        this.status = status;
     }
 
     public static Product create(ProductCommand.Create command) {
@@ -49,7 +50,8 @@ public class Product extends BaseEntity {
                 command.brandId(),
                 command.description(),
                 command.imageUrl(),
-                command.price()
+                command.price(),
+                ProductStatus.SALE
         );
     }
 

@@ -25,4 +25,22 @@ public class ProductV1Response {
         }
     }
 
+    public record ProductSummary(
+            Long productId,
+            Long brandId,
+            String name,
+            String imageUrl,
+            Long price
+    ) {
+        public static ProductSummary of(ProductResult.ProductDto product) {
+            return new ProductSummary(
+                    product.id(),
+                    product.brandId(),
+                    product.name(),
+                    product.imageUrl(),
+                    product.price()
+            );
+        }
+    }
+
 }

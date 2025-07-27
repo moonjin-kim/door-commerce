@@ -1,13 +1,10 @@
 package com.loopers.interfaces.api.product;
 
-import com.loopers.domain.brand.Brand;
-import com.loopers.domain.brand.BrandCommand;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductCommand;
-import com.loopers.infrastructure.brand.BrandJpaRepository;
 import com.loopers.infrastructure.product.ProductJpaRepository;
 import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.interfaces.api.brand.BrandV1Response;
+import com.loopers.interfaces.api.PageResponse;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +16,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.function.Function;
@@ -105,5 +103,141 @@ class ProductV1E2ETest {
             );
         }
 
+    }
+
+    @DisplayName("Get /api/v1/products")
+    @Nested
+    class Search {
+        private static final String ENDPOINT_SEARCH = "/api/v1/products";
+
+        @DisplayName("검색 조건이 주어지면 해당 조건에 맞는 상품 페이지를 반환한다.")
+        @Test
+        void returnProductPage_whenSearchQueryIsProvided() {
+            //given
+            var product1 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 티셔츠",
+                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/t-shirt.png",
+                            20000L
+                    )));
+            var product2 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 후드티",
+                            "루퍼스의 공식 후드티입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/hoodie.png",
+                            30000L
+                    )));
+
+            //when
+            ParameterizedTypeReference<ApiResponse<PageResponse<ProductV1Response.ProductSummary>>> responseType = new ParameterizedTypeReference<>() {
+            };
+            ResponseEntity<ApiResponse<PageResponse<ProductV1Response.ProductSummary>>> response =
+                    testRestTemplate.exchange(
+                            ENDPOINT_SEARCH + "?page=1&size=10",
+                            HttpMethod.GET,
+                            null,
+                            responseType
+                    );
+
+            //then
+            assertAll(
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                    () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
+                    () -> assertThat(response.getBody().data().getTotalCount()).isEqualTo(2),
+                    () -> assertThat(response.getBody().data().getPageNum()).isEqualTo(0),
+                    () -> assertThat(response.getBody().data().getSize()).isEqualTo(10),
+                    () -> assertThat(response.getBody().data().getItems()).hasSize(2),
+                    () -> assertThat(response.getBody().data().getItems().get(0).productId()).isEqualTo(product2.getId())
+            );
+        }
+
+        @DisplayName("brandId가 주어지면 해당 브랜드의 상품 페이지를 반환한다.")
+        @Test
+        void returnProductPage_whenBrandIdProvider() {
+            //given
+            var product1 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 티셔츠",
+                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/t-shirt.png",
+                            20000L
+                    )));
+            var product2 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            2L,
+                            "루퍼스 공식 후드티",
+                            "루퍼스의 공식 후드티입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/hoodie.png",
+                            30000L
+                    )));
+
+            //when
+            ParameterizedTypeReference<ApiResponse<PageResponse<ProductV1Response.ProductSummary>>> responseType = new ParameterizedTypeReference<>() {
+            };
+            ResponseEntity<ApiResponse<PageResponse<ProductV1Response.ProductSummary>>> response =
+                    testRestTemplate.exchange(
+                            ENDPOINT_SEARCH + "?page=1&size=10&brandId=1",
+                            HttpMethod.GET,
+                            null,
+                            responseType
+                    );
+
+            //then
+            assertAll(
+                    () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
+                    () -> assertThat(response.getBody().data().getTotalCount()).isEqualTo(1),
+                    () -> assertThat(response.getBody().data().getPageNum()).isEqualTo(0),
+                    () -> assertThat(response.getBody().data().getSize()).isEqualTo(10),
+                    () -> assertThat(response.getBody().data().getItems()).hasSize(1),
+                    () -> assertThat(response.getBody().data().getItems().get(0).productId()).isEqualTo(product1.getId())
+            );
+        }
+
+        @DisplayName("가격 오름차순 정렬 옵션이 주어지면 해당 조건에 맞는 상품 페이지를 반환한다.")
+        @Test
+        void returnProductPage_whenPriceAscSortOption() {
+            //given
+            var product1 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 티셔츠",
+                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/t-shirt.png",
+                            10000L
+                    )));
+            var product2 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            2L,
+                            "루퍼스 공식 후드티",
+                            "루퍼스의 공식 후드티입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/hoodie.png",
+                            20000L
+                    )));
+
+            //when
+            ParameterizedTypeReference<ApiResponse<PageResponse<ProductV1Response.ProductSummary>>> responseType = new ParameterizedTypeReference<>() {
+            };
+            ResponseEntity<ApiResponse<PageResponse<ProductV1Response.ProductSummary>>> response =
+                    testRestTemplate.exchange(
+                            ENDPOINT_SEARCH + "?page=1&size=10&sort=price_asc",
+                            HttpMethod.GET,
+                            null,
+                            responseType
+                    );
+
+            //then
+            assertAll(
+                    () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
+                    () -> assertThat(response.getBody().data().getTotalCount()).isEqualTo(2),
+                    () -> assertThat(response.getBody().data().getPageNum()).isEqualTo(0),
+                    () -> assertThat(response.getBody().data().getSize()).isEqualTo(10),
+                    () -> assertThat(response.getBody().data().getItems()).hasSize(2),
+                    () -> assertThat(response.getBody().data().getItems().get(0).productId()).isEqualTo(product1.getId())
+            );
+        }
     }
 }

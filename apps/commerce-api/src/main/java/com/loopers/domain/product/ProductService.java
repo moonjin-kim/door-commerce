@@ -15,4 +15,8 @@ public class ProductService {
     public Optional<Product> getBy(Long id) {
         return productRepository.findBy(id);
     }
+
+    public ProductInfo.ProductPage search(ProductQuery.Search query) {
+        return productRepository.search(query.toParams());
+    }
 }
