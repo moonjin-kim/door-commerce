@@ -4,7 +4,7 @@ import com.loopers.application.brand.BrandResult;
 
 public class BrandV1Response {
     public record Brand(
-            Long id,
+            Long brandId,
             String name,
             String description,
             String logoUrl

@@ -101,7 +101,7 @@ class BrandV1ApiE2ETest {
             //then
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().id()).isEqualTo(brand.getId()),
+                    () -> assertThat(response.getBody().data().brandId()).isEqualTo(brand.getId()),
                     () -> assertThat(response.getBody().data().name()).isEqualTo(brand.getName()),
                     () -> assertThat(response.getBody().data().description()).isEqualTo(brand.getDescription()),
                     () -> assertThat(response.getBody().data().logoUrl()).isEqualTo(brand.getLogoUrl())
