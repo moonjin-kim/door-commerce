@@ -6,8 +6,8 @@ import com.loopers.fixture.UserFixture;
 import com.loopers.infrastructure.point.PointJpaRepository;
 import com.loopers.infrastructure.user.UserJpaRepository;
 import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.interfaces.api.point.PointV1RequestDto;
-import com.loopers.interfaces.api.point.PointV1ResponseDto;
+import com.loopers.interfaces.api.point.PointV1Request;
+import com.loopers.interfaces.api.point.PointV1Response;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -60,20 +60,20 @@ public class PointV1ApiE2ETest {
             User user = userJpaRepository.save(
                     UserFixture.createMember()
             );
-            var request = new PointV1RequestDto.PointChargeRequest(1000);
+            var request = new PointV1Request.PointChargeRequest(1000);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("X-USER-ID", String.valueOf(user.getId()));
 
             //when
-            ParameterizedTypeReference<ApiResponse<PointV1ResponseDto.PointBalance>> responseType = new ParameterizedTypeReference<>() {
+            ParameterizedTypeReference<ApiResponse<PointV1Response.PointBalance>> responseType = new ParameterizedTypeReference<>() {
             };
-            ResponseEntity<ApiResponse<PointV1ResponseDto.PointBalance>> response =
+            ResponseEntity<ApiResponse<PointV1Response.PointBalance>> response =
                     testRestTemplate.exchange(
                             ENDPOINT_CHARGE,
                             HttpMethod.POST,
-                            new HttpEntity<PointV1RequestDto.PointChargeRequest>(request, headers),
+                            new HttpEntity<PointV1Request.PointChargeRequest>(request, headers),
                             responseType
                     );
 
@@ -96,20 +96,20 @@ public class PointV1ApiE2ETest {
             Point point = pointJpaRepository.save(
                     Point.init(user.getId())
             );
-            var request = new PointV1RequestDto.PointChargeRequest(amount);
+            var request = new PointV1Request.PointChargeRequest(amount);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("X-USER-ID", String.valueOf(user.getId()));
 
             //when
-            ParameterizedTypeReference<ApiResponse<PointV1ResponseDto.PointBalance>> responseType = new ParameterizedTypeReference<>() {
+            ParameterizedTypeReference<ApiResponse<PointV1Response.PointBalance>> responseType = new ParameterizedTypeReference<>() {
             };
-            ResponseEntity<ApiResponse<PointV1ResponseDto.PointBalance>> response =
+            ResponseEntity<ApiResponse<PointV1Response.PointBalance>> response =
                     testRestTemplate.exchange(
                             ENDPOINT_CHARGE,
                             HttpMethod.POST,
-                            new HttpEntity<PointV1RequestDto.PointChargeRequest>(request, headers),
+                            new HttpEntity<PointV1Request.PointChargeRequest>(request, headers),
                             responseType
                     );
 
@@ -124,19 +124,19 @@ public class PointV1ApiE2ETest {
         @Test
         void throwsException_whenInvalidIdIsProvided() {
             //given
-            var request = new PointV1RequestDto.PointChargeRequest(1000);
+            var request = new PointV1Request.PointChargeRequest(1000);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("X-USER-ID", "1");
 
             //when
-            ParameterizedTypeReference<ApiResponse<PointV1ResponseDto.PointBalance>> responseType = new ParameterizedTypeReference<>() {
+            ParameterizedTypeReference<ApiResponse<PointV1Response.PointBalance>> responseType = new ParameterizedTypeReference<>() {
             };
-            ResponseEntity<ApiResponse<PointV1ResponseDto.PointBalance>> response =
+            ResponseEntity<ApiResponse<PointV1Response.PointBalance>> response =
                     testRestTemplate.exchange(
                             ENDPOINT_CHARGE,
                             HttpMethod.POST,
-                            new HttpEntity<PointV1RequestDto.PointChargeRequest>(request, headers),
+                            new HttpEntity<PointV1Request.PointChargeRequest>(request, headers),
                             responseType
                     );
 
@@ -174,9 +174,9 @@ public class PointV1ApiE2ETest {
             headers.set("X-USER-ID", String.valueOf(user.getId()));
 
             //when
-            ParameterizedTypeReference<ApiResponse<PointV1ResponseDto.PointBalance>> responseType = new ParameterizedTypeReference<>() {
+            ParameterizedTypeReference<ApiResponse<PointV1Response.PointBalance>> responseType = new ParameterizedTypeReference<>() {
             };
-            ResponseEntity<ApiResponse<PointV1ResponseDto.PointBalance>> response =
+            ResponseEntity<ApiResponse<PointV1Response.PointBalance>> response =
                     testRestTemplate.exchange(
                             ENDPOINT_GET_BALANCE,
                             HttpMethod.GET,
@@ -203,9 +203,9 @@ public class PointV1ApiE2ETest {
             headers.set("X-USER-ID", String.valueOf(user.getId()));
 
             //when
-            ParameterizedTypeReference<ApiResponse<PointV1ResponseDto.PointBalance>> responseType = new ParameterizedTypeReference<>() {
+            ParameterizedTypeReference<ApiResponse<PointV1Response.PointBalance>> responseType = new ParameterizedTypeReference<>() {
             };
-            ResponseEntity<ApiResponse<PointV1ResponseDto.PointBalance>> response =
+            ResponseEntity<ApiResponse<PointV1Response.PointBalance>> response =
                     testRestTemplate.exchange(
                             ENDPOINT_GET_BALANCE,
                             HttpMethod.GET,
@@ -224,15 +224,15 @@ public class PointV1ApiE2ETest {
         @Test
         void throwsException_whenInvalidIdIsProvided() {
             //given
-            var request = new PointV1RequestDto.PointChargeRequest(1000);
+            var request = new PointV1Request.PointChargeRequest(1000);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("X-USER-ID", "1");
 
             //when
-            ParameterizedTypeReference<ApiResponse<PointV1ResponseDto.PointBalance>> responseType = new ParameterizedTypeReference<>() {
+            ParameterizedTypeReference<ApiResponse<PointV1Response.PointBalance>> responseType = new ParameterizedTypeReference<>() {
             };
-            ResponseEntity<ApiResponse<PointV1ResponseDto.PointBalance>> response =
+            ResponseEntity<ApiResponse<PointV1Response.PointBalance>> response =
                     testRestTemplate.exchange(
                             ENDPOINT_GET_BALANCE,
                             HttpMethod.GET,

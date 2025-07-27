@@ -17,11 +17,11 @@ public class BrandV1Controller implements BrandV1ApiSpec{
 
     @GetMapping("/{brandId}")
     @Override
-    public ApiResponse<BrandV1ResponseDto.Brand> get(@PathVariable(value = "brandId") Long brandId) {
+    public ApiResponse<BrandV1Response.Brand> get(@PathVariable(value = "brandId") Long brandId) {
         BrandResult.BrandDto brandDto = brandFacade.getBrand(brandId);
 
         return ApiResponse.success(
-            BrandV1ResponseDto.Brand.from(brandDto)
+            BrandV1Response.Brand.from(brandDto)
         );
     }
 }

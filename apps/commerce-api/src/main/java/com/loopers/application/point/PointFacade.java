@@ -4,7 +4,7 @@ import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointService;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserService;
-import com.loopers.interfaces.api.point.PointV1RequestDto;
+import com.loopers.interfaces.api.point.PointV1Request;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ public class PointFacade {
     private final PointService pointService;
     private final UserService userService;
 
-    public PointResult charge(Long userId, PointV1RequestDto.PointChargeRequest chargeRequest) {
+    public PointResult charge(Long userId, PointV1Request.PointChargeRequest chargeRequest) {
         User user = userService.getUser(userId).orElseThrow(() ->
                 new CoreException(ErrorType.NOT_FOUND, "[account = " + userId + "] 존재하지 않는 회원입니다.")
         );

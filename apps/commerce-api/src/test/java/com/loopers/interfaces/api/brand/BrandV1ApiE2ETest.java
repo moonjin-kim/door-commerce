@@ -57,13 +57,13 @@ class BrandV1ApiE2ETest {
             String requestUrl = ENDPOINT_GET.apply(1L);
 
             //when
-            ParameterizedTypeReference<ApiResponse<BrandV1ResponseDto.Brand>> responseType = new ParameterizedTypeReference<>() {
+            ParameterizedTypeReference<ApiResponse<BrandV1Response.Brand>> responseType = new ParameterizedTypeReference<>() {
             };
-            ResponseEntity<ApiResponse<BrandV1ResponseDto.Brand>> response =
+            ResponseEntity<ApiResponse<BrandV1Response.Brand>> response =
                     testRestTemplate.exchange(
                             requestUrl,
                             HttpMethod.GET,
-                            new HttpEntity<BrandV1ResponseDto.Brand>(null, null),
+                            new HttpEntity<BrandV1Response.Brand>(null, null),
                             responseType
                     );
 
@@ -88,13 +88,13 @@ class BrandV1ApiE2ETest {
             String requestUrl = ENDPOINT_GET.apply(brand.getId());
 
             //when
-            ParameterizedTypeReference<ApiResponse<BrandV1ResponseDto.Brand>> responseType = new ParameterizedTypeReference<>() {
+            ParameterizedTypeReference<ApiResponse<BrandV1Response.Brand>> responseType = new ParameterizedTypeReference<>() {
             };
-            ResponseEntity<ApiResponse<BrandV1ResponseDto.Brand>> response =
+            ResponseEntity<ApiResponse<BrandV1Response.Brand>> response =
                     testRestTemplate.exchange(
                             requestUrl,
                             HttpMethod.GET,
-                            new HttpEntity<BrandV1ResponseDto.Brand>(null, null),
+                            new HttpEntity<BrandV1Response.Brand>(null, null),
                             responseType
                     );
 

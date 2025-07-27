@@ -2,7 +2,7 @@ package com.loopers.interfaces.api.brand;
 
 import com.loopers.application.brand.BrandResult;
 
-public class BrandV1ResponseDto {
+public class BrandV1Response {
     public record Brand(
             Long id,
             String name,

@@ -7,7 +7,7 @@ import com.loopers.support.error.ErrorType;
 
 import java.time.LocalDate;
 
-public class UserV1ResponseDto {
+public class UserV1Response {
     public record User(
             Long id,
             String account,

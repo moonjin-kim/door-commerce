@@ -4,7 +4,7 @@ import com.loopers.domain.user.Gender;
 import com.loopers.domain.user.UserCommand;
 import jakarta.validation.constraints.NotNull;
 
-public class UserV1RequestDto {
+public class UserV1Request {
     public record Register(
             @NotNull
             String name,
