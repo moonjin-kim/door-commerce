@@ -50,7 +50,7 @@ class PointFacadeTest {
             var chargeRequest = new PointV1RequestDto.PointChargeRequest(1000);
 
             //when
-            PointInfo result = pointFacade.charge(user.getId(), chargeRequest);
+            PointResult result = pointFacade.charge(user.getId(), chargeRequest);
 
             //then
             assertAll(
@@ -75,7 +75,7 @@ class PointFacadeTest {
             var chargeRequest = new PointV1RequestDto.PointChargeRequest(1000);
 
             //when
-            PointInfo result = pointFacade.charge(user.getId(), chargeRequest);
+            PointResult result = pointFacade.charge(user.getId(), chargeRequest);
 
             //then
             assertAll(
@@ -120,7 +120,7 @@ class PointFacadeTest {
             );
 
             //when
-            PointInfo result = pointFacade.getBalance(user.getId());
+            PointResult result = pointFacade.getBalance(user.getId());
 
             //then
             assertAll(
@@ -153,7 +153,7 @@ class PointFacadeTest {
             );
 
             //when
-            PointInfo pointInfo = pointFacade.getBalance(user.getId());
+            PointResult pointInfo = pointFacade.getBalance(user.getId());
 
             //then
             Optional<Point> savedPoint = pointJpaRepository.findByUserId(user.getId());

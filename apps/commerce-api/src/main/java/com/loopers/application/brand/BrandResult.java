@@ -1,0 +1,16 @@
+package com.loopers.application.brand;
+
+import com.loopers.domain.brand.Brand;
+
+public class BrandResult {
+    public record BrandDto(Long id, String name, String description, String logoUrl) {
+        public static BrandDto from(Brand brand) {
+            return new BrandDto(
+                    brand.getId(),
+                    brand.getName(),
+                    brand.getDescription(),
+                    brand.getLogoUrl()
+            );
+        }
+    }
+}

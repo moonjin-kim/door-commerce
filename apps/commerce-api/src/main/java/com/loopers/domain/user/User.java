@@ -37,12 +37,10 @@ public class User extends BaseEntity {
         UserValidator.validateName(command.name());
         user.name = command.name();
 
-//        UserValidator.validateAccount(command.account());
         user.account = new Account(command.account());
 
 
         user.email = new Email(command.email());
-//        user.email = command.email();
 
         UserValidator.validateBirthday(command.birthday());
         user.birthday = LocalDate.parse(command.birthday());

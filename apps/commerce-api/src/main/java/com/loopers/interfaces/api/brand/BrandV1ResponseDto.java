@@ -1,4 +1,21 @@
 package com.loopers.interfaces.api.brand;
 
+import com.loopers.application.brand.BrandResult;
+
 public class BrandV1ResponseDto {
+    public record Brand(
+            Long id,
+            String name,
+            String description,
+            String logoUrl
+    ){
+        public static Brand from(BrandResult.BrandDto brandDto) {
+            return new Brand(
+                    brandDto.id(),
+                    brandDto.name(),
+                    brandDto.description(),
+                    brandDto.logoUrl()
+            );
+        }
+    }
 }
