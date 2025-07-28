@@ -14,21 +14,21 @@ public class PointV1Controller implements PointV1ApiSpec{
 
     @PostMapping("/charge")
     @Override
-    public ApiResponse<PointV1ResponseDto.PointBalance> register(
+    public ApiResponse<PointV1Response.PointBalance> register(
             @RequestHeader("X-USER-ID") Long userId,
-            @RequestBody PointV1RequestDto.PointChargeRequest body
+            @RequestBody PointV1Request.PointChargeRequest body
     ) {
         PointResult info = pointFacade.charge(userId, body);
-        PointV1ResponseDto.PointBalance response = PointV1ResponseDto.PointBalance.from(info);
+        PointV1Response.PointBalance response = PointV1Response.PointBalance.from(info);
         return ApiResponse.success(response);
     }
 
 
     @GetMapping("")
     @Override
-    public ApiResponse<PointV1ResponseDto.PointBalance> getBalance(@RequestHeader("X-USER-ID") Long userId) {
+    public ApiResponse<PointV1Response.PointBalance> getBalance(@RequestHeader("X-USER-ID") Long userId) {
         PointResult info = pointFacade.getBalance(userId);
-        PointV1ResponseDto.PointBalance response = PointV1ResponseDto.PointBalance.from(info);
+        PointV1Response.PointBalance response = PointV1Response.PointBalance.from(info);
         return ApiResponse.success(response);
     }
 

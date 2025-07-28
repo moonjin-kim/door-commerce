@@ -1,5 +1,5 @@
 package com.loopers.domain.user;
-import com.loopers.interfaces.api.user.UserV1RequestDto;
+import com.loopers.interfaces.api.user.UserV1Request;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     @Transactional
-    public User registerMember(UserV1RequestDto.Register request) {
+    public User registerMember(UserV1Request.Register request) {
         checkDuplicateAccount(request.account());
 
         return userRepository.save(

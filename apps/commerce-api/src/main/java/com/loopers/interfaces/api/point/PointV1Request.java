@@ -3,7 +3,7 @@ package com.loopers.interfaces.api.point;
 import com.loopers.domain.point.PointCommand;
 import jakarta.validation.constraints.NotNull;
 
-public class PointV1RequestDto {
+public class PointV1Request {
     public record PointChargeRequest(
             @NotNull
             int amount
