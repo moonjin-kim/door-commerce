@@ -39,9 +39,11 @@ public class QProduct extends EntityPathBase<Product> {
 
     public final StringPath imageUrl = createString("imageUrl");
 
+    public final NumberPath<Long> likeCount = createNumber("likeCount", Long.class);
+
     public final StringPath name = createString("name");
 
-    public final QAmount price;
+    public final com.loopers.domain.QAmount price;
 
     public final EnumPath<ProductStatus> status = createEnum("status", ProductStatus.class);
 
@@ -66,7 +68,7 @@ public class QProduct extends EntityPathBase<Product> {
 
     public QProduct(Class<? extends Product> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.price = inits.isInitialized("price") ? new QAmount(forProperty("price")) : null;
+        this.price = inits.isInitialized("price") ? new com.loopers.domain.QAmount(forProperty("price")) : null;
     }
 
 }
