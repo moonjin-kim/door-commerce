@@ -112,4 +112,30 @@ class ProductLikeServiceTest {
             );
         }
     }
+
+    @DisplayName("유저의 좋아요를 검색할 때,")
+    @Nested
+    class Search {
+        @DisplayName("유저의 좋아요를 검색하면, 좋아요 목록을 반환한다.")
+        @Test
+        void searchLikes() {
+            //given
+            Long userId = 1L;
+            likeJpaRepository.save(ProductLike.create(userId, 1L));
+            likeJpaRepository.save(ProductLike.create(userId, 2L));
+            likeJpaRepository.save(ProductLike.create(userId, 3L));
+            likeJpaRepository.save(ProductLike.create(userId, 4L));
+
+            //when
+            LikeInfo.SearchResult result = likeService.search(LikeQuery.Search.of(10,0, userId));
+
+            //then
+            assertAll(
+                () -> assertThat(result.totalCount()).isEqualTo(4),
+                () -> assertThat(result.limit()).isEqualTo(10),
+                () -> assertThat(result.offset()).isEqualTo(0),
+                () -> assertThat(result.likes()).hasSize(4)
+            );
+        }
+    }
 }

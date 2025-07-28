@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -292,6 +293,43 @@ class ProductServiceTest {
             assertThrows(CoreException.class, () -> {
                 productService.decreaseLikeCount(nonExistentProductId);
             });
+        }
+    }
+
+    @DisplayName("상품 리스트를 조회할 때")
+    @Nested
+    class FindAllBy {
+        @DisplayName("상품 ID 리스트가 주어지면 해당 상품들을 반환한다.")
+        @Test
+        void returnProducts_whenProductIdsAreProvided() {
+            //given
+            var product1 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 티셔츠",
+                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/t-shirt.png",
+                            20000L
+                    ))
+            );
+            var product2 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            2L,
+                            "루퍼스 공식 후드티",
+                            "루퍼스의 공식 후드티입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/hoodie.png",
+                            30000L
+                    ))
+            );
+
+            //when
+            var products = productService.findAllBy(List.of(product1.getId(), product2.getId()));
+
+            //then
+            assertAll(
+                    () -> assertThat(products).hasSize(2),
+                    () -> assertThat(products).containsExactlyInAnyOrder(product1, product2)
+            );
         }
     }
 }

@@ -9,6 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class LikeService {
     private final LikeRepository likeRepository;
 
+    public LikeInfo.SearchResult search(LikeQuery.Search likeSearch) {
+        return likeRepository.search(likeSearch.toParams());
+    }
+
     @Transactional
     public LikeInfo.AddLikeResult addLike(Long userId, Long productId) {
         if (likeRepository.existsBy(userId, productId)) {
