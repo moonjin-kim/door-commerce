@@ -46,4 +46,19 @@ public class ProductV1Controller implements ProductV1ApiSpec{
                 ProductV1Response.ProductDetail.of(product)
         );
     }
+
+
+    @PostMapping("/{productId}/like")
+    @Override
+    public ApiResponse<String> like(Long userId, Long productId) {
+//        productFacade.like(userId, productId);
+        return ApiResponse.success("좋아요에 성공했습니다.");
+    }
+
+    @PostMapping("/{productId}/unlike")
+    @Override
+    public ApiResponse<String> unLike(Long userId, Long productId) {
+//        productFacade.unLike(userId, productId);
+        return ApiResponse.success("좋아요가 취소되었습니다.");
+    }
 }

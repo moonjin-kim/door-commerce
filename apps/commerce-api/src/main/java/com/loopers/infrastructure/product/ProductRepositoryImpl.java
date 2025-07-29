@@ -7,6 +7,7 @@ import com.loopers.domain.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -18,6 +19,11 @@ public class ProductRepositoryImpl implements ProductRepository {
     @Override
     public Product save(Product product) {
         return productJpaRepository.save(product);
+    }
+
+    @Override
+    public List<Product> findAllBy(List<Long> productIds) {
+        return productJpaRepository.findAllById(productIds);
     }
 
     @Override

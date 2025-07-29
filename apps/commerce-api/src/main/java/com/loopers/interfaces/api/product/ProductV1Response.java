@@ -11,7 +11,7 @@ public class ProductV1Response {
             String imageUrl,
             Long price
 //            long lickCount,
-//            boolean isLiked,
+//            boolean isSuccess,
     ) {
         public static ProductDetail of(ProductResult.ProductDto product) {
             return new ProductDetail(

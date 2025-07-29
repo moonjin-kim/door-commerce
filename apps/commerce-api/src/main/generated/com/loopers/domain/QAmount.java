@@ -1,4 +1,4 @@
-package com.loopers.domain.product;
+package com.loopers.domain;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -15,7 +15,7 @@ import com.querydsl.core.types.Path;
 @Generated("com.querydsl.codegen.DefaultEmbeddableSerializer")
 public class QAmount extends BeanPath<Amount> {
 
-    private static final long serialVersionUID = 971913320L;
+    private static final long serialVersionUID = 738565001L;
 
     public static final QAmount amount = new QAmount("amount");
 
