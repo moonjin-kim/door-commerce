@@ -1,5 +1,8 @@
 package com.loopers.domain.like;
 
+import com.loopers.domain.PageRequest;
+import com.loopers.domain.PageResponse;
+import com.loopers.infrastructure.like.LikeParams;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,17 +12,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class LikeService {
     private final LikeRepository likeRepository;
 
-    public LikeInfo.SearchResult search(LikeQuery.Search likeSearch) {
-        return likeRepository.search(likeSearch.toParams());
+    public PageResponse<LikeInfo.Like> search(PageRequest<LikeQuery.Search> query) {
+        PageResponse<ProductLike> pageRequest = likeRepository.search(query.map(LikeQuery.Search::toParams));
+
+        return pageRequest.map(LikeInfo.Like::of);
     }
 
     @Transactional
-    public LikeInfo.AddLikeResult addLike(Long userId, Long productId) {
-        if (likeRepository.existsBy(userId, productId)) {
+    public LikeInfo.AddLikeResult like(LikeCommand.Like command) {
+        if (likeRepository.existsBy(command.userId(), command.productId())) {
             return LikeInfo.AddLikeResult.fail();
         }
 
-        likeRepository.save(ProductLike.create(userId, productId));
+        likeRepository.save(ProductLike.create(command));
         return LikeInfo.AddLikeResult.success();
     }
 

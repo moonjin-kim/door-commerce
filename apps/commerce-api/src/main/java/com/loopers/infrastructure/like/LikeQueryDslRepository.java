@@ -1,10 +1,9 @@
 package com.loopers.infrastructure.like;
 
+import com.loopers.domain.PageRequest;
+import com.loopers.domain.PageResponse;
 import com.loopers.domain.like.LikeInfo;
 import com.loopers.domain.like.ProductLike;
-import com.loopers.domain.product.Product;
-import com.loopers.domain.product.ProductInfo;
-import com.loopers.domain.product.ProductStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -19,21 +18,22 @@ public class LikeQueryDslRepository implements LikeCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public LikeInfo.SearchResult search(LikeParams.Search likeSearch) {
+    public PageResponse<ProductLike> search(PageRequest<LikeParams.Search> searchParams) {
         List<ProductLike> items = jpaQueryFactory.selectFrom(productLike)
-                .limit(likeSearch.limit())
-                .offset(likeSearch.offset())
-                .where(productLike.userId.eq(likeSearch.userId()))
+                .limit(searchParams.limit())
+                .offset(searchParams.offset())
+                .where(productLike.userId.eq(searchParams.getParams().userId()))
                 .fetch();
 
         Long totalCount = jpaQueryFactory.select(productLike.count())
                 .from(productLike)
-                .where(productLike.userId.eq(likeSearch.userId()))
+                .where(productLike.userId.eq(searchParams.getParams().userId()))
                 .fetchOne();
 
         long count = totalCount != null ? totalCount : 0L;
 
-        return new LikeInfo.SearchResult(likeSearch.limit(), likeSearch.offset(),
-                count, items);
+
+        return PageResponse.of(searchParams.getPage(), searchParams.getSize(), count, items);
+
     }
 }

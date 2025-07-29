@@ -1,4 +1,4 @@
-package com.loopers.domain.product;
+package com.loopers.domain.product.vo;
 
 public enum ProductStatus {
     SALE,

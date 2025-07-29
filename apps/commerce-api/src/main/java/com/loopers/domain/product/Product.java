@@ -2,6 +2,7 @@ package com.loopers.domain.product;
 
 import com.loopers.domain.Amount;
 import com.loopers.domain.BaseEntity;
+import com.loopers.domain.product.vo.ProductStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

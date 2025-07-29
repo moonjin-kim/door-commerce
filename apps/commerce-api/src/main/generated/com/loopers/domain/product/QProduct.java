@@ -45,7 +45,7 @@ public class QProduct extends EntityPathBase<Product> {
 
     public final com.loopers.domain.QAmount price;
 
-    public final EnumPath<ProductStatus> status = createEnum("status", ProductStatus.class);
+    public final EnumPath<com.loopers.domain.product.vo.ProductStatus> status = createEnum("status", com.loopers.domain.product.vo.ProductStatus.class);
 
     //inherited
     public final DateTimePath<java.time.ZonedDateTime> updatedAt = _super.updatedAt;

@@ -14,8 +14,6 @@ public class LikeV1Request {
 
         public LikeQuery.Search toQuery(long userId) {
             return LikeQuery.Search.of(
-                    size,
-                    getOffset(),
                     userId
             );
         }

@@ -30,15 +30,12 @@ public class LikeInfo {
         }
     }
 
-    public record SearchResult(
-            long limit,
-            long offset,
-
-            long totalCount,
-            List<ProductLike> likes
+    public record Like(
+            long userId,
+            long productId
     ) {
-        public static SearchResult of(long totalCount, int limit, long offset, List<ProductLike> likes) {
-            return new SearchResult(totalCount, limit, offset, likes);
+        public static Like of(ProductLike productLike) {
+            return new Like(productLike.getUserId(), productLike.getProductId());
         }
     }
 }

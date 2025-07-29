@@ -19,7 +19,7 @@ public class MySqlTestContainersConfig {
                 "--character-set-server=utf8mb4",
                 "--collation-server=utf8mb4_general_ci",
                 "--skip-character-set-client-handshake"
-            );
+            ).withReuse(true);
         mySqlContainer.start();
 
         String mySqlJdbcUrl = String.format(

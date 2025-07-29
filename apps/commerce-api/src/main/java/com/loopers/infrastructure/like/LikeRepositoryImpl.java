@@ -1,5 +1,7 @@
 package com.loopers.infrastructure.like;
 
+import com.loopers.domain.PageRequest;
+import com.loopers.domain.PageResponse;
 import com.loopers.domain.like.LikeInfo;
 import com.loopers.domain.like.LikeQuery;
 import com.loopers.domain.like.ProductLike;
@@ -18,8 +20,9 @@ public class LikeRepositoryImpl implements LikeRepository {
         return likeJpaRepository.save(productLike);
     }
 
+
     @Override
-    public LikeInfo.SearchResult search(LikeParams.Search likeSearch) {
+    public PageResponse<ProductLike> search(PageRequest<LikeParams.Search> likeSearch) {
         return likeCustomRepository.search(likeSearch);
     }
 

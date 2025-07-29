@@ -1,5 +1,7 @@
 package com.loopers.domain.like;
 
+import com.loopers.domain.PageRequest;
+import com.loopers.domain.PageResponse;
 import com.loopers.infrastructure.like.LikeJpaRepository;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
@@ -39,12 +41,13 @@ class ProductLikeServiceTest {
             //given
             Long userId = 1L;
             Long productId = 1L;
+            var command = LikeCommand.Like.of(userId, productId);
 
             //when
-            LikeInfo.AddLikeResult result = likeService.addLike(userId, productId);
+            LikeInfo.AddLikeResult result = likeService.like(command);
 
             //then
-            boolean foundLike = likeJpaRepository.existsByUserIdAndProductId(userId, productId);
+            boolean foundLike = likeJpaRepository.existsByUserIdAndProductId(command.userId(), command.productId());
             assertAll(
                 () -> assertThat(result.isSuccess()).isTrue(),
                 () -> assertThat(foundLike).isTrue(),
@@ -58,10 +61,11 @@ class ProductLikeServiceTest {
             //given
             Long userId = 1L;
             Long productId = 1L;
-            likeJpaRepository.save(ProductLike.create(userId, productId));
+            var command = LikeCommand.Like.of(userId, productId);
+            likeJpaRepository.save(ProductLike.create(command));
 
             //when
-            LikeInfo.AddLikeResult result = likeService.addLike(userId, productId);
+            LikeInfo.AddLikeResult result = likeService.like(command);
 
             //then
             assertAll(
@@ -79,7 +83,7 @@ class ProductLikeServiceTest {
             //given
             Long userId = 1L;
             Long productId = 1L;
-            likeJpaRepository.save(ProductLike.create(userId, productId));
+            likeJpaRepository.save(ProductLike.create(LikeCommand.Like.of(userId, productId)));
 
             //when
             LikeInfo.DeleteLikeResult result = likeService.unlike(userId, productId);
@@ -121,20 +125,24 @@ class ProductLikeServiceTest {
         void searchLikes() {
             //given
             Long userId = 1L;
-            likeJpaRepository.save(ProductLike.create(userId, 1L));
-            likeJpaRepository.save(ProductLike.create(userId, 2L));
-            likeJpaRepository.save(ProductLike.create(userId, 3L));
-            likeJpaRepository.save(ProductLike.create(userId, 4L));
+            likeJpaRepository.save(ProductLike.create(LikeCommand.Like.of(userId, 1L)));
+            likeJpaRepository.save(ProductLike.create(LikeCommand.Like.of(userId, 2L)));
+            likeJpaRepository.save(ProductLike.create(LikeCommand.Like.of(userId, 3L)));
+            likeJpaRepository.save(ProductLike.create(LikeCommand.Like.of(userId, 4L)));
+
+            PageRequest<LikeQuery.Search> pageRequest = PageRequest.of(
+                    1,10, LikeQuery.Search.of(1L)
+            );
 
             //when
-            LikeInfo.SearchResult result = likeService.search(LikeQuery.Search.of(10,0, userId));
+            PageResponse<LikeInfo.Like> result = likeService.search(pageRequest);
 
             //then
             assertAll(
-                () -> assertThat(result.totalCount()).isEqualTo(4),
-                () -> assertThat(result.limit()).isEqualTo(10),
-                () -> assertThat(result.offset()).isEqualTo(0),
-                () -> assertThat(result.likes()).hasSize(4)
+                () -> assertThat(result.getTotalCount()).isEqualTo(4L),
+                () -> assertThat(result.getPage()).isEqualTo(1),
+                () -> assertThat(result.getSize()).isEqualTo(10),
+                () -> assertThat(result.getItems()).hasSize(4)
             );
         }
     }

@@ -7,18 +7,6 @@ import com.loopers.domain.product.Product;
 import java.util.List;
 
 public class LikeResult {
-    public record Search(
-            long limit,
-            long offset,
-            long totalCount,
-            List<LikeProduct> items
-
-    ) {
-        public static LikeResult.Search of(LikeInfo.SearchResult searchResult, List<LikeProduct> products) {
-            return new LikeResult.Search(searchResult.limit(), searchResult.offset(), searchResult.totalCount(),products);
-        }
-
-    }
 
     public record LikeProduct(
             long productId,
