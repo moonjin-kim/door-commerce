@@ -14,7 +14,10 @@ public enum ErrorType {
     CONFLICT(HttpStatus.CONFLICT, HttpStatus.CONFLICT.getReasonPhrase(), "이미 존재하는 리소스입니다."),
 
     /** 포인트 에러 **/
-    INVALID_POINT_AMOUNT(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(), "유효하지 않은 포인트 금액입니다.");
+    INVALID_POINT_AMOUNT(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(), "유효하지 않은 포인트 금액입니다."),
+
+    /** 재고 에러 **/
+    INSUFFICIENT_STOCK(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(), "재고가 부족합니다.");
 
     private final HttpStatus status;
     private final String code;

@@ -147,12 +147,14 @@ class ProductTest {
             Product product = Product.create(command);
 
             // then
-            assertNotNull(product);
-            assertEquals(command.brandId(), product.getBrandId());
-            assertEquals(command.name(), product.getName());
-            assertEquals(command.description(), product.getDescription());
-            assertEquals(command.imageUrl(), product.getImageUrl());
-            assertEquals(command.price(), product.getPrice().getPrice());
+            assertAll(
+                () -> assertNotNull(product),
+                () -> assertEquals(command.brandId(), product.getBrandId()),
+                () -> assertEquals(command.name(), product.getName()),
+                () -> assertEquals(command.description(), product.getDescription()),
+                () -> assertEquals(command.imageUrl(), product.getImageUrl()),
+                () -> assertEquals(command.price(), product.getPrice().getPrice())
+            );
         }
     }
 
