@@ -1,7 +1,6 @@
 package com.loopers.interfaces.api.like;
 
 import com.loopers.domain.like.LikeQuery;
-import com.loopers.domain.product.ProductQuery;
 
 public class LikeV1Request {
     public record Search(

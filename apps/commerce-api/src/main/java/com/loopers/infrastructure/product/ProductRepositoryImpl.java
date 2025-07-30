@@ -1,5 +1,7 @@
 package com.loopers.infrastructure.product;
 
+import com.loopers.domain.PageRequest;
+import com.loopers.domain.PageResponse;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductInfo;
 import com.loopers.domain.product.ProductRepository;
@@ -32,7 +34,7 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public ProductInfo.ProductPage search(ProductParams.Search productSearch) {
+    public PageResponse<Product> search(PageRequest<ProductParams.Search> productSearch) {
         return productCustomRepository.search(productSearch);
     }
 }

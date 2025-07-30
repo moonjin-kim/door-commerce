@@ -1,6 +1,7 @@
 package com.loopers.application.point;
 
 import com.loopers.domain.point.Point;
+import com.loopers.domain.point.PointInfo;
 import com.loopers.domain.point.PointService;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserService;
@@ -21,7 +22,7 @@ public class PointFacade {
                 new CoreException(ErrorType.NOT_FOUND, "[account = " + userId + "] 존재하지 않는 회원입니다.")
         );
 
-        Point point = pointService.chargePoint(chargeRequest.toCommand(user.getId()));
+        PointInfo point = pointService.charge(chargeRequest.toCommand(user.getId()));
 
         return PointResult.from(point);
     }
@@ -31,9 +32,7 @@ public class PointFacade {
                 new CoreException(ErrorType.NOT_FOUND, "[account = " + userId + "] 존재하지 않는 회원입니다.")
         );
 
-        Point point = pointService.getPoint(user.getId()).orElseGet(() ->
-                pointService.initPoint(user.getId())
-        );
+        PointInfo point = pointService.get(user.getId());
 
         return PointResult.from(point);
     }

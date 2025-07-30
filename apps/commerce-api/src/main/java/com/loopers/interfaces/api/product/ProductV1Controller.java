@@ -1,9 +1,11 @@
 package com.loopers.interfaces.api.product;
 
+import com.loopers.application.product.ProductCriteria;
 import com.loopers.application.product.ProductFacade;
 import com.loopers.application.product.ProductResult;
+import com.loopers.domain.PageRequest;
+import com.loopers.domain.PageResponse;
 import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.interfaces.api.PageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
@@ -19,20 +21,23 @@ public class ProductV1Controller implements ProductV1ApiSpec{
     @GetMapping("")
     @Override
     public ApiResponse<PageResponse<ProductV1Response.ProductSummary>> getList(
-            @ModelAttribute ProductV1Request.Search search) {
-        ProductResult.ProductPage productPage = productFacade.search(
-                search.toQuery()
+            @PageableDefault(size = 10) Pageable pageable,
+            @ModelAttribute ProductV1Request.Search searchDto
+
+    ) {
+        PageRequest<ProductCriteria.Search> searchCriteria = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                searchDto.toCriteria()
+        );
+
+        PageResponse<ProductResult.ProductDto> productPage = productFacade.search(
+                searchCriteria
         );
 
         return ApiResponse.success(
-                PageResponse.of(
-                        productPage.limit(),
-                        productPage.offset(),
-                        productPage.totalCount(),
-                        productPage.products().stream()
-                                .map(ProductV1Response.ProductSummary::of)
-                                .toList()
-
+                productPage.map(
+                        ProductV1Response.ProductSummary::of
                 )
         );
     }

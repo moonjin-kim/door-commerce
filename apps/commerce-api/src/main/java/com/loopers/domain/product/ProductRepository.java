@@ -1,5 +1,7 @@
 package com.loopers.domain.product;
 
+import com.loopers.domain.PageRequest;
+import com.loopers.domain.PageResponse;
 import com.loopers.infrastructure.product.ProductParams;
 
 import java.util.List;
@@ -12,5 +14,5 @@ public interface ProductRepository {
 
     Optional<Product> findBy(Long id);
 
-    ProductInfo.ProductPage search(ProductParams.Search productSearch);
+    PageResponse<Product> search(PageRequest<ProductParams.Search> productSearch);
 }

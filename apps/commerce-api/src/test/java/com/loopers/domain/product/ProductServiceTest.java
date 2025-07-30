@@ -1,8 +1,12 @@
 package com.loopers.domain.product;
 
 import com.loopers.application.product.ProductResult;
+import com.loopers.domain.PageRequest;
+import com.loopers.domain.PageResponse;
+import com.loopers.domain.point.PointInfo;
 import com.loopers.infrastructure.product.ProductJpaRepository;
 import com.loopers.support.error.CoreException;
+import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,19 +38,19 @@ class ProductServiceTest {
     @DisplayName("상품을 조회할 때")
     @Nested
     class FindBy {
-        @DisplayName("존재하지 않는 상품 아이디가 주어지면 빈 Optional을 반환한다.")
+        @DisplayName("존재하지 않는 상품 아이디가 주어지면 NotFound 예외가 발생한다.")
         @Test
         void returnEmpty_whenProductIsNotFound(){
             //given
             Long productId = 1L;
 
             //when
-            Optional<Product> foundProduct = productService.getBy(productId);
+            CoreException exception = assertThrows(CoreException.class, () -> {
+                productService.getBy(productId);
+            });
 
             //then
-            assertAll(
-                    () -> assertFalse(foundProduct.isPresent())
-            );
+            assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
         }
 
         @DisplayName("조회할 상품의 아이디가 주어지면 해당 상품을 반환한다.")
@@ -65,12 +69,11 @@ class ProductServiceTest {
             Long productId = 1L;
 
             //when
-            Optional<Product> foundProduct = productService.getBy(productId);
+            ProductInfo foundProduct = productService.getBy(productId);
 
             //then
             assertAll(
-                    () -> assertTrue(foundProduct.isPresent()),
-                    () -> assertEquals(product, foundProduct.get())
+                    () -> assertEquals(ProductInfo.of(product), foundProduct)
             );
         }
     }
@@ -101,17 +104,17 @@ class ProductServiceTest {
                     ))
             );
 
-            ProductQuery.Search query = new ProductQuery.Search(10,0,null, null);
+            PageRequest<ProductCommand.Search> query = PageRequest.of(1, 10, ProductCommand.Search.of(null, null));
 
             //when
-            ProductInfo.ProductPage productPage = productService.search(query);
+            PageResponse<ProductInfo> productPage = productService.search(query);
 
             //then
             assertAll(
-                    () -> assertThat(productPage.totalElements()).isEqualTo(2),
-                    () -> assertThat(productPage.limit()).isEqualTo(10),
-                    () -> assertThat(productPage.offset()).isEqualTo(0),
-                    () -> assertThat(productPage.items()).hasSize(2)
+                    () -> assertThat(productPage.getPage()).isEqualTo(1),
+                    () -> assertThat(productPage.getSize()).isEqualTo(10),
+                    () -> assertThat(productPage.getTotalCount()).isEqualTo(2),
+                    () -> assertThat(productPage.getItems()).hasSize(2)
             );
         }
 
@@ -138,18 +141,17 @@ class ProductServiceTest {
                     ))
             );
 
-            ProductQuery.Search query = new ProductQuery.Search(10,0,null, 1L);
+            PageRequest<ProductCommand.Search> query = PageRequest.of(1, 10, ProductCommand.Search.of(null, 1L));
 
             //when
-            ProductInfo.ProductPage productPage = productService.search(query);
+            PageResponse<ProductInfo> productPage = productService.search(query);
 
             //then
             assertAll(
-                    () -> assertThat(productPage.totalElements()).isEqualTo(1),
-                    () -> assertThat(productPage.limit()).isEqualTo(10),
-                    () -> assertThat(productPage.offset()).isEqualTo(0),
-                    () -> assertThat(productPage.items()).hasSize(1),
-                    () -> assertThat(productPage.items().get(0).getId()).isEqualTo(ProductResult.ProductDto.of(product1).id())
+                    () -> assertThat(productPage.getPage()).isEqualTo(1),
+                    () -> assertThat(productPage.getSize()).isEqualTo(10),
+                    () -> assertThat(productPage.getItems()).hasSize(1),
+                    () -> assertThat(productPage.getItems().get(0).id()).isEqualTo(product1.getId())
             );
         }
 
@@ -176,123 +178,19 @@ class ProductServiceTest {
                     ))
             );
 
-            ProductQuery.Search query = new ProductQuery.Search(10,0,"price_asc", null);
+            PageRequest<ProductCommand.Search> query = PageRequest.of(1, 10, ProductCommand.Search.of("price_asc", null));
 
             //when
-            ProductInfo.ProductPage productPage = productService.search(query);
+            PageResponse<ProductInfo> productPage = productService.search(query);
 
             //then
             assertAll(
-                    () -> assertThat(productPage.totalElements()).isEqualTo(2),
-                    () -> assertThat(productPage.limit()).isEqualTo(10),
-                    () -> assertThat(productPage.offset()).isEqualTo(0),
-                    () -> assertThat(productPage.items()).hasSize(2),
-                    () -> assertThat(productPage.items().get(0).getId()).isEqualTo(ProductResult.ProductDto.of(product2).id())
+                    () -> assertThat(productPage.getPage()).isEqualTo(1),
+                    () -> assertThat(productPage.getSize()).isEqualTo(10),
+                    () -> assertThat(productPage.getItems()).hasSize(2),
+                    () -> assertThat(productPage.getItems().get(0).id()).isEqualTo(
+                            product2.getId())
             );
-        }
-    }
-
-    @DisplayName("좋아요 수 증가 기능을 테스트할 때")
-    @Nested
-    class IncreaseLikeCount {
-        @DisplayName("상품이 존재하면 상품의 좋아요 수를 증가시킨다.")
-        @Test
-        void increaseLikeCount_whenProductExists() {
-            //given
-            var product = productJpaRepository.save(
-                    Product.create(ProductCommand.Create.of(
-                            1L,
-                            "루퍼스 공식 티셔츠",
-                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
-                            "https://loopers.com/product/t-shirt.png",
-                            20000L
-
-                    ))
-            );
-
-            //when
-            productService.increaseLikeCount(product.getId());
-
-            //then
-            Product findProduct = productJpaRepository.findById(product.getId()).orElseThrow();
-            assertAll(
-                    () -> assertThat(findProduct.getLikeCount()).isEqualTo(1)
-            );
-        }
-
-        @DisplayName("존재하지 않는 상품의 좋아요 수를 증가시키면 예외가 발생한다.")
-        @Test
-        void throwException_whenProductNotFound() {
-            //given
-            Long nonExistentProductId = 999L;
-
-            //when & then
-            assertThrows(CoreException.class, () -> {
-                productService.increaseLikeCount(nonExistentProductId);
-            });
-        }
-    }
-
-    @DisplayName("좋아요 수 증가 기능을 테스트할 때")
-    @Nested
-    class DecreaseLikeCount {
-        @DisplayName("상품이 존재하면 상품의 좋아요 수를 감소시킨다.")
-        @Test
-        void decreaseLikeCount_whenProductExists() {
-            //given
-            Product product =
-                    Product.create(ProductCommand.Create.of(
-                            1L,
-                            "루퍼스 공식 티셔츠",
-                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
-                            "https://loopers.com/product/t-shirt.png",
-                            20000L
-                    ));
-            product.increaseLikeCount(); // 초기 좋아요 수를 1로 설정
-            product = productJpaRepository.save(product);
-
-            //when
-            productService.decreaseLikeCount(product.getId());
-
-            //then
-            Product findProduct = productJpaRepository.findById(product.getId()).orElseThrow();
-            assertAll(
-                    () -> assertThat(findProduct.getLikeCount()).isEqualTo(0L)
-            );
-        }
-
-        @DisplayName("존재하는 상품의 좋아요 수가 0일 때 좋아요 수를 감소시키면 좋아요 수는 0으로 유지된다.")
-        @Test
-        void zeroLikeCount_whenProductLikeCountZero() {
-            //given
-            var product = productJpaRepository.save(Product.create(ProductCommand.Create.of(
-                    1L,
-                    "루퍼스 공식 티셔츠",
-                    "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
-                    "https://loopers.com/product/t-shirt.png",
-                    20000L
-            )));
-
-            //when
-            productService.decreaseLikeCount(product.getId());
-
-            //then
-            Product findProduct = productJpaRepository.findById(product.getId()).orElseThrow();
-            assertAll(
-                    () -> assertThat(findProduct.getLikeCount()).isEqualTo(0L)
-            );
-        }
-
-        @DisplayName("존재하지 않는 상품의 좋아요 수를 증가시키면 예외가 발생한다.")
-        @Test
-        void throwException_whenProductNotFound() {
-            //given
-            Long nonExistentProductId = 999L;
-
-            //when & then
-            assertThrows(CoreException.class, () -> {
-                productService.decreaseLikeCount(nonExistentProductId);
-            });
         }
     }
 

@@ -144,7 +144,7 @@ class PointFacadeTest {
             assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
         }
 
-        @DisplayName("유저의 포인트가 없는 경우, 포인트가 새로 생성되고 조회된다.")
+        @DisplayName("유저의 포인트가 없는 경우, NOT_FOUND 예외가 발생한다.")
         @Test
         void savePoint_whenPointDoesntExist(){
             //given
@@ -153,15 +153,12 @@ class PointFacadeTest {
             );
 
             //when
-            PointResult pointInfo = pointFacade.getBalance(user.getId());
+            CoreException exception = assertThrows(CoreException.class, () -> {
+                pointFacade.getBalance(user.getId());
+            });
 
             //then
-            Optional<Point> savedPoint = pointJpaRepository.findByUserId(user.getId());
-            assertAll(
-                    () -> assertThat(savedPoint).isNotNull(),
-                    () -> assertThat(savedPoint.get().getUserId()).isEqualTo(pointInfo.userId()),
-                    () -> assertThat(savedPoint.get().getBalance()).isEqualTo(pointInfo.balance())
-            );
+            assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
         }
     }
 }

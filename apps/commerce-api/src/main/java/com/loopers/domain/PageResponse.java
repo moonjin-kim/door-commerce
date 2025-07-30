@@ -2,17 +2,21 @@ package com.loopers.domain;
 
 import jakarta.persistence.GeneratedValue;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Getter
+@Setter
 public class PageResponse<T> {
-    private final int page;
-    private final int size;
-    private final long totalCount;
-    private final List<T> items;
+    private int page;
+    private int size;
+    private long totalCount;
+    private List<T> items;
+
+    public PageResponse() {}
 
     protected PageResponse(int page, int size, long totalCount, List<T> items) {
         this.page = page;

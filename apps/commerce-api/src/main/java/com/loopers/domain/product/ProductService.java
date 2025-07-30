@@ -1,5 +1,8 @@
 package com.loopers.domain.product;
 
+import com.loopers.domain.PageRequest;
+import com.loopers.domain.PageResponse;
+import com.loopers.infrastructure.product.ProductParams;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -15,33 +18,23 @@ import java.util.Optional;
 public class ProductService {
     private final ProductRepository productRepository;
 
-    public Optional<Product> getBy(Long id) {
-        return productRepository.findBy(id);
+    public ProductInfo getBy(Long id) {
+        return productRepository.findBy(id)
+                .map(ProductInfo::of)
+                .orElseThrow(() ->
+                        new CoreException(ErrorType.NOT_FOUND, "[productId = " + id + "] 존재하지 않는 상품입니다.")
+                );
     }
 
-    public ProductInfo.ProductPage search(ProductQuery.Search query) {
-        return productRepository.search(query.toParams());
+    public PageResponse<ProductInfo> search(PageRequest<ProductCommand.Search> command) {
+        PageRequest<ProductParams.Search> productParams = command.map(ProductCommand.Search::toParams);
+
+        PageResponse<Product> productPage = productRepository.search(productParams);
+
+        return productPage.map(ProductInfo::of);
     }
 
     public List<Product> findAllBy(List<Long> productIds) {
         return productRepository.findAllBy(productIds);
-    }
-
-    @Transactional
-    public void decreaseLikeCount(Long productId) {
-        Product product = productRepository.findBy(productId).orElseThrow(
-                () -> new CoreException(ErrorType.NOT_FOUND,"Product not found with id: " + productId)
-        );
-
-        product.decreaseLikeCount();
-    }
-
-    @Transactional
-    public void increaseLikeCount(Long productId) {
-        Product product = productRepository.findBy(productId).orElseThrow(
-                () -> new CoreException(ErrorType.NOT_FOUND,"Product not found with id: " + productId)
-        );
-
-        product.increaseLikeCount();
     }
 }

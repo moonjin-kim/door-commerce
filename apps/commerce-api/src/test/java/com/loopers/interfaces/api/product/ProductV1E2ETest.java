@@ -1,10 +1,10 @@
 package com.loopers.interfaces.api.product;
 
+import com.loopers.domain.PageResponse;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductCommand;
 import com.loopers.infrastructure.product.ProductJpaRepository;
 import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.interfaces.api.PageResponse;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -147,7 +147,7 @@ class ProductV1E2ETest {
                     () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
                     () -> assertThat(response.getBody().data().getTotalCount()).isEqualTo(2),
-                    () -> assertThat(response.getBody().data().getPageNum()).isEqualTo(0),
+                    () -> assertThat(response.getBody().data().getPage()).isEqualTo(1),
                     () -> assertThat(response.getBody().data().getSize()).isEqualTo(10),
                     () -> assertThat(response.getBody().data().getItems()).hasSize(2),
                     () -> assertThat(response.getBody().data().getItems().get(0).productId()).isEqualTo(product2.getId())
@@ -190,7 +190,7 @@ class ProductV1E2ETest {
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
                     () -> assertThat(response.getBody().data().getTotalCount()).isEqualTo(1),
-                    () -> assertThat(response.getBody().data().getPageNum()).isEqualTo(0),
+                    () -> assertThat(response.getBody().data().getPage()).isEqualTo(1),
                     () -> assertThat(response.getBody().data().getSize()).isEqualTo(10),
                     () -> assertThat(response.getBody().data().getItems()).hasSize(1),
                     () -> assertThat(response.getBody().data().getItems().get(0).productId()).isEqualTo(product1.getId())
@@ -233,7 +233,7 @@ class ProductV1E2ETest {
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
                     () -> assertThat(response.getBody().data().getTotalCount()).isEqualTo(2),
-                    () -> assertThat(response.getBody().data().getPageNum()).isEqualTo(0),
+                    () -> assertThat(response.getBody().data().getPage()).isEqualTo(1),
                     () -> assertThat(response.getBody().data().getSize()).isEqualTo(10),
                     () -> assertThat(response.getBody().data().getItems()).hasSize(2),
                     () -> assertThat(response.getBody().data().getItems().get(0).productId()).isEqualTo(product1.getId())

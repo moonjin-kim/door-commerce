@@ -15,6 +15,7 @@ public enum ErrorType {
 
     /** 포인트 에러 **/
     INVALID_POINT_AMOUNT(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(), "유효하지 않은 포인트 금액입니다."),
+    INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(), "포인트 잔액이 부족합니다."),
 
     /** 재고 에러 **/
     INSUFFICIENT_STOCK(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(), "재고가 부족합니다.");

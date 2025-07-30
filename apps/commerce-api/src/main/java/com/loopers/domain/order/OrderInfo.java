@@ -1,0 +1,35 @@
+package com.loopers.domain.order;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+public class OrderInfo {
+    public record OrderDto(
+            Long orderId,
+            Long userId,
+            List<OrderItemDto> orderItemDtos,
+            Long totalPrice,
+            LocalDateTime orderDate,
+            OrderStatus status
+    ) {
+        public static OrderDto of(Order order) {
+            List<OrderItemDto> orderItemDtos = order.getOrderItems().stream()
+                    .map(OrderItemDto::of)
+                    .toList();
+
+            return new OrderDto(order.getId(), order.getUserId(), orderItemDtos, order.getTotalPrice(), order.getOrderDate(), order.getStatus());
+        }
+    }
+
+    public record OrderItemDto(
+            Long productId,
+            String name,
+            int price,
+            int quantity
+    ) {
+        public static OrderItemDto of(OrderItem orderItem) {
+            return new OrderItemDto(orderItem.getProductId(), orderItem.getName(), orderItem.getProductPrice(), orderItem.getQuantity());
+        }
+    }
+
+}
