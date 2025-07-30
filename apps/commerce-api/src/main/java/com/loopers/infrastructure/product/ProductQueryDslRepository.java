@@ -18,7 +18,7 @@ import static com.loopers.domain.product.QProduct.product;
 
 @RequiredArgsConstructor
 @Component
-public class ProductQueryDslRepository implements ProductCustomRepository{
+public class ProductQueryDslRepository{
     private final JPAQueryFactory jpaQueryFactory;
 
     public PageResponse<Product> search(PageRequest<ProductParams.Search> param) {

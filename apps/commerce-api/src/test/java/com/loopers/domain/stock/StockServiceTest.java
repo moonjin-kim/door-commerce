@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.shaded.org.checkerframework.checker.units.qual.A;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -97,6 +99,97 @@ class StockServiceTest {
             Stock foundStock = stockJpaRepository.findById(productId).get();
             assertAll(
                     () -> assertThat(foundStock.getQuantity()).isEqualTo(stock.getQuantity() - 10)
+            );
+        }
+    }
+
+    @DisplayName("여러 상품의 재고를 감소시킬 때,")
+    @Nested
+    class decreaseAll {
+        @DisplayName("존재하지 않는 상품 아이디가 포함되면 NOT_FOUND 예외가 발생한다.")
+        @Test
+        void throwException_whenProductIdIsNotFound() {
+            //given
+            Long productId = 1L;
+            Stock stock = stockJpaRepository.save(new Stock(productId, 1));
+
+            //when
+            CoreException exception = assertThrows(CoreException.class, () -> {
+                stockService.decreaseAll(
+                        List.of(
+                                new StockCommand.Decrease(productId, 1),
+                                new StockCommand.Decrease(2L, 1)
+                        )
+                );
+            });
+
+            //then
+            assertEquals(ErrorType.NOT_FOUND, exception.getErrorType());
+        }
+
+        @DisplayName("재고가 차감시킬 수량보다 적으면 INSUFFICIENT_STOCK 예외가 발생한다.")
+        @Test
+        void throwInsufficientStock_whenQuantityIsLack() {
+            //given
+            Stock stock1 = stockJpaRepository.save(new Stock(1L, 10));
+            Stock stock2 = stockJpaRepository.save(new Stock(2L, 5));
+
+            //when
+            CoreException exception = assertThrows(CoreException.class, () -> {
+                stockService.decreaseAll(
+                        List.of(
+                                new StockCommand.Decrease(1L, 10),
+                                new StockCommand.Decrease(2L, 6)
+                        )
+                );
+            });
+
+            //then
+            assertThat(exception.getErrorType()).isEqualTo(ErrorType.INSUFFICIENT_STOCK);
+        }
+
+        @DisplayName("차감 수량이 0보다 작은 요청이 있으면 BadRequest 예외가 발생한다.")
+        @Test
+        void throwInsufficientStock_whenQuantityIsLowZero() {
+            //given
+            Stock stock1 = stockJpaRepository.save(new Stock(1L, 10));
+            Stock stock2 = stockJpaRepository.save(new Stock(2L, 5));
+
+            //when
+            CoreException exception = assertThrows(CoreException.class, () -> {
+                stockService.decreaseAll(
+                        List.of(
+                                new StockCommand.Decrease(1L, 10),
+                                new StockCommand.Decrease(2L, -1)
+                        )
+                );
+            });
+
+            //then
+            assertThat(exception.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+        }
+
+        @DisplayName("재고 감소가 성공적으로 이루어진다.")
+        @Test
+        void decreaseStockSuccessfully() {
+            //given
+            Stock stock1 = stockJpaRepository.save(new Stock(1L, 10));
+            Stock stock2 = stockJpaRepository.save(new Stock(2L, 15));
+
+            //when
+            stockService.decreaseAll(
+                    List.of(
+                            new StockCommand.Decrease(1L, 10),
+                            new StockCommand.Decrease(2L, 5)
+                    )
+            );
+
+            //then
+            Stock foundStock1 = stockJpaRepository.findById(stock1.getProductId()).get();
+            Stock foundStock2 = stockJpaRepository.findById(stock2.getProductId()).get();
+            assertAll(
+                    () -> assertThat(foundStock1.getQuantity()).isEqualTo(stock1.getQuantity() - 10),
+                    () -> assertThat(foundStock2.getQuantity()).isEqualTo(stock2.getQuantity() - 5)
             );
         }
     }

@@ -80,7 +80,7 @@ class ProductServiceTest {
 
     @DisplayName("상품을 검색할 때")
     @Nested
-    class Search {
+    class GetOrdersBy {
         @DisplayName("검색 조건이 주어지면 해당 조건에 맞는 상품 페이지를 반환한다.")
         @Test
         void returnProductPage_whenSearchQueryIsProvided() {

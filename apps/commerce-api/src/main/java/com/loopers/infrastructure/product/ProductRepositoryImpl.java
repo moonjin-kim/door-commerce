@@ -3,9 +3,7 @@ package com.loopers.infrastructure.product;
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
 import com.loopers.domain.product.Product;
-import com.loopers.domain.product.ProductInfo;
 import com.loopers.domain.product.ProductRepository;
-import com.loopers.domain.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +14,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProductRepositoryImpl implements ProductRepository {
     private final ProductJpaRepository productJpaRepository;
-    private final ProductCustomRepository productCustomRepository;
+    private final ProductQueryDslRepository productQueryDslRepository;
 
     @Override
     public Product save(Product product) {
@@ -35,6 +33,6 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     @Override
     public PageResponse<Product> search(PageRequest<ProductParams.Search> productSearch) {
-        return productCustomRepository.search(productSearch);
+        return productQueryDslRepository.search(productSearch);
     }
 }

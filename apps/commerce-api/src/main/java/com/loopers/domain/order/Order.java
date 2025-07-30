@@ -37,7 +37,7 @@ public class Order extends BaseEntity {
 
     private Order(Long userId, List<OrderItem> items, OrderStatus status) {
         if(userId == null || items == null || items.isEmpty()) {
-            throw new IllegalArgumentException("주문 정보가 올바르지 않습니다.");
+            throw new CoreException(ErrorType.BAD_REQUEST,"주문 정보가 올바르지 않습니다.");
         }
         this.userId = userId;
         this.orderItems = items;
@@ -60,12 +60,22 @@ public class Order extends BaseEntity {
                 .toList();
 
 
-        return new Order(command.userId(), orderItems,OrderStatus.PENDING);
+        return new Order(command.userId(), orderItems,OrderStatus.CONFIRMED);
     }
 
     private Long calculateTotalPrice() {
         return this.totalPrice = orderItems.stream()
                 .mapToLong(OrderItem::getTotalAmount)
                 .sum();
+    }
+
+    public void checkPermission(Long userId) {
+        if(userId == null) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "사용자 ID가 제공되지 않았습니다.");
+        }
+
+        if(!this.userId.equals(userId)) {
+            throw new CoreException(ErrorType.FORBIDDEN, "해당 주문에 대한 권한이 없습니다.");
+        }
     }
 }

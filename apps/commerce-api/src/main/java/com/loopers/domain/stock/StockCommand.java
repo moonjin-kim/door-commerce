@@ -20,11 +20,4 @@ public class StockCommand {
         }
     }
 
-    public record DecreaseItem(
-            Long productId,
-            int quantity
-    ) {
-
-    }
-
 }

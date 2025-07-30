@@ -107,7 +107,7 @@ class ProductV1E2ETest {
 
     @DisplayName("Get /api/v1/products")
     @Nested
-    class Search {
+    class GetOrdersBy {
         private static final String ENDPOINT_SEARCH = "/api/v1/products";
 
         @DisplayName("검색 조건이 주어지면 해당 조건에 맞는 상품 페이지를 반환한다.")
