@@ -14,11 +14,11 @@ public class OrderItem {
     @Column()
     private String name;
     @Column()
-    private int productPrice;
+    private long productPrice;
     @Column()
     private int quantity;
 
-    private OrderItem(Long productId, String name, int productPrice, int quantity) {
+    private OrderItem(Long productId, String name, long productPrice, int quantity) {
         this.productId = productId;
         this.name = name;
         this.productPrice = productPrice;

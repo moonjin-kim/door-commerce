@@ -9,6 +9,7 @@ public class OrderInfo {
             Long userId,
             List<OrderItemDto> orderItemDtos,
             Long totalPrice,
+            Long pointUsed,
             LocalDateTime orderDate,
             OrderStatus status
     ) {
@@ -17,14 +18,14 @@ public class OrderInfo {
                     .map(OrderItemDto::of)
                     .toList();
 
-            return new OrderDto(order.getId(), order.getUserId(), orderItemDtos, order.getTotalPrice(), order.getOrderDate(), order.getStatus());
+            return new OrderDto(order.getId(), order.getUserId(), orderItemDtos, order.getTotalPrice(), order.getPointUsed(), order.getOrderDate(), order.getStatus());
         }
     }
 
     public record OrderItemDto(
             Long productId,
             String name,
-            int price,
+            long price,
             int quantity
     ) {
         public static OrderItemDto of(OrderItem orderItem) {

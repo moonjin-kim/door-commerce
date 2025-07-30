@@ -7,11 +7,13 @@ public class OrderCommand {
             Long userId,
             List<OrderItem> orderItems
     ) {
-
+        public static Order of(Long userId, List<OrderItem> orderItems) {
+            return new Order(userId, orderItems);
+        }
     }
 
-    public record OrderItem(Long productId, String name, int price, int quantity) {
-        public static OrderItem of(Long productId, String name, int price, int quantity) {
+    public record OrderItem(Long productId, String name, long price, int quantity) {
+        public static OrderItem of(Long productId, String name, long price, int quantity) {
             return new OrderItem(productId, name, price, quantity);
         }
     }

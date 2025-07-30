@@ -5,7 +5,7 @@ import com.loopers.application.point.PointResult;
 public class PointV1Response {
     public record PointBalance(
             Long userId,
-            int balance
+            long balance
     ){
         public static PointBalance from(PointResult pointBalanceInfo) {
             return new PointBalance(

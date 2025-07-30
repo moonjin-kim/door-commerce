@@ -3,6 +3,7 @@ package com.loopers.application.like;
 import com.loopers.domain.like.LikeInfo;
 import com.loopers.domain.like.LikeQuery;
 import com.loopers.domain.product.Product;
+import com.loopers.domain.product.ProductInfo;
 
 import java.util.List;
 
@@ -16,13 +17,13 @@ public class LikeResult {
             Long likeCount,
             boolean isLiked
     ) {
-        public static LikeProduct of(Product product) {
+        public static LikeProduct of(ProductInfo product) {
             return new LikeProduct(
-                    product.getId(),
-                    product.getName(),
-                    product.getImageUrl(),
-                    product.getBrandId(),
-                    product.getLikeCount(),
+                    product.id(),
+                    product.name(),
+                    product.imageUrl(),
+                    product.brandId(),
+                    0L,
                     true
             );
         }

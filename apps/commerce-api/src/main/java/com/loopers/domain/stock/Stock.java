@@ -17,9 +17,9 @@ import lombok.NoArgsConstructor;
 @Getter
 public class Stock extends BaseEntity {
     @Column(unique = true)
-    Long productId;
+    private Long productId;
     @Column
-    int quantity;
+    private int quantity;
 
     protected Stock(Long productId, int quantity) {
         if (productId == null) {
@@ -37,6 +37,9 @@ public class Stock extends BaseEntity {
     }
 
     public void decrease(int quantity) {
+        if(quantity <= 0) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "재고 감소 수량은 0보다 커야 합니다.");
+        }
         if (this.quantity < quantity) {
             throw new CoreException(ErrorType.INSUFFICIENT_STOCK);
         }

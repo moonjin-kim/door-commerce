@@ -19,4 +19,12 @@ public class StockCommand {
             return new StockCommand.Decrease(productId, quantity);
         }
     }
+
+    public record DecreaseItem(
+            Long productId,
+            int quantity
+    ) {
+
+    }
+
 }

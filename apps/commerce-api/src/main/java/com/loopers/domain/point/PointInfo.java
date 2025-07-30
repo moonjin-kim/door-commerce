@@ -3,7 +3,7 @@ package com.loopers.domain.point;
 
 public record PointInfo(
         Long userId,
-        int balance
+        long balance
 ) {
     public static PointInfo of(Point point) {
         return new PointInfo(

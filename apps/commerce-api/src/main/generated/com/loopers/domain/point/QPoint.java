@@ -21,7 +21,7 @@ public class QPoint extends EntityPathBase<Point> {
 
     public final com.loopers.domain.QBaseEntity _super = new com.loopers.domain.QBaseEntity(this);
 
-    public final NumberPath<Integer> balance = createNumber("balance", Integer.class);
+    public final NumberPath<Long> balance = createNumber("balance", Long.class);
 
     //inherited
     public final DateTimePath<java.time.ZonedDateTime> createdAt = _super.createdAt;

@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +35,7 @@ public class ProductService {
         return productPage.map(ProductInfo::of);
     }
 
-    public List<Product> findAllBy(List<Long> productIds) {
-        return productRepository.findAllBy(productIds);
+    public List<ProductInfo> findAllBy(List<Long> productIds) {
+        return productRepository.findAllBy(productIds).stream().map(ProductInfo::of).collect(Collectors.toList());
     }
 }

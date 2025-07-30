@@ -16,10 +16,10 @@ import lombok.NoArgsConstructor;
 @Getter
 public class PointHistory extends BaseEntity {
     private Long orderId;
-    private int amount;
+    private long amount;
     private PointStatus status;
 
-    public PointHistory(int amount, Long orderId, PointStatus status) {
+    public PointHistory(long amount, Long orderId, PointStatus status) {
         this.amount = amount;
         this.orderId = orderId;
         this.status = status;

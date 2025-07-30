@@ -221,12 +221,12 @@ class ProductServiceTest {
             );
 
             //when
-            var products = productService.findAllBy(List.of(product1.getId(), product2.getId()));
+            List<ProductInfo> products = productService.findAllBy(List.of(product1.getId(), product2.getId()));
 
             //then
             assertAll(
                     () -> assertThat(products).hasSize(2),
-                    () -> assertThat(products).containsExactlyInAnyOrder(product1, product2)
+                    () -> assertThat(products).containsExactlyInAnyOrder(ProductInfo.of(product1), ProductInfo.of(product2))
             );
         }
     }

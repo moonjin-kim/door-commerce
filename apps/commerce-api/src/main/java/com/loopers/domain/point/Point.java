@@ -16,7 +16,7 @@ public class Point extends BaseEntity {
     @Column(nullable = false)
     private Long userId;
     @Column(nullable = false)
-    int balance;
+    long balance;
 
     public static Point init(Long userId) {
         Point point = new Point();
@@ -26,14 +26,14 @@ public class Point extends BaseEntity {
         return point;
     }
 
-    public void charge(int amount) {
+    public void charge(long amount) {
         if(amount <= 0) {
             throw new CoreException(ErrorType.INVALID_POINT_AMOUNT, "충전할 포인트는 0원 이상이어야 합니다.");
         }
         this.balance += amount;
     }
 
-    public void use(int amount) {
+    public void use(long amount) {
         if(amount <= 0) {
             throw new CoreException(ErrorType.INVALID_POINT_AMOUNT, "사용할 포인트는 0원 이상이어야 합니다.");
         }

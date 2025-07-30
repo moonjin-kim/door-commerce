@@ -23,7 +23,7 @@ public class QOrderItem extends BeanPath<OrderItem> {
 
     public final NumberPath<Long> productId = createNumber("productId", Long.class);
 
-    public final NumberPath<Integer> productPrice = createNumber("productPrice", Integer.class);
+    public final NumberPath<Long> productPrice = createNumber("productPrice", Long.class);
 
     public final NumberPath<Integer> quantity = createNumber("quantity", Integer.class);
 

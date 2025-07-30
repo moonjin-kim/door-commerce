@@ -10,7 +10,7 @@ public class OrderService {
 
     public OrderInfo.OrderDto order(OrderCommand.Order order) {
         // 주문 저장
-        Order savedOrder = orderRepository.save(Order.createOrder(order));
+        Order savedOrder = orderRepository.save(Order.order(order));
 
         // 주문 정보 반환
         return OrderInfo.OrderDto.of(savedOrder);
