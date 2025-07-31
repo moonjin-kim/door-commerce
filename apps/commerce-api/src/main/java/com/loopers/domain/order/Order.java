@@ -19,19 +19,24 @@ import java.util.List;
 public class Order extends BaseEntity {
     @Column
     private Long userId;
-    @Column
-    private Long totalPrice;
-    @Column
-    private Long pointUsed;
+    @AttributeOverrides({
+            @AttributeOverride(name="value", column = @Column(name="total_amount"))
+    })
+    private Money totalAmount;
+    @AttributeOverrides({
+            @AttributeOverride(name="value", column = @Column(name="point_used"))
+    })
+    private Money pointUsed;
     @Column
     LocalDateTime orderDate;
+    @Enumerated(EnumType.STRING)
     @Column
     private OrderStatus status;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
-            name = "orders_item_list",
-            joinColumns = @JoinColumn(name = "order_number")
+            name = "order_item", // OrderItem 정보를 저장할 별도 테이블의 이름
+            joinColumns = @JoinColumn(name = "order_id") // 이 테이블에서 Order를 참조할 외래 키(FK)
     )
     private List<OrderItem> orderItems = new ArrayList<>();
 
@@ -42,16 +47,11 @@ public class Order extends BaseEntity {
         this.userId = userId;
         this.orderItems = items;
         this.status = status;
-        this.totalPrice = calculateTotalPrice();
-        if(this.totalPrice < 0) {
-            throw new CoreException(ErrorType.BAD_REQUEST,"총 가격은 0보다 작을 수 없습니다.");
-        }
+        this.totalAmount = new Money(calculateTotalPrice());
+        this.orderDate = LocalDateTime.now();
 
         // todo: 지금은 포인트로 전액을 사용하는 구조이지만 결제가 생기면 분리할 예정
-        this.pointUsed = this.totalPrice;
-        if(this.pointUsed > this.totalPrice) {
-            throw new CoreException(ErrorType.BAD_REQUEST,"사용된 포인트는 총 가격보다 클 수 없습니다.");
-        }
+        this.pointUsed = this.totalAmount;
     }
 
     public static Order order(OrderCommand.Order command) {
@@ -64,7 +64,7 @@ public class Order extends BaseEntity {
     }
 
     private Long calculateTotalPrice() {
-        return this.totalPrice = orderItems.stream()
+        return orderItems.stream()
                 .mapToLong(OrderItem::getTotalAmount)
                 .sum();
     }

@@ -13,12 +13,20 @@ public class OrderInfo {
             LocalDateTime orderDate,
             OrderStatus status
     ) {
-        public static OrderDto of(Order order) {
+        public static OrderDto from(Order order) {
             List<OrderItemDto> orderItemDtos = order.getOrderItems().stream()
-                    .map(OrderItemDto::of)
+                    .map(OrderItemDto::from)
                     .toList();
 
-            return new OrderDto(order.getId(), order.getUserId(), orderItemDtos, order.getTotalPrice(), order.getPointUsed(), order.getOrderDate(), order.getStatus());
+            return new OrderDto(
+                    order.getId(),
+                    order.getUserId(),
+                    orderItemDtos,
+                    order.getTotalAmount().value(),
+                    order.getPointUsed().value(),
+                    order.getOrderDate(),
+                    order.getStatus()
+            );
         }
     }
 
@@ -28,8 +36,8 @@ public class OrderInfo {
             long price,
             int quantity
     ) {
-        public static OrderItemDto of(OrderItem orderItem) {
-            return new OrderItemDto(orderItem.getProductId(), orderItem.getName(), orderItem.getProductPrice(), orderItem.getQuantity());
+        public static OrderItemDto from(OrderItem orderItem) {
+            return new OrderItemDto(orderItem.getProductId(), orderItem.getName(), orderItem.getProductPrice().value(), orderItem.getQuantity());
         }
     }
 

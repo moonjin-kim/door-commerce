@@ -6,22 +6,23 @@ import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
 
+    @Transactional
     public OrderInfo.OrderDto order(OrderCommand.Order order) {
         // 주문 저장
         Order savedOrder = orderRepository.save(Order.order(order));
 
         // 주문 정보 반환
-        return OrderInfo.OrderDto.of(savedOrder);
+        return OrderInfo.OrderDto.from(savedOrder);
     }
 
+    @Transactional(readOnly = true)
     public OrderInfo.OrderDto getBy(OrderCommand.GetBy command) {
         // 주문 조회
         Order order = orderRepository.findById(command.orderId())
@@ -31,9 +32,10 @@ public class OrderService {
         order.checkPermission(command.userId());
 
         // 주문 정보 반환
-        return OrderInfo.OrderDto.of(order);
+        return OrderInfo.OrderDto.from(order);
     }
 
+    @Transactional(readOnly = true)
     public PageResponse<OrderInfo.OrderDto> getOrders(
             PageRequest<OrderCommand.GetOrdersBy> command
     ) {
@@ -43,6 +45,6 @@ public class OrderService {
         );
 
         // 주문 정보 반환
-        return orders.map(OrderInfo.OrderDto::of);
+        return orders.map(OrderInfo.OrderDto::from);
     }
 }

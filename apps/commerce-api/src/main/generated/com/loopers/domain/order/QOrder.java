@@ -18,6 +18,8 @@ public class QOrder extends EntityPathBase<Order> {
 
     private static final long serialVersionUID = 37960733L;
 
+    private static final PathInits INITS = PathInits.DIRECT2;
+
     public static final QOrder order = new QOrder("order1");
 
     public final com.loopers.domain.QBaseEntity _super = new com.loopers.domain.QBaseEntity(this);
@@ -35,11 +37,11 @@ public class QOrder extends EntityPathBase<Order> {
 
     public final ListPath<OrderItem, QOrderItem> orderItems = this.<OrderItem, QOrderItem>createList("orderItems", OrderItem.class, QOrderItem.class, PathInits.DIRECT2);
 
-    public final NumberPath<Long> pointUsed = createNumber("pointUsed", Long.class);
+    public final QMoney pointUsed;
 
     public final EnumPath<OrderStatus> status = createEnum("status", OrderStatus.class);
 
-    public final NumberPath<Long> totalPrice = createNumber("totalPrice", Long.class);
+    public final QMoney totalAmount;
 
     //inherited
     public final DateTimePath<java.time.ZonedDateTime> updatedAt = _super.updatedAt;
@@ -47,15 +49,25 @@ public class QOrder extends EntityPathBase<Order> {
     public final NumberPath<Long> userId = createNumber("userId", Long.class);
 
     public QOrder(String variable) {
-        super(Order.class, forVariable(variable));
+        this(Order.class, forVariable(variable), INITS);
     }
 
     public QOrder(Path<? extends Order> path) {
-        super(path.getType(), path.getMetadata());
+        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
     public QOrder(PathMetadata metadata) {
-        super(Order.class, metadata);
+        this(metadata, PathInits.getFor(metadata, INITS));
+    }
+
+    public QOrder(PathMetadata metadata, PathInits inits) {
+        this(Order.class, metadata, inits);
+    }
+
+    public QOrder(Class<? extends Order> type, PathMetadata metadata, PathInits inits) {
+        super(type, metadata, inits);
+        this.pointUsed = inits.isInitialized("pointUsed") ? new QMoney(forProperty("pointUsed")) : null;
+        this.totalAmount = inits.isInitialized("totalAmount") ? new QMoney(forProperty("totalAmount")) : null;
     }
 
 }

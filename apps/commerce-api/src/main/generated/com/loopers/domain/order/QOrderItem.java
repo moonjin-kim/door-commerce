@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -17,26 +18,37 @@ public class QOrderItem extends BeanPath<OrderItem> {
 
     private static final long serialVersionUID = 2013320400L;
 
+    private static final PathInits INITS = PathInits.DIRECT2;
+
     public static final QOrderItem orderItem = new QOrderItem("orderItem");
 
     public final StringPath name = createString("name");
 
     public final NumberPath<Long> productId = createNumber("productId", Long.class);
 
-    public final NumberPath<Long> productPrice = createNumber("productPrice", Long.class);
+    public final QMoney productPrice;
 
     public final NumberPath<Integer> quantity = createNumber("quantity", Integer.class);
 
     public QOrderItem(String variable) {
-        super(OrderItem.class, forVariable(variable));
+        this(OrderItem.class, forVariable(variable), INITS);
     }
 
     public QOrderItem(Path<? extends OrderItem> path) {
-        super(path.getType(), path.getMetadata());
+        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
     public QOrderItem(PathMetadata metadata) {
-        super(OrderItem.class, metadata);
+        this(metadata, PathInits.getFor(metadata, INITS));
+    }
+
+    public QOrderItem(PathMetadata metadata, PathInits inits) {
+        this(OrderItem.class, metadata, inits);
+    }
+
+    public QOrderItem(Class<? extends OrderItem> type, PathMetadata metadata, PathInits inits) {
+        super(type, metadata, inits);
+        this.productPrice = inits.isInitialized("productPrice") ? new QMoney(forProperty("productPrice")) : null;
     }
 
 }
