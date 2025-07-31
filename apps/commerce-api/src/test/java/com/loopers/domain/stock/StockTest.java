@@ -27,8 +27,8 @@ class StockTest {
 
             //then
             assertAll(
-                () -> assertThat(stock.productId).isEqualTo(productId),
-                () -> assertThat(stock.quantity).isEqualTo(quantity)
+                () -> assertThat(stock.getProductId()).isEqualTo(productId),
+                () -> assertThat(stock.getQuantity()).isEqualTo(quantity)
             );
         }
 
@@ -81,8 +81,8 @@ class StockTest {
 
             //then
             assertAll(
-                    () -> assertThat(stock.productId).isEqualTo(productId),
-                    () -> assertThat(stock.quantity).isEqualTo(5)
+                    () -> assertThat(stock.getProductId()).isEqualTo(productId),
+                    () -> assertThat(stock.getQuantity()).isEqualTo(5)
             );
         }
 

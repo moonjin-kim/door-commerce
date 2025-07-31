@@ -1,14 +1,16 @@
 package com.loopers.domain.product;
 
-import java.util.List;
-
-public class ProductInfo {
-    public record ProductPage(
-            int limit,
-            long offset,
-            long totalElements,
-            List<Product> items
+public record ProductInfo(
+        Long id,
+        Long brandId,
+        String name,
+        String description,
+        String imageUrl,
+        Long price
+) {
+    static public ProductInfo of(
+            Product product
     ) {
-
+        return new ProductInfo(product.getId(), product.getBrandId(),product.getName(), product.getDescription(), product.getImageUrl(), product.getPrice().getPrice());
     }
 }

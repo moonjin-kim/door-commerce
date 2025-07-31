@@ -119,7 +119,7 @@ class ProductLikeServiceTest {
 
     @DisplayName("유저의 좋아요를 검색할 때,")
     @Nested
-    class Search {
+    class GetOrdersBy {
         @DisplayName("유저의 좋아요를 검색하면, 좋아요 목록을 반환한다.")
         @Test
         void searchLikes() {

@@ -191,7 +191,7 @@ public class PointV1ApiE2ETest {
             );
         }
 
-        @DisplayName("충전 이력이 없는 유저가 잔액 조회에 성공할 경우, 잔액이 0으로 응답이 반환된다")
+        @DisplayName("충전 이력이 없는 유저 잔액을 조회할 경우, 404 Not Found 응답을 반환한다.")
         @Test
         void returnsUserZeroBalance_whenValidUserIdIsProvidedAndNotChargedHistory() {
             //given
@@ -215,8 +215,8 @@ public class PointV1ApiE2ETest {
 
             //then
             assertAll(
-                    () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().balance()).isEqualTo(0)
+                    () -> assertTrue(response.getStatusCode().is4xxClientError()),
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND)
             );
         }
 

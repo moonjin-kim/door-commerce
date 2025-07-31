@@ -169,7 +169,7 @@ sequenceDiagram
     alt 포인트 잔액이 부족하면(롤백 발생)
         PointService-->>OrderService: throw InsufficientPointException()
     else 포인트 잔액이 충분하면(롤백 발생)
-        OrderService->>ProductService: deductStocks(orderItems)
+        OrderService->>ProductService: deductStocks(orderItemDtos)
         alt 상품의 재고가 부족하여 차감되지 않은 경우(롤백 발생)
             ProductService-->>OrderService: 400 Bad Request (OutOfStockException)
         else 상품의 재고가 존재하여 차감된 경우

@@ -7,6 +7,7 @@ import com.loopers.domain.like.LikeQuery;
 import com.loopers.domain.like.LikeService;
 import com.loopers.domain.like.ProductLike;
 import com.loopers.domain.product.Product;
+import com.loopers.domain.product.ProductInfo;
 import com.loopers.domain.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -30,16 +31,14 @@ public class LikeFacade {
                 .map(LikeInfo.Like::productId)
                 .collect(Collectors.toList());
 
-        // 3. 추출된 productId 리스트를 사용하여 'Product' 목록을 한 번에 조회합니다.
-        List<Product> products = productService.findAllBy(productIds);
+        List<ProductInfo> products = productService.findAllBy(productIds);
 
-        // 4. 조회된 Product 목록을 Map<productId, Product> 형태로 변환하여 검색 효율을 높입니다.
-        Map<Long, Product> productMap = products.stream()
-                .collect(Collectors.toMap(Product::getId, product -> product));
+        Map<Long, ProductInfo> productMap = products.stream()
+                .collect(Collectors.toMap(ProductInfo::id, productInfo -> productInfo));
 
         List<LikeResult.LikeProduct> likeProducts = searchResult.getItems().stream()
                 .map(like -> {
-                    Product product = productMap.get(like.productId());
+                    ProductInfo product = productMap.get(like.productId());
                     return LikeResult.LikeProduct.of(product);
                 })
                 .toList();

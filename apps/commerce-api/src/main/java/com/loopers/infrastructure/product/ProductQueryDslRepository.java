@@ -1,5 +1,7 @@
 package com.loopers.infrastructure.product;
 
+import com.loopers.domain.PageRequest;
+import com.loopers.domain.PageResponse;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductInfo;
 import com.loopers.domain.product.vo.ProductStatus;
@@ -16,33 +18,31 @@ import static com.loopers.domain.product.QProduct.product;
 
 @RequiredArgsConstructor
 @Component
-public class ProductQueryDslRepository implements ProductCustomRepository{
+public class ProductQueryDslRepository{
     private final JPAQueryFactory jpaQueryFactory;
 
-    public ProductInfo.ProductPage search(ProductParams.Search postSearch) {
-
+    public PageResponse<Product> search(PageRequest<ProductParams.Search> param) {
         List<Product> items = jpaQueryFactory.selectFrom(product)
-                .limit(postSearch.limit())
-                .offset(postSearch.offset())
+                .limit(param.limit())
+                .offset(param.offset())
                 .where(
                         product.status.eq(ProductStatus.SALE),
-                        eqBrandId(postSearch.brandId())
+                        eqBrandId(param.getParams().brandId())
                 )
-                .orderBy(getOrderSpecifier(postSearch.sort()))
+                .orderBy(getOrderSpecifier(param.getParams().sort()))
                 .fetch();
 
         Long totalCount = jpaQueryFactory.select(product.count())
                 .from(product)
                 .where(
                         product.status.eq(ProductStatus.SALE),
-                        eqBrandId(postSearch.brandId()) // 동일한 where 조건 추가
+                        eqBrandId(param.getParams().brandId()) // 동일한 where 조건 추가
                 )
                 .fetchOne();
 
         long count = totalCount != null ? totalCount : 0L;
 
-        return new ProductInfo.ProductPage(postSearch.limit(),postSearch.offset(),
-                count, items);
+        return PageResponse.of(param.getPage(),param.getSize(), count, items);
     }
 
     private BooleanExpression eqBrandId(Long brandId) {

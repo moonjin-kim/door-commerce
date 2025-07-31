@@ -49,7 +49,7 @@ public class PointServiceIntegrationTest {
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                pointService.initPoint(userId);
+                pointService.init(userId);
             });
 
             //then
@@ -63,7 +63,7 @@ public class PointServiceIntegrationTest {
             Long userId = 1L;
 
             //when
-            Point point = pointService.initPoint(userId);
+            Point point = pointService.init(userId);
 
             //then
             Optional<Point> savedPoint = pointJpaRepository.findByUserId(userId);
@@ -87,13 +87,13 @@ public class PointServiceIntegrationTest {
             PointCommand.Charge chargeCommand = PointCommand.Charge.of(user.getId(), 10000);
 
             //when
-            Point result = pointService.chargePoint(chargeCommand);
+            PointInfo result = pointService.charge(chargeCommand);
 
             //then
             assertAll(
                     () -> assertThat(result).isNotNull(),
-                    () -> assertThat(result.getUserId()).isEqualTo(user.getId()),
-                    () -> assertThat(result.getBalance()).isEqualTo(chargeCommand.amount())
+                    () -> assertThat(result.userId()).isEqualTo(user.getId()),
+                    () -> assertThat(result.balance()).isEqualTo(chargeCommand.amount())
             );
         }
 
@@ -111,13 +111,13 @@ public class PointServiceIntegrationTest {
             PointCommand.Charge chargeCommand = PointCommand.Charge.of(user.getId(), 10000);
 
             //when
-            Point result = pointService.chargePoint(chargeCommand);
+            PointInfo result = pointService.charge(chargeCommand);
 
             //then
             assertAll(
                     () -> assertThat(result).isNotNull(),
-                    () -> assertThat(result.getUserId()).isEqualTo(user.getId()),
-                    () -> assertThat(result.getBalance()).isEqualTo(point.balance + chargeCommand.amount())
+                    () -> assertThat(result.userId()).isEqualTo(user.getId()),
+                    () -> assertThat(result.balance()).isEqualTo(point.balance + chargeCommand.amount())
             );
         }
 
@@ -135,7 +135,7 @@ public class PointServiceIntegrationTest {
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                pointService.chargePoint(chargeCommand);
+                pointService.charge(chargeCommand);
             });
 
             //then
@@ -151,7 +151,7 @@ public class PointServiceIntegrationTest {
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                pointService.chargePoint(chargeCommand);
+                pointService.charge(chargeCommand);
             });
 
             //then
@@ -168,7 +168,7 @@ public class PointServiceIntegrationTest {
             PointCommand.Charge chargeCommand = PointCommand.Charge.of(user.getId(), amount);
 
             //when
-            Point result = pointService.chargePoint(chargeCommand);
+            PointInfo result = pointService.charge(chargeCommand);
 
             //then
             Optional<Point> savedPoint = pointJpaRepository.findByUserId(user.getId());
@@ -199,22 +199,24 @@ public class PointServiceIntegrationTest {
             );
 
             //when
-            Point result = pointService.getPoint(user.getId()).orElse(null);
+            PointInfo result = pointService.get(user.getId());
 
             //then
-            assertThat(result.balance).isEqualTo(point.balance);
+            assertThat(result.balance()).isEqualTo(point.balance);
         }
 
-        @DisplayName("존재하지 않는 유저이면, null이 반환된다.")
+        @DisplayName("존재하지 않는 유저이면, NotFound 예외가 발생한다.")
         @Test
-        void returnNullPoint_whenUserNotExist(){
+        void throwNotFound_whenUserNotExist(){
             //given
 
             //when
-            Optional<Point> result = pointService.getPoint(null);
+            CoreException exception = assertThrows(CoreException.class, () -> {
+                pointService.get(null);
+            });
 
             //then
-            assertThat(result.isPresent()).isFalse();
+            assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
         }
     }
 }

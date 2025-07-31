@@ -14,32 +14,14 @@ public class ProductResult {
             String imageUrl,
             Long price
     ) {
-        public static ProductDto of(Product product) {
+        public static ProductDto of(ProductInfo product) {
             return new ProductDto(
-                    product.getId(),
-                    product.getBrandId(),
-                    product.getName(),
-                    product.getDescription(),
-                    product.getImageUrl(),
-                    product.getPrice().getPrice()
-            );
-        }
-    }
-
-    public record ProductPage(
-            Long totalCount,
-            int limit,
-            Long offset,
-            List<ProductDto> products
-    ) {
-        public static ProductPage of(ProductInfo.ProductPage productPage) {
-            return new ProductPage(
-                    productPage.totalElements(),
-                    productPage.limit(),
-                    productPage.offset(),
-                    productPage.items().stream()
-                            .map(ProductDto::of)
-                            .toList()
+                    product.id(),
+                    product.brandId(),
+                    product.name(),
+                    product.description(),
+                    product.imageUrl(),
+                    product.price()
             );
         }
     }

@@ -1,16 +1,21 @@
 package com.loopers.domain;
 
+import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.function.Function;
 
-@Getter
+@Data
 public class PageRequest<T> {
-    private final int page;
-    private final int size;
-    private final T params;
+    private int page;
+    private int size;
+    private T params;
 
-    protected PageRequest(int page, int size, T params) {
+    public PageRequest() {
+    }
+
+    public PageRequest(int page, int size, T params) {
         this.page = page;
         this.size = size;
         this.params = params;

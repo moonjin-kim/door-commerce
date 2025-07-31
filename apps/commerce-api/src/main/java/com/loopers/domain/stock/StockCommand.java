@@ -19,4 +19,5 @@ public class StockCommand {
             return new StockCommand.Decrease(productId, quantity);
         }
     }
+
 }
