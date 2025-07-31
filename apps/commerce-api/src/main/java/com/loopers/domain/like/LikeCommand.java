@@ -18,4 +18,13 @@ public class LikeCommand {
             return new UnLike(userId, productId);
         }
     }
+
+    public record IsLiked(
+            Long userId,
+            Long productId
+    ) {
+        public static IsLiked of(Long userId, Long productId) {
+            return new IsLiked(userId, productId);
+        }
+    }
 }

@@ -6,21 +6,24 @@ public class ProductV1Response {
     public record ProductDetail(
             Long productId,
             Long brandId,
+            String brandName,
             String name,
             String description,
             String imageUrl,
-            Long price
+            Long price,
 //            long lickCount,
-//            boolean isSuccess,
+            boolean isLiked
     ) {
-        public static ProductDetail of(ProductResult.ProductDto product) {
+        public static ProductDetail of(ProductResult.ProductDetail product) {
             return new ProductDetail(
                     product.id(),
                     product.brandId(),
+                    product.brandName(),
                     product.name(),
                     product.description(),
                     product.imageUrl(),
-                    product.price()
+                    product.price(),
+                    product.isLiked()
             );
         }
     }

@@ -1,8 +1,11 @@
 package com.loopers.interfaces.api.product;
 
 import com.loopers.domain.PageResponse;
+import com.loopers.domain.brand.Brand;
+import com.loopers.domain.brand.BrandCommand;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductCommand;
+import com.loopers.infrastructure.brand.BrandJpaRepository;
 import com.loopers.infrastructure.product.ProductJpaRepository;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.utils.DatabaseCleanUp;
@@ -26,13 +29,16 @@ class ProductV1E2ETest {
     @Autowired
     private final ProductJpaRepository productJpaRepository;
     @Autowired
+    private final BrandJpaRepository brandJpaRepository;
+    @Autowired
     private final TestRestTemplate testRestTemplate;
     @Autowired
     private final DatabaseCleanUp databaseCleanUp;
 
     @Autowired
-    public ProductV1E2ETest(ProductJpaRepository productJpaRepository, TestRestTemplate testRestTemplate, DatabaseCleanUp databaseCleanUp) {
+    public ProductV1E2ETest(ProductJpaRepository productJpaRepository,BrandJpaRepository brandJpaRepository, TestRestTemplate testRestTemplate, DatabaseCleanUp databaseCleanUp) {
         this.productJpaRepository = productJpaRepository;
+        this.brandJpaRepository = brandJpaRepository;
         this.testRestTemplate = testRestTemplate;
         this.databaseCleanUp = databaseCleanUp;
     }
@@ -77,6 +83,11 @@ class ProductV1E2ETest {
         @Test
         void getBrandResponse_whenBrandIdIsProvide(){
             //given
+            var brand = brandJpaRepository.save(
+                    Brand.create(
+                            new BrandCommand.Create("루퍼스", "루퍼스 공식 브랜드", "https://loopers.com/brand/logo.png")
+                    )
+            );
             var product = productJpaRepository.save(
                     Product.create(ProductCommand.Create.of(
                             1L,

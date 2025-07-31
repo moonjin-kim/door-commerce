@@ -2,6 +2,11 @@ package com.loopers.application.product;
 
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
+import com.loopers.domain.brand.BrandInfo;
+import com.loopers.domain.brand.BrandService;
+import com.loopers.domain.like.LikeCommand;
+import com.loopers.domain.like.LikeInfo;
+import com.loopers.domain.like.LikeService;
 import com.loopers.domain.product.ProductCommand;
 import com.loopers.domain.product.ProductInfo;
 import com.loopers.domain.product.ProductService;
@@ -14,11 +19,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ProductFacade {
     private final ProductService productService;
+    private final BrandService brandService;
+    private final LikeService likeService;
 
-    public ProductResult.ProductDto getBy(Long productId) {
+    public ProductResult.ProductDetail getBy(Long productId, Long userId) {
         ProductInfo product = productService.getBy(productId);
 
-        return ProductResult.ProductDto.of(product);
+        BrandInfo brandInfo = brandService.findBy(product.brandId());
+
+        LikeInfo.IsLiked likeInfo = likeService.isLiked(
+                LikeCommand.IsLiked.of(userId, productId)
+        );
+
+        return ProductResult.ProductDetail.from(product, brandInfo, likeInfo.isLiked());
     }
 
 
@@ -27,7 +40,7 @@ public class ProductFacade {
 
         PageResponse<ProductInfo> productPage = productService.search(searchCommand);
 
-        return productPage.map(ProductResult.ProductDto::of);
+        return productPage.map(ProductResult.ProductDto::from);
     }
 
 }

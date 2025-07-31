@@ -47,7 +47,7 @@ public class ProductV1Controller implements ProductV1ApiSpec{
             @RequestHeader("X-USER-ID") Long userId,
             @PathVariable(value = "productId")Long brandId
     ) {
-        ProductResult.ProductDto product = productFacade.getBy(brandId);
+        ProductResult.ProductDetail product = productFacade.getBy(brandId, userId);
 
         return ApiResponse.success(
                 ProductV1Response.ProductDetail.of(product)
