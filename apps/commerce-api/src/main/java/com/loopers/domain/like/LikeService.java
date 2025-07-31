@@ -2,7 +2,6 @@ package com.loopers.domain.like;
 
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
-import com.loopers.infrastructure.like.LikeParams;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,22 +18,22 @@ public class LikeService {
     }
 
     @Transactional
-    public LikeInfo.AddLikeResult like(LikeCommand.Like command) {
+    public LikeInfo.LikeResult like(LikeCommand.Like command) {
         if (likeRepository.existsBy(command.userId(), command.productId())) {
-            return LikeInfo.AddLikeResult.fail();
+            return LikeInfo.LikeResult.fail();
         }
 
         likeRepository.save(ProductLike.create(command));
-        return LikeInfo.AddLikeResult.success();
+        return LikeInfo.LikeResult.success();
     }
 
     @Transactional
-    public LikeInfo.DeleteLikeResult unlike(Long userId, Long productId) {
-        if (likeRepository.existsBy(userId, productId)) {
-            likeRepository.delete(userId, productId);
-            return LikeInfo.DeleteLikeResult.success();
+    public LikeInfo.UnLikeResult unlike(LikeCommand.UnLike command) {
+        if (likeRepository.existsBy(command.userId(), command.productId())) {
+            likeRepository.delete(command.userId(), command.productId());
+            return LikeInfo.UnLikeResult.success();
         }
 
-        return LikeInfo.DeleteLikeResult.fail();
+        return LikeInfo.UnLikeResult.fail();
     }
 }

@@ -2,6 +2,7 @@ package com.loopers.domain.point;
 
 import com.loopers.domain.user.User;
 import com.loopers.fixture.UserFixture;
+import com.loopers.infrastructure.point.PointHistoryJpaRepository;
 import com.loopers.infrastructure.point.PointJpaRepository;
 import com.loopers.infrastructure.user.UserJpaRepository;
 import com.loopers.support.error.CoreException;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,6 +29,8 @@ public class PointServiceIntegrationTest {
     private UserJpaRepository userJpaRepository;
     @Autowired
     private PointJpaRepository pointJpaRepository;
+    @Autowired
+    private PointHistoryJpaRepository pointHistoryJpaRepository;
     @Autowired
     private PointService pointService;
     @Autowired
@@ -84,7 +88,7 @@ public class PointServiceIntegrationTest {
         void returnPoint(){
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
-            PointCommand.Charge chargeCommand = PointCommand.Charge.of(user.getId(), 10000);
+            PointCommand.Charge chargeCommand = PointCommand.Charge.of(user.getId(), 10000L);
 
             //when
             PointInfo result = pointService.charge(chargeCommand);
@@ -95,6 +99,25 @@ public class PointServiceIntegrationTest {
                     () -> assertThat(result.userId()).isEqualTo(user.getId()),
                     () -> assertThat(result.balance()).isEqualTo(chargeCommand.amount())
             );
+        }
+
+        @DisplayName("포인트가 정상적으로 충전되면 포인트 충전 이력이 저장된다.")
+        @Test
+        void savedRequest_whenAmountLessThanBalance() {
+            //given
+            User user = userJpaRepository.save(UserFixture.createMember());
+            Point point = pointJpaRepository.save(Point.init(user.getId()));
+
+            //when
+            PointInfo result = pointService.charge(PointCommand.Charge.of(user.getId(),500L));
+
+            //then
+            List<PointHistory> savedPoint = pointHistoryJpaRepository.findAll();
+            assertThat(savedPoint).hasSize(1);
+            assertThat(savedPoint.get(0).getStatus()).isEqualTo(PointStatus.CHARGE);
+            assertThat(savedPoint.get(0).getPointId()).isEqualTo(point.getId());
+            assertThat(savedPoint.get(0).getAmount()).isEqualTo(500L);
+            assertThat(result.balance()).isEqualTo(500L);
         }
 
         @DisplayName("해당 ID에 잔액이 남아있으면 잔액에 충전 포인트가 더해진다.")
@@ -108,7 +131,7 @@ public class PointServiceIntegrationTest {
             Point chargedPoint = pointJpaRepository.save(
                     point
             );
-            PointCommand.Charge chargeCommand = PointCommand.Charge.of(user.getId(), 10000);
+            PointCommand.Charge chargeCommand = PointCommand.Charge.of(user.getId(), 10000L);
 
             //when
             PointInfo result = pointService.charge(chargeCommand);
@@ -131,7 +154,7 @@ public class PointServiceIntegrationTest {
             Point chargedPoint = pointJpaRepository.save(
                     point
             );
-            PointCommand.Charge chargeCommand = PointCommand.Charge.of(null, 10000);
+            PointCommand.Charge chargeCommand = PointCommand.Charge.of(null, 10000L);
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
@@ -147,7 +170,7 @@ public class PointServiceIntegrationTest {
         void throwInvalidPointAmount_whenZeroPoint(){
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
-            PointCommand.Charge chargeCommand = PointCommand.Charge.of(user.getId(), 0);
+            PointCommand.Charge chargeCommand = PointCommand.Charge.of(user.getId(), 0L);
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
@@ -164,7 +187,7 @@ public class PointServiceIntegrationTest {
         void saveNewPointAndCharge_whenPointExist(){
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
-            int amount = 1000;
+            Long amount = 1000L;
             PointCommand.Charge chargeCommand = PointCommand.Charge.of(user.getId(), amount);
 
             //when
@@ -217,6 +240,82 @@ public class PointServiceIntegrationTest {
 
             //then
             assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
+        }
+    }
+
+    @DisplayName("포인트를 사용할 때,")
+    @Nested
+    class Using {
+        @DisplayName("잔액보다 많은 금액 사용요청이 발생하면, 예외가 발생한다.")
+        @Test
+        void throwInsufficientBalance_whenAmountMoreThanBalance() {
+            //given
+            User user = userJpaRepository.save(UserFixture.createMember());
+            Point point = Point.init(user.getId());
+            point.charge(1000);
+            pointJpaRepository.save(point);
+
+            //when
+            CoreException exception = assertThrows(CoreException.class, () -> {
+                pointService.using(PointCommand.Using.of(user.getId(), 1L,2000L));
+            });
+
+            //then
+            assertThat(exception.getErrorType()).isEqualTo(ErrorType.INSUFFICIENT_BALANCE);
+        }
+
+        @DisplayName("잔액보다 적은 금액 사용요청이 발생하면, 잔액에서 차감된다.")
+        @Test
+        void deductBalance_whenAmountLessThanBalance() {
+            //given
+            User user = userJpaRepository.save(UserFixture.createMember());
+            Point point = Point.init(user.getId());
+            point.charge(1000);
+            pointJpaRepository.save(point);
+
+            //when
+            PointInfo result = pointService.using(PointCommand.Using.of(user.getId(), 1L,500L));
+
+            //then
+            assertThat(result.balance()).isEqualTo(500L);
+        }
+
+        @DisplayName("잔액이 정상적으로 차감되면 잔액 차감 후 포인트 사용 이력이 저장된다.")
+        @Test
+        void savedRequest_whenAmountLessThanBalance() {
+            //given
+            User user = userJpaRepository.save(UserFixture.createMember());
+            Point point = Point.init(user.getId());
+            point.charge(1000);
+            pointJpaRepository.save(point);
+
+            //when
+            PointInfo result = pointService.using(PointCommand.Using.of(user.getId(), 1L,500L));
+
+            //then
+            Optional<PointHistory> savedPoint = pointHistoryJpaRepository.findByOrderId(1L);
+            assertThat(savedPoint).isPresent();
+            assertThat(savedPoint.get().getStatus()).isEqualTo(PointStatus.USE);
+            assertThat(savedPoint.get().getAmount()).isEqualTo(-500L);
+            assertThat(result.balance()).isEqualTo(500L);
+        }
+
+        @DisplayName("0 이하의 금액을 사용 요청하면, INVALID_POINT_AMOUNT 예외가 발생한다.")
+        @Test
+        void throwInvalidPointAmount_whenZeroOrLessAmount() {
+            //given
+            User user = userJpaRepository.save(UserFixture.createMember());
+            Point point = Point.init(user.getId());
+            point.charge(1000);
+            pointJpaRepository.save(point);
+
+            //when
+            CoreException exception = assertThrows(CoreException.class, () -> {
+                pointService.using(PointCommand.Using.of(user.getId(), 1L,0L));
+            });
+
+            //then
+            assertThat(exception.getErrorType()).isEqualTo(ErrorType.INVALID_POINT_AMOUNT);
         }
     }
 }

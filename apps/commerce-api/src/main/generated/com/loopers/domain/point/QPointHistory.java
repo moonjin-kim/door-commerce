@@ -34,6 +34,8 @@ public class QPointHistory extends EntityPathBase<PointHistory> {
 
     public final NumberPath<Long> orderId = createNumber("orderId", Long.class);
 
+    public final NumberPath<Long> pointId = createNumber("pointId", Long.class);
+
     public final EnumPath<PointStatus> status = createEnum("status", PointStatus.class);
 
     //inherited

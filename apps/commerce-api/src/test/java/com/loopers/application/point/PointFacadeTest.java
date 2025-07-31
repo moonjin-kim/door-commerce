@@ -47,7 +47,7 @@ class PointFacadeTest {
         void returnPoint(){
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
-            var chargeRequest = new PointV1Request.PointChargeRequest(1000);
+            var chargeRequest = new PointV1Request.PointChargeRequest(1000L);
 
             //when
             PointResult result = pointFacade.charge(user.getId(), chargeRequest);
@@ -72,7 +72,7 @@ class PointFacadeTest {
                     point
             );
 
-            var chargeRequest = new PointV1Request.PointChargeRequest(1000);
+            var chargeRequest = new PointV1Request.PointChargeRequest(1000L);
 
             //when
             PointResult result = pointFacade.charge(user.getId(), chargeRequest);
@@ -89,7 +89,7 @@ class PointFacadeTest {
         @Test
         void throwException_whenInvalidIdIsProvided(){
             //given
-            var chargeRequest = new PointV1Request.PointChargeRequest(1000);
+            var chargeRequest = new PointV1Request.PointChargeRequest(1000L);
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {

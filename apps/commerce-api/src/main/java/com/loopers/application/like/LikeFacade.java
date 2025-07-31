@@ -24,6 +24,16 @@ public class LikeFacade {
     private final LikeService likeService;
     private final ProductService productService;
 
+    public String like(LikeCriteria.Like like) {
+        LikeInfo.LikeResult productLike = likeService.like(like.toCommand());
+        return "좋아요에 성공했습니다";
+    }
+
+    public String unLike(LikeCriteria.UnLike like) {
+        LikeInfo.UnLikeResult productLike = likeService.unlike(like.toCommand());
+        return "좋아요에 성공했습니다";
+    }
+
     public PageResponse<LikeResult.LikeProduct> search(PageRequest<LikeQuery.Search> query) {
         PageResponse<LikeInfo.Like> searchResult = likeService.search(query);
 

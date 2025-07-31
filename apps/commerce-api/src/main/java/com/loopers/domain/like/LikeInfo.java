@@ -1,32 +1,28 @@
 package com.loopers.domain.like;
 
-import com.loopers.domain.product.Product;
-
-import java.util.List;
-
 public class LikeInfo {
-    public record AddLikeResult(
+    public record LikeResult(
             boolean isSuccess
     ) {
-        public static AddLikeResult fail() {
-            return new AddLikeResult(false);
+        public static LikeResult fail() {
+            return new LikeResult(false);
         }
 
-        public static AddLikeResult success() {
-            return new AddLikeResult(true);
+        public static LikeResult success() {
+            return new LikeResult(true);
         }
     }
 
-    public record DeleteLikeResult(
+    public record UnLikeResult(
             boolean isSuccess
     ) {
 
-        public static DeleteLikeResult fail() {
-            return new DeleteLikeResult(false);
+        public static UnLikeResult fail() {
+            return new UnLikeResult(false);
         }
 
-        public static DeleteLikeResult success() {
-            return new DeleteLikeResult(true);
+        public static UnLikeResult success() {
+            return new UnLikeResult(true);
         }
     }
 

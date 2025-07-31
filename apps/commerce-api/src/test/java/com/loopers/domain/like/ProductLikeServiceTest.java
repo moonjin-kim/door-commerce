@@ -44,7 +44,7 @@ class ProductLikeServiceTest {
             var command = LikeCommand.Like.of(userId, productId);
 
             //when
-            LikeInfo.AddLikeResult result = likeService.like(command);
+            LikeInfo.LikeResult result = likeService.like(command);
 
             //then
             boolean foundLike = likeJpaRepository.existsByUserIdAndProductId(command.userId(), command.productId());
@@ -65,7 +65,7 @@ class ProductLikeServiceTest {
             likeJpaRepository.save(ProductLike.create(command));
 
             //when
-            LikeInfo.AddLikeResult result = likeService.like(command);
+            LikeInfo.LikeResult result = likeService.like(command);
 
             //then
             assertAll(
@@ -84,9 +84,10 @@ class ProductLikeServiceTest {
             Long userId = 1L;
             Long productId = 1L;
             likeJpaRepository.save(ProductLike.create(LikeCommand.Like.of(userId, productId)));
+            LikeCommand.UnLike command = LikeCommand.UnLike.of(userId, productId);
 
             //when
-            LikeInfo.DeleteLikeResult result = likeService.unlike(userId, productId);
+            LikeInfo.UnLikeResult result = likeService.unlike(command);
 
             //then
             boolean foundLike = likeJpaRepository.existsByUserIdAndProductId(userId, productId);
@@ -103,9 +104,10 @@ class ProductLikeServiceTest {
             //given
             Long userId = 1L;
             Long productId = 1L;
+            LikeCommand.UnLike command = LikeCommand.UnLike.of(userId, productId);
 
             //when
-            LikeInfo.DeleteLikeResult result = likeService.unlike(userId, productId);
+            LikeInfo.UnLikeResult result = likeService.unlike(command);
 
             //then
             boolean foundLike = likeJpaRepository.existsByUserIdAndProductId(userId, productId);
