@@ -63,9 +63,9 @@ class UserV1ApiE2ETest {
             );
 
             //when
-            ParameterizedTypeReference<ApiResponse<UserV1ResponseDto.UserResponse>> responseType = new ParameterizedTypeReference<>() {
+            ParameterizedTypeReference<ApiResponse<UserV1ResponseDto.User>> responseType = new ParameterizedTypeReference<>() {
             };
-            ResponseEntity<ApiResponse<UserV1ResponseDto.UserResponse>> response =
+            ResponseEntity<ApiResponse<UserV1ResponseDto.User>> response =
                     testRestTemplate.exchange(
                             ENDPOINT_REGISTER,
                             HttpMethod.POST,
@@ -133,9 +133,9 @@ class UserV1ApiE2ETest {
             headers.set("X-USER-ID", String.valueOf(user.getId()));
 
             //when
-            ParameterizedTypeReference<ApiResponse<UserV1ResponseDto.UserResponse>> responseType = new ParameterizedTypeReference<>() {
+            ParameterizedTypeReference<ApiResponse<UserV1ResponseDto.User>> responseType = new ParameterizedTypeReference<>() {
             };
-            ResponseEntity<ApiResponse<UserV1ResponseDto.UserResponse>> response =
+            ResponseEntity<ApiResponse<UserV1ResponseDto.User>> response =
                     testRestTemplate.exchange(
                             ENDPOINT_GET_ME,
                             HttpMethod.GET,
@@ -147,9 +147,9 @@ class UserV1ApiE2ETest {
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
                     () -> assertThat(response.getBody().data().id()).isEqualTo(user.getId()),
-                    () -> assertThat(response.getBody().data().account()).isEqualTo(user.getAccount()),
+                    () -> assertThat(response.getBody().data().account()).isEqualTo(user.getAccount().value()),
                     () -> assertThat(response.getBody().data().birthday()).isEqualTo(user.getBirthday()),
-                    () -> assertThat(response.getBody().data().email()).isEqualTo(user.getEmail()),
+                    () -> assertThat(response.getBody().data().email()).isEqualTo(user.getEmail().value()),
                     () -> assertThat(response.getBody().data().gender()).isEqualTo(UserV1ResponseDto.GenderResponse.from(user.getGender()))
             );
         }
@@ -163,9 +163,9 @@ class UserV1ApiE2ETest {
             headers.set("X-USER-ID", "-1");
 
             //when
-            ParameterizedTypeReference<ApiResponse<UserV1ResponseDto.UserResponse>> responseType = new ParameterizedTypeReference<>() {
+            ParameterizedTypeReference<ApiResponse<UserV1ResponseDto.User>> responseType = new ParameterizedTypeReference<>() {
             };
-            ResponseEntity<ApiResponse<UserV1ResponseDto.UserResponse>> response =
+            ResponseEntity<ApiResponse<UserV1ResponseDto.User>> response =
                     testRestTemplate.exchange(
                             ENDPOINT_GET_ME,
                             HttpMethod.GET,

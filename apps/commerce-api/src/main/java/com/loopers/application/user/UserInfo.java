@@ -15,8 +15,8 @@ public record UserInfo(
     public static UserInfo from(User user) {
         return new UserInfo(
                 user.getId(),
-                user.getAccount(),
-                user.getEmail(),
+                user.getAccount().value(),
+                user.getEmail().value(),
                 user.getBirthday(),
                 user.getGender()
         );
