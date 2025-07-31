@@ -27,6 +27,12 @@ public class LikeService {
         return LikeInfo.LikeResult.success();
     }
 
+    public LikeInfo.IsLiked isLiked(LikeCommand.IsLiked command) {
+        boolean exists = likeRepository.existsBy(command.userId(), command.productId());
+
+        return LikeInfo.IsLiked.of(exists);
+    }
+
     @Transactional
     public LikeInfo.UnLikeResult unlike(LikeCommand.UnLike command) {
         if (likeRepository.existsBy(command.userId(), command.productId())) {

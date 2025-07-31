@@ -18,6 +18,9 @@ public class Money {
     }
 
     public Money plus(Long value) {
+        if( value < 0) {
+            throw new CoreException(ErrorType.INVALID_INPUT);
+        }
         return new Money(this.value + value);
     }
 

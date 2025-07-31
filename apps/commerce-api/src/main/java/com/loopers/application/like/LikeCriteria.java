@@ -1,6 +1,8 @@
 package com.loopers.application.like;
 
 import com.loopers.domain.like.LikeCommand;
+import com.loopers.domain.like.LikeQuery;
+import com.loopers.infrastructure.like.LikeParams;
 
 public class LikeCriteria {
     public record Like(
@@ -26,6 +28,18 @@ public class LikeCriteria {
 
         public LikeCommand.UnLike toCommand() {
             return LikeCommand.UnLike.of(userId, productId);
+        }
+    }
+
+    public record Search(
+            long userId
+    ) {
+        public static Search of(long userId) {
+            return new Search(userId);
+        }
+
+        public LikeQuery.Search toQuery() {
+            return LikeQuery.Search.of(userId);
         }
     }
 }

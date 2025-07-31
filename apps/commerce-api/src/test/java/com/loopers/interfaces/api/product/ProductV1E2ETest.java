@@ -1,8 +1,11 @@
 package com.loopers.interfaces.api.product;
 
 import com.loopers.domain.PageResponse;
+import com.loopers.domain.brand.Brand;
+import com.loopers.domain.brand.BrandCommand;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductCommand;
+import com.loopers.infrastructure.brand.BrandJpaRepository;
 import com.loopers.infrastructure.product.ProductJpaRepository;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.utils.DatabaseCleanUp;
@@ -14,10 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 
 import java.util.function.Function;
 
@@ -29,13 +29,16 @@ class ProductV1E2ETest {
     @Autowired
     private final ProductJpaRepository productJpaRepository;
     @Autowired
+    private final BrandJpaRepository brandJpaRepository;
+    @Autowired
     private final TestRestTemplate testRestTemplate;
     @Autowired
     private final DatabaseCleanUp databaseCleanUp;
 
     @Autowired
-    public ProductV1E2ETest(ProductJpaRepository productJpaRepository, TestRestTemplate testRestTemplate, DatabaseCleanUp databaseCleanUp) {
+    public ProductV1E2ETest(ProductJpaRepository productJpaRepository,BrandJpaRepository brandJpaRepository, TestRestTemplate testRestTemplate, DatabaseCleanUp databaseCleanUp) {
         this.productJpaRepository = productJpaRepository;
+        this.brandJpaRepository = brandJpaRepository;
         this.testRestTemplate = testRestTemplate;
         this.databaseCleanUp = databaseCleanUp;
     }
@@ -52,17 +55,27 @@ class ProductV1E2ETest {
 
         @DisplayName("존재하지 않는 상품ID로 요청 시, 404 Not_Found 예외를 바는다.")
         @Test
-        void throwNotFound_whenProductIdIsNoExist() {
+        void throwNotFound_whenProductIdIsNoExist(){
             //given
             String requestUrl = ENDPOINT_GET.apply(1L);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("X-USER-ID", "1");
 
             //when
-            var response = testRestTemplate.getForEntity(requestUrl, String.class);
+            ParameterizedTypeReference<ApiResponse<ProductV1Response.ProductDetail>> responseType = new ParameterizedTypeReference<>() {
+            };
+            ResponseEntity<ApiResponse<ProductV1Response.ProductDetail>> response =
+                    testRestTemplate.exchange(
+                            requestUrl,
+                            HttpMethod.GET,
+                            new HttpEntity<ProductV1Response.ProductDetail>(null, headers),
+                            responseType
+                    );
 
             //then
             assertAll(
-                () -> assertEquals(404, response.getStatusCodeValue()),
-                () -> assertTrue(response.getBody().contains("Not Found"))
+                () -> assertEquals(404, response.getStatusCodeValue())
             );
         }
 
@@ -70,6 +83,11 @@ class ProductV1E2ETest {
         @Test
         void getBrandResponse_whenBrandIdIsProvide(){
             //given
+            var brand = brandJpaRepository.save(
+                    Brand.create(
+                            new BrandCommand.Create("루퍼스", "루퍼스 공식 브랜드", "https://loopers.com/brand/logo.png")
+                    )
+            );
             var product = productJpaRepository.save(
                     Product.create(ProductCommand.Create.of(
                             1L,
@@ -80,6 +98,9 @@ class ProductV1E2ETest {
                     ))
             );
             String requestUrl = ENDPOINT_GET.apply(1L);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("X-USER-ID", "1");
 
             //when
             ParameterizedTypeReference<ApiResponse<ProductV1Response.ProductDetail>> responseType = new ParameterizedTypeReference<>() {
@@ -88,7 +109,7 @@ class ProductV1E2ETest {
                     testRestTemplate.exchange(
                             requestUrl,
                             HttpMethod.GET,
-                            new HttpEntity<ProductV1Response.ProductDetail>(null, null),
+                            new HttpEntity<ProductV1Response.ProductDetail>(null, headers),
                             responseType
                     );
 

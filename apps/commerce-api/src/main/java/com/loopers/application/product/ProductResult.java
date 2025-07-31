@@ -1,9 +1,7 @@
 package com.loopers.application.product;
 
-import com.loopers.domain.product.Product;
+import com.loopers.domain.brand.BrandInfo;
 import com.loopers.domain.product.ProductInfo;
-
-import java.util.List;
 
 public class ProductResult {
     public record ProductDto(
@@ -14,7 +12,7 @@ public class ProductResult {
             String imageUrl,
             Long price
     ) {
-        public static ProductDto of(ProductInfo product) {
+        public static ProductDto from(ProductInfo product) {
             return new ProductDto(
                     product.id(),
                     product.brandId(),
@@ -22,6 +20,30 @@ public class ProductResult {
                     product.description(),
                     product.imageUrl(),
                     product.price()
+            );
+        }
+    }
+
+    public record ProductDetail(
+            Long id,
+            Long brandId,
+            String brandName,
+            String name,
+            String description,
+            String imageUrl,
+            Long price,
+            Boolean isLiked
+    ) {
+        public static ProductDetail from(ProductInfo product, BrandInfo brandInfo, Boolean isLiked) {
+            return new ProductDetail(
+                    product.id(),
+                    product.brandId(),
+                    brandInfo.name(),
+                    product.name(),
+                    product.description(),
+                    product.imageUrl(),
+                    product.price(),
+                    isLiked
             );
         }
     }

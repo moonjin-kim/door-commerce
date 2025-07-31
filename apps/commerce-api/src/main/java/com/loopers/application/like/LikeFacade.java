@@ -9,6 +9,7 @@ import com.loopers.domain.product.ProductInfo;
 import com.loopers.domain.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -17,23 +18,28 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
+@Transactional
 public class LikeFacade {
 
     private final LikeService likeService;
     private final ProductService productService;
 
     public String like(LikeCriteria.Like like) {
+        productService.getBy(like.productId());
+
         LikeInfo.LikeResult productLike = likeService.like(like.toCommand());
         return "좋아요에 성공했습니다";
     }
 
     public String unLike(LikeCriteria.UnLike like) {
+        productService.getBy(like.productId());
+
         LikeInfo.UnLikeResult productLike = likeService.unlike(like.toCommand());
         return "좋아요에 성공했습니다";
     }
 
-    public PageResponse<LikeResult.LikeProduct> search(PageRequest<LikeQuery.Search> query) {
-        PageResponse<LikeInfo.Like> searchResult = likeService.search(query);
+    public PageResponse<LikeResult.LikeProduct> search(PageRequest<LikeCriteria.Search> query) {
+        PageResponse<LikeInfo.Like> searchResult = likeService.search(query.map(LikeCriteria.Search::toQuery));
 
         List<Long> productIds = searchResult.getItems().stream()
                 .map(LikeInfo.Like::productId)

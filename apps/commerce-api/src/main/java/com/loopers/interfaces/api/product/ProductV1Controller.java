@@ -23,7 +23,6 @@ public class ProductV1Controller implements ProductV1ApiSpec{
     public ApiResponse<PageResponse<ProductV1Response.ProductSummary>> getList(
             @PageableDefault(size = 10) Pageable pageable,
             @ModelAttribute ProductV1Request.Search searchDto
-
     ) {
         PageRequest<ProductCriteria.Search> searchCriteria = PageRequest.of(
                 pageable.getPageNumber(),
@@ -44,26 +43,14 @@ public class ProductV1Controller implements ProductV1ApiSpec{
 
     @GetMapping("/{productId}")
     @Override
-    public ApiResponse<ProductV1Response.ProductDetail> getBy(@PathVariable(value = "productId")Long brandId) {
-        ProductResult.ProductDto product = productFacade.getBy(brandId);
+    public ApiResponse<ProductV1Response.ProductDetail> getBy(
+            @RequestHeader("X-USER-ID") Long userId,
+            @PathVariable(value = "productId")Long brandId
+    ) {
+        ProductResult.ProductDetail product = productFacade.getBy(brandId, userId);
 
         return ApiResponse.success(
                 ProductV1Response.ProductDetail.of(product)
         );
-    }
-
-
-    @PostMapping("/{productId}/like")
-    @Override
-    public ApiResponse<String> like(Long userId, Long productId) {
-//        productFacade.like(userId, productId);
-        return ApiResponse.success("좋아요에 성공했습니다.");
-    }
-
-    @PostMapping("/{productId}/unlike")
-    @Override
-    public ApiResponse<String> unLike(Long userId, Long productId) {
-//        productFacade.unLike(userId, productId);
-        return ApiResponse.success("좋아요가 취소되었습니다.");
     }
 }

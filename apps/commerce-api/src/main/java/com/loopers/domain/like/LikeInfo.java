@@ -26,6 +26,14 @@ public class LikeInfo {
         }
     }
 
+    public record IsLiked(
+            boolean isLiked
+    ) {
+        public static IsLiked of(boolean isLiked) {
+            return new IsLiked(isLiked);
+        }
+    }
+
     public record Like(
             long userId,
             long productId
