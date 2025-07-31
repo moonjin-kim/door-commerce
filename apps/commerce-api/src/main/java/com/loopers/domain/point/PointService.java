@@ -39,7 +39,7 @@ public class PointService {
         );
         point.charge(command.amount());
 
-        pointHistoryRepository.save(PointHistory.charge(command));
+        pointHistoryRepository.save(PointHistory.charge(point.getId(), command));
 
         return PointInfo.of(point);
     }
@@ -51,7 +51,7 @@ public class PointService {
         );
         point.use(command.amount());
 
-        pointHistoryRepository.save(PointHistory.use(command));
+        pointHistoryRepository.save(PointHistory.use(point.getId(), command));
 
         return PointInfo.of(point);
     }

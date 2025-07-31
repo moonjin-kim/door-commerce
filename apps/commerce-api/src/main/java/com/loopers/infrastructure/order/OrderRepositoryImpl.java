@@ -27,6 +27,6 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public PageResponse<Order> findAllBy(PageRequest<OrderParams.GetOrdersBy> params) {
-        return null;
+        return orderQueryDslRepository.findAllBy(params);
     }
 }

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 public class PointV1Request {
     public record PointChargeRequest(
             @NotNull
-            int amount
+            Long amount
     ) {
 
         public PointCommand.Charge toCommand(Long userId) {

@@ -2,15 +2,14 @@ package com.loopers.infrastructure.like;
 
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
-import com.loopers.domain.like.LikeInfo;
-import com.loopers.domain.like.ProductLike;
+import com.loopers.domain.like.Like;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import static com.loopers.domain.like.QProductLike.productLike;
+import static com.loopers.domain.like.QLike.like;
 
 @Component
 @RequiredArgsConstructor
@@ -18,16 +17,16 @@ public class LikeQueryDslRepository implements LikeCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public PageResponse<ProductLike> search(PageRequest<LikeParams.Search> searchParams) {
-        List<ProductLike> items = jpaQueryFactory.selectFrom(productLike)
+    public PageResponse<Like> search(PageRequest<LikeParams.Search> searchParams) {
+        List<Like> items = jpaQueryFactory.selectFrom(like)
                 .limit(searchParams.limit())
                 .offset(searchParams.offset())
-                .where(productLike.userId.eq(searchParams.getParams().userId()))
+                .where(like.userId.eq(searchParams.getParams().userId()))
                 .fetch();
 
-        Long totalCount = jpaQueryFactory.select(productLike.count())
-                .from(productLike)
-                .where(productLike.userId.eq(searchParams.getParams().userId()))
+        Long totalCount = jpaQueryFactory.select(like.count())
+                .from(like)
+                .where(like.userId.eq(searchParams.getParams().userId()))
                 .fetchOne();
 
         long count = totalCount != null ? totalCount : 0L;

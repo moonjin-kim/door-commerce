@@ -1,5 +1,9 @@
 package com.loopers.application.order;
 
+import com.loopers.application.product.ProductCriteria;
+import com.loopers.application.product.ProductResult;
+import com.loopers.domain.PageRequest;
+import com.loopers.domain.PageResponse;
 import com.loopers.domain.order.OrderCommand;
 import com.loopers.domain.order.OrderInfo;
 import com.loopers.domain.order.OrderService;
@@ -77,5 +81,24 @@ public class OrderFacade {
         stockService.decreaseAll(stockCommands);
 
         return OrderResult.Order.of(orderInfo);
+    }
+
+    public OrderResult.Order order(Long orderId, Long userId) {
+        // 주문 정보 조회
+        OrderInfo.OrderDto orderInfo = orderService.getBy(OrderCommand.GetBy.of(orderId, userId));
+        if (orderInfo == null) {
+            throw new CoreException(ErrorType.NOT_FOUND, "Order not found: " + orderId);
+        }
+
+        // 주문 결과 반환
+        return OrderResult.Order.of(orderInfo);
+    }
+
+    public PageResponse<OrderResult.Order> orders(PageRequest<OrderCriteria.GetOrdersBy> criteria) {
+        // 주문 목록 조회
+        PageResponse<OrderInfo.OrderDto> orderPage = orderService.getOrders(criteria.map(OrderCriteria.GetOrdersBy::toCommand));
+
+        // 페이지 응답 생성
+        return orderPage.map(OrderResult.Order::of);
     }
 }

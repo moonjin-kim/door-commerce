@@ -60,7 +60,7 @@ public class PointV1ApiE2ETest {
             User user = userJpaRepository.save(
                     UserFixture.createMember()
             );
-            var request = new PointV1Request.PointChargeRequest(1000);
+            var request = new PointV1Request.PointChargeRequest(1000L);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -92,7 +92,7 @@ public class PointV1ApiE2ETest {
                     UserFixture.createMember()
             );
 
-            int amount = 10000;
+            Long amount = 10000L;
             Point point = pointJpaRepository.save(
                     Point.init(user.getId())
             );
@@ -116,7 +116,9 @@ public class PointV1ApiE2ETest {
             //then
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().balance()).isEqualTo(point.getBalance() + amount)
+                    () -> assertThat(response.getBody().data().balance()).isEqualTo(
+                            point.getBalance().plus(amount).value()
+                    )
             );
         }
 
@@ -124,7 +126,7 @@ public class PointV1ApiE2ETest {
         @Test
         void throwsException_whenInvalidIdIsProvided() {
             //given
-            var request = new PointV1Request.PointChargeRequest(1000);
+            var request = new PointV1Request.PointChargeRequest(1000L);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("X-USER-ID", "1");
@@ -187,7 +189,7 @@ public class PointV1ApiE2ETest {
             //then
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().balance()).isEqualTo(chargePoint.getBalance())
+                    () -> assertThat(response.getBody().data().balance()).isEqualTo(chargePoint.getBalance().value())
             );
         }
 
@@ -224,7 +226,7 @@ public class PointV1ApiE2ETest {
         @Test
         void throwsException_whenInvalidIdIsProvided() {
             //given
-            var request = new PointV1Request.PointChargeRequest(1000);
+            var request = new PointV1Request.PointChargeRequest(1000L);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("X-USER-ID", "1");

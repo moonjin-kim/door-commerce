@@ -16,7 +16,7 @@ import static com.loopers.domain.order.QOrder.order;
 public class OrderQueryDslRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
-    public PageResponse<Order> search(PageRequest<OrderParams.GetOrdersBy> param) {
+    public PageResponse<Order> findAllBy(PageRequest<OrderParams.GetOrdersBy> param) {
         List<Order> items = jpaQueryFactory.selectFrom(order)
                 .limit(param.limit())
                 .offset(param.offset())

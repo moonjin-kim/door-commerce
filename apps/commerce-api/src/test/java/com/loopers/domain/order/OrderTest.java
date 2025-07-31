@@ -1,6 +1,5 @@
 package com.loopers.domain.order;
 
-import com.loopers.domain.product.Product;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +16,7 @@ class OrderTest {
     @DisplayName("주문을 생성할 때")
     @Nested
     class OrderCreate {
-        @DisplayName("상품의 가격에 음수가 포함되면, BAD_REQUEST 예외가 발생한다.")
+        @DisplayName("상품의 가격에 음수가 포함되면, INVALID_INPUT 예외가 발생한다.")
         @Test
         void returnOrder_whenProductPriceIsNegative(){
             //given
@@ -35,10 +34,10 @@ class OrderTest {
             });
 
             // then
-            assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+            assertThat(result.getErrorType()).isEqualTo(ErrorType.INVALID_INPUT);
         }
 
-        @DisplayName("유저ID가 null이면, BAD_REQUEST 예외가 발생한다.")
+        @DisplayName("유저ID가 null이면, INVALID_INPUT 예외가 발생한다.")
         @Test
         void throwBadRequest_whenProductPriceIsNegative(){
             //given
@@ -56,7 +55,7 @@ class OrderTest {
             });
 
             // then
-            assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+            assertThat(result.getErrorType()).isEqualTo(ErrorType.INVALID_INPUT);
         }
 
         @DisplayName("주문 정보가 올바르게 맞으면, 주문이 생성된다.")
@@ -77,8 +76,8 @@ class OrderTest {
             //then
             assertAll(
                     ()-> assertEquals(1L, order.getUserId()),
-                    () -> assertEquals(11000L, order.getTotalPrice()),
-                    () -> assertEquals(11000L, order.getPointUsed()),
+                    () -> assertEquals(11000L, order.getTotalAmount().value()),
+                    () -> assertEquals(11000L, order.getPointUsed().value()),
                     () -> assertEquals(OrderStatus.CONFIRMED, order.getStatus()),
                     () -> assertEquals(2, order.getOrderItems().size()),
                     () -> assertEquals("상품1", order.getOrderItems().get(0).getName()),
