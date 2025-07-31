@@ -75,7 +75,7 @@ public class PointServiceIntegrationTest {
                     () -> assertThat(savedPoint).isPresent(),
                     () -> assertThat(savedPoint.get().getId()).isEqualTo(point.getId()),
                     () -> assertThat(savedPoint.get().getUserId()).isEqualTo(userId),
-                    () -> assertThat(savedPoint.get().getBalance()).isEqualTo(0)
+                    () -> assertThat(savedPoint.get().balance().value()).isEqualTo(0)
             );
         }
     }
@@ -140,7 +140,7 @@ public class PointServiceIntegrationTest {
             assertAll(
                     () -> assertThat(result).isNotNull(),
                     () -> assertThat(result.userId()).isEqualTo(user.getId()),
-                    () -> assertThat(result.balance()).isEqualTo(point.balance + chargeCommand.amount())
+                    () -> assertThat(result.balance()).isEqualTo(point.balance().plus(chargeCommand.amount()).value())
             );
         }
 
@@ -198,7 +198,7 @@ public class PointServiceIntegrationTest {
             assertAll(
                     () -> assertThat(savedPoint).isPresent(),
                     () -> assertThat(savedPoint.get().getUserId()).isEqualTo(user.getId()),
-                    () -> assertThat(savedPoint.get().getBalance()).isEqualTo(amount)
+                    () -> assertThat(savedPoint.get().balance().value()).isEqualTo(amount)
             );
         }
     }
@@ -225,7 +225,7 @@ public class PointServiceIntegrationTest {
             PointInfo result = pointService.get(user.getId());
 
             //then
-            assertThat(result.balance()).isEqualTo(point.balance);
+            assertThat(result.balance()).isEqualTo(point.balance().value());
         }
 
         @DisplayName("존재하지 않는 유저이면, NotFound 예외가 발생한다.")
@@ -261,7 +261,7 @@ public class PointServiceIntegrationTest {
             });
 
             //then
-            assertThat(exception.getErrorType()).isEqualTo(ErrorType.INSUFFICIENT_BALANCE);
+            assertThat(exception.getErrorType()).isEqualTo(ErrorType.INVALID_INPUT);
         }
 
         @DisplayName("잔액보다 적은 금액 사용요청이 발생하면, 잔액에서 차감된다.")

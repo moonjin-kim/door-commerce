@@ -1,6 +1,7 @@
 package com.loopers.application.brand;
 
 import com.loopers.domain.brand.Brand;
+import com.loopers.domain.brand.BrandInfo;
 import com.loopers.domain.brand.BrandService;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
@@ -15,9 +16,7 @@ public class BrandFacade {
     private final BrandService brandService;
 
     public BrandResult.BrandDto getBrand(Long brandId) {
-        Brand brand = brandService.findBy(brandId).orElseThrow(
-                () -> new CoreException(ErrorType.NOT_FOUND, "[brandId = " + brandId + "] 존재하지 않는 브랜드입니다.")
-        );
+        BrandInfo brand = brandService.findBy(brandId);
 
         return BrandResult.BrandDto.from(brand);
     }

@@ -10,14 +10,14 @@ import com.querydsl.core.types.Path;
 
 
 /**
- * QProductLike is a Querydsl query type for ProductLike
+ * QLike is a Querydsl query type for Like
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QProductLike extends EntityPathBase<ProductLike> {
+public class QLike extends EntityPathBase<Like> {
 
-    private static final long serialVersionUID = -2092842240L;
+    private static final long serialVersionUID = 906743549L;
 
-    public static final QProductLike productLike = new QProductLike("productLike");
+    public static final QLike like = new QLike("like1");
 
     public final com.loopers.domain.QBaseEntity _super = new com.loopers.domain.QBaseEntity(this);
 
@@ -37,16 +37,16 @@ public class QProductLike extends EntityPathBase<ProductLike> {
 
     public final NumberPath<Long> userId = createNumber("userId", Long.class);
 
-    public QProductLike(String variable) {
-        super(ProductLike.class, forVariable(variable));
+    public QLike(String variable) {
+        super(Like.class, forVariable(variable));
     }
 
-    public QProductLike(Path<? extends ProductLike> path) {
+    public QLike(Path<? extends Like> path) {
         super(path.getType(), path.getMetadata());
     }
 
-    public QProductLike(PathMetadata metadata) {
-        super(ProductLike.class, metadata);
+    public QLike(PathMetadata metadata) {
+        super(Like.class, metadata);
     }
 
 }

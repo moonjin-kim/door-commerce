@@ -30,8 +30,8 @@ public class LikeInfo {
             long userId,
             long productId
     ) {
-        public static Like of(ProductLike productLike) {
-            return new Like(productLike.getUserId(), productLike.getProductId());
+        public static Like of(com.loopers.domain.like.Like like) {
+            return new Like(like.getUserId(), like.getProductId());
         }
     }
 }

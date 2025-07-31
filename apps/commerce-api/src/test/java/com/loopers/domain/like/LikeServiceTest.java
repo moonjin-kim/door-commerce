@@ -19,7 +19,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest
-class ProductLikeServiceTest {
+class LikeServiceTest {
     @MockitoSpyBean
     private LikeJpaRepository likeJpaRepository;
     @Autowired
@@ -34,7 +34,7 @@ class ProductLikeServiceTest {
 
     @DisplayName("좋아요를 생성할 때")
     @Nested
-    class AddProductLike {
+    class AddLike {
         @DisplayName("UserId와 ProductId에 대해서좋아요가 존재하지 않으면 좋아요를 추가하고 성공 결과를 반환한다.")
         @Test
         void addLike_whenLikeNotExist() {
@@ -51,7 +51,7 @@ class ProductLikeServiceTest {
             assertAll(
                 () -> assertThat(result.isSuccess()).isTrue(),
                 () -> assertThat(foundLike).isTrue(),
-                ()-> verify(likeJpaRepository, times(1)).save(any(ProductLike.class))
+                ()-> verify(likeJpaRepository, times(1)).save(any(Like.class))
             );
         }
 
@@ -62,7 +62,7 @@ class ProductLikeServiceTest {
             Long userId = 1L;
             Long productId = 1L;
             var command = LikeCommand.Like.of(userId, productId);
-            likeJpaRepository.save(ProductLike.create(command));
+            likeJpaRepository.save(Like.create(command));
 
             //when
             LikeInfo.LikeResult result = likeService.like(command);
@@ -76,14 +76,14 @@ class ProductLikeServiceTest {
 
     @DisplayName("좋아요를 취소할 때")
     @Nested
-    class DeleteProductLike {
+    class DeleteLike {
         @DisplayName("UserId와 ProductId에 대해서 좋아요가 존재하면 좋아요를 삭제하고 성공 결과를 반환한다.")
         @Test
         void DeleteLike_whenLikeNotExist() {
             //given
             Long userId = 1L;
             Long productId = 1L;
-            likeJpaRepository.save(ProductLike.create(LikeCommand.Like.of(userId, productId)));
+            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, productId)));
             LikeCommand.UnLike command = LikeCommand.UnLike.of(userId, productId);
 
             //when
@@ -114,7 +114,7 @@ class ProductLikeServiceTest {
             assertAll(
                     () -> assertThat(result.isSuccess()).isFalse(),
                     () -> assertThat(foundLike).isFalse(),
-                    ()-> verify(likeJpaRepository, times(0)).delete(any(ProductLike.class))
+                    ()-> verify(likeJpaRepository, times(0)).delete(any(Like.class))
             );
         }
     }
@@ -127,10 +127,10 @@ class ProductLikeServiceTest {
         void searchLikes() {
             //given
             Long userId = 1L;
-            likeJpaRepository.save(ProductLike.create(LikeCommand.Like.of(userId, 1L)));
-            likeJpaRepository.save(ProductLike.create(LikeCommand.Like.of(userId, 2L)));
-            likeJpaRepository.save(ProductLike.create(LikeCommand.Like.of(userId, 3L)));
-            likeJpaRepository.save(ProductLike.create(LikeCommand.Like.of(userId, 4L)));
+            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, 1L)));
+            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, 2L)));
+            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, 3L)));
+            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, 4L)));
 
             PageRequest<LikeQuery.Search> pageRequest = PageRequest.of(
                     1,10, LikeQuery.Search.of(1L)

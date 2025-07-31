@@ -12,7 +12,7 @@ public class LikeService {
     private final LikeRepository likeRepository;
 
     public PageResponse<LikeInfo.Like> search(PageRequest<LikeQuery.Search> query) {
-        PageResponse<ProductLike> pageRequest = likeRepository.search(query.map(LikeQuery.Search::toParams));
+        PageResponse<Like> pageRequest = likeRepository.search(query.map(LikeQuery.Search::toParams));
 
         return pageRequest.map(LikeInfo.Like::of);
     }
@@ -23,7 +23,7 @@ public class LikeService {
             return LikeInfo.LikeResult.fail();
         }
 
-        likeRepository.save(ProductLike.create(command));
+        likeRepository.save(Like.create(command));
         return LikeInfo.LikeResult.success();
     }
 

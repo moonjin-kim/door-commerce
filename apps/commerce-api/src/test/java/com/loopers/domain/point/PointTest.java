@@ -30,7 +30,7 @@ class PointTest {
             point.charge(amount);
 
             //then
-            assertThat(point.getBalance()).isEqualTo(20000);
+            assertThat(point.getBalance().value()).isEqualTo(20000);
         }
 
         @DisplayName("0 이하의 정수로 포인트를 충전 시 INVALID_POINT_AMOUNT 예외가 반환된다.")
@@ -70,7 +70,7 @@ class PointTest {
             assertThat(result.getErrorType()).isEqualTo(ErrorType.INVALID_POINT_AMOUNT);
         }
 
-        @DisplayName("잔액보다 많은 금액 사용요청이 발생하면, 예외가 발생한다.")
+        @DisplayName("잔액보다 많은 금액 사용요청이 발생하면, INVALID_INPUT 예외가 발생한다.")
         @Test
         void throwsInsufficientBalance_whenBalanceLessThanPointAmount(){
             //given
@@ -83,7 +83,7 @@ class PointTest {
             });
 
             //then
-            assertThat(result.getErrorType()).isEqualTo(ErrorType.INSUFFICIENT_BALANCE);
+            assertThat(result.getErrorType()).isEqualTo(ErrorType.INVALID_INPUT);
         }
 
         @DisplayName("잔액보다 적은 포인트 사용을 요청하면, 잔액이 포인트만큼 감소한다.")
@@ -97,7 +97,7 @@ class PointTest {
             point.use(1000L);
 
             //then
-            assertThat(point.getBalance()).isEqualTo(0L);
+            assertThat(point.getBalance().value()).isEqualTo(0L);
         }
     }
 }

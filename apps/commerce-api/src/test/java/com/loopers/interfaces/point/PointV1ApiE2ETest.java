@@ -116,7 +116,9 @@ public class PointV1ApiE2ETest {
             //then
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().balance()).isEqualTo(point.getBalance() + amount)
+                    () -> assertThat(response.getBody().data().balance()).isEqualTo(
+                            point.getBalance().plus(amount).value()
+                    )
             );
         }
 
@@ -187,7 +189,7 @@ public class PointV1ApiE2ETest {
             //then
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().balance()).isEqualTo(chargePoint.getBalance())
+                    () -> assertThat(response.getBody().data().balance()).isEqualTo(chargePoint.getBalance().value())
             );
         }
 

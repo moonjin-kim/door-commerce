@@ -5,8 +5,6 @@ import com.loopers.domain.PageResponse;
 import com.loopers.domain.like.LikeInfo;
 import com.loopers.domain.like.LikeQuery;
 import com.loopers.domain.like.LikeService;
-import com.loopers.domain.like.ProductLike;
-import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductInfo;
 import com.loopers.domain.product.ProductService;
 import lombok.RequiredArgsConstructor;

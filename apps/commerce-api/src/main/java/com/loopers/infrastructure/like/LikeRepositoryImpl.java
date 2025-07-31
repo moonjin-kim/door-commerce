@@ -2,9 +2,7 @@ package com.loopers.infrastructure.like;
 
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
-import com.loopers.domain.like.LikeInfo;
-import com.loopers.domain.like.LikeQuery;
-import com.loopers.domain.like.ProductLike;
+import com.loopers.domain.like.Like;
 import com.loopers.domain.like.LikeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,13 +14,13 @@ public class LikeRepositoryImpl implements LikeRepository {
     private final LikeCustomRepository likeCustomRepository;
 
     @Override
-    public ProductLike save(ProductLike productLike) {
-        return likeJpaRepository.save(productLike);
+    public Like save(Like like) {
+        return likeJpaRepository.save(like);
     }
 
 
     @Override
-    public PageResponse<ProductLike> search(PageRequest<LikeParams.Search> likeSearch) {
+    public PageResponse<Like> search(PageRequest<LikeParams.Search> likeSearch) {
         return likeCustomRepository.search(likeSearch);
     }
 

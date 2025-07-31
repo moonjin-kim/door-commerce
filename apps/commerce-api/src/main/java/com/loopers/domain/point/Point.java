@@ -15,13 +15,15 @@ import lombok.NoArgsConstructor;
 public class Point extends BaseEntity {
     @Column(nullable = false)
     private Long userId;
-    @Column(nullable = false)
-    long balance;
+    @AttributeOverrides({
+            @AttributeOverride(name="value", column = @Column(name="balance"))
+    })
+    private Money balance;
 
     public static Point init(Long userId) {
         Point point = new Point();
         point.userId = userId;
-        point.balance = 0;
+        point.balance = new Money(0L);
 
         return point;
     }
@@ -30,16 +32,17 @@ public class Point extends BaseEntity {
         if(amount <= 0) {
             throw new CoreException(ErrorType.INVALID_POINT_AMOUNT, "충전할 포인트는 0원 이상이어야 합니다.");
         }
-        this.balance += amount;
+        this.balance = this.balance.plus(amount);
     }
 
     public void use(long amount) {
         if(amount <= 0) {
             throw new CoreException(ErrorType.INVALID_POINT_AMOUNT, "사용할 포인트는 0원 이상이어야 합니다.");
         }
-        if(this.balance < amount) {
-            throw new CoreException(ErrorType.INSUFFICIENT_BALANCE);
-        }
-        this.balance -= amount;
+        this.balance = this.balance.minus(amount);
+    }
+
+    public Money balance() {
+        return this.balance;
     }
 }

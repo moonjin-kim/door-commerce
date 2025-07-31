@@ -81,7 +81,9 @@ class PointFacadeTest {
             assertAll(
                     () -> assertThat(result).isNotNull(),
                     () -> assertThat(result.userId()).isEqualTo(user.getId()),
-                    () -> assertThat(result.balance()).isEqualTo(chargedPoint.getBalance() + chargeRequest.amount())
+                    () -> assertThat(result.balance()).isEqualTo(
+                            chargedPoint.getBalance().plus(chargeRequest.amount()).value()
+                    )
             );
         }
 
@@ -126,7 +128,7 @@ class PointFacadeTest {
             assertAll(
                     () -> assertThat(result).isNotNull(),
                     () -> assertThat(result.userId()).isEqualTo(user.getId()),
-                    () -> assertThat(result.balance()).isEqualTo(chargedPoint.getBalance())
+                    () -> assertThat(result.balance()).isEqualTo(chargedPoint.getBalance().value())
             );
         }
 
