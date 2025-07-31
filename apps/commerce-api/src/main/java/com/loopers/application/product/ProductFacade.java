@@ -7,9 +7,11 @@ import com.loopers.domain.product.ProductInfo;
 import com.loopers.domain.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Component
+@Transactional
 public class ProductFacade {
     private final ProductService productService;
 

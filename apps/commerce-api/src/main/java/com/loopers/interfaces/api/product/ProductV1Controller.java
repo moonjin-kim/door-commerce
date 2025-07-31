@@ -43,7 +43,10 @@ public class ProductV1Controller implements ProductV1ApiSpec{
 
     @GetMapping("/{productId}")
     @Override
-    public ApiResponse<ProductV1Response.ProductDetail> getBy(@PathVariable(value = "productId")Long brandId) {
+    public ApiResponse<ProductV1Response.ProductDetail> getBy(
+            @RequestHeader("X-USER-ID") Long userId,
+            @PathVariable(value = "productId")Long brandId
+    ) {
         ProductResult.ProductDto product = productFacade.getBy(brandId);
 
         return ApiResponse.success(

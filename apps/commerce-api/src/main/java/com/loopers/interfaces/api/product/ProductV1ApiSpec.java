@@ -15,7 +15,7 @@ public interface ProductV1ApiSpec {
             summary = "상품 상세 조회",
             description = "상품 id로 상품을을 조회한다"
     )
-    ApiResponse<ProductV1Response.ProductDetail> getBy(Long userId);
+    ApiResponse<ProductV1Response.ProductDetail> getBy(Long userId, Long productId);
 
 
     @Operation(
