@@ -22,6 +22,9 @@ public class Money {
     }
 
     public Money minus(Long value) {
+        if (value < 0) {
+            throw new CoreException(ErrorType.INVALID_INPUT);
+        }
         return new Money(this.value - value);
     }
 

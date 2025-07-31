@@ -246,7 +246,7 @@ public class PointServiceIntegrationTest {
     @DisplayName("포인트를 사용할 때,")
     @Nested
     class Using {
-        @DisplayName("잔액보다 많은 금액 사용요청이 발생하면, 예외가 발생한다.")
+        @DisplayName("잔액보다 많은 금액 사용요청이 발생하면, INVALID_INPUT 예외가 발생한다.")
         @Test
         void throwInsufficientBalance_whenAmountMoreThanBalance() {
             //given
@@ -262,6 +262,21 @@ public class PointServiceIntegrationTest {
 
             //then
             assertThat(exception.getErrorType()).isEqualTo(ErrorType.INVALID_INPUT);
+        }
+
+        @DisplayName("포인트 정보가 없으면, NOT_FOUND 예외가 발생한다.")
+        @Test
+        void throwNotFound_whenNotFoundPoint() {
+            //given
+            User user = userJpaRepository.save(UserFixture.createMember());
+
+            //when
+            CoreException exception = assertThrows(CoreException.class, () -> {
+                pointService.using(PointCommand.Using.of(user.getId(), 1L,2000L));
+            });
+
+            //then
+            assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
         }
 
         @DisplayName("잔액보다 적은 금액 사용요청이 발생하면, 잔액에서 차감된다.")

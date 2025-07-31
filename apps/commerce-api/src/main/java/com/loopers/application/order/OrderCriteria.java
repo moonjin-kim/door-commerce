@@ -1,5 +1,7 @@
 package com.loopers.application.order;
 
+import com.loopers.domain.order.OrderCommand;
+
 import java.util.List;
 
 public class OrderCriteria {
@@ -12,4 +14,12 @@ public class OrderCriteria {
             Long productId,
             int quantity
     ) { }
+
+    public record GetOrdersBy(
+            Long userId
+    ){
+        public OrderCommand.GetOrdersBy toCommand() {
+            return OrderCommand.GetOrdersBy.of(userId);
+        }
+    }
 }
