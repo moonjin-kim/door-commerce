@@ -25,17 +25,17 @@ public class OrderItem {
 
     private OrderItem(Long productId, String name, Long productPrice, int quantity) {
         if (productId == null) {
-            throw new CoreException(ErrorType.BAD_REQUEST, "상품 ID는 null일 수 없습니다.");
+            throw new CoreException(ErrorType.INVALID_INPUT, "상품 ID는 null일 수 없습니다.");
         }
         this.productId = productId;
 
         if (name == null || name.isEmpty()) {
-            throw new CoreException(ErrorType.BAD_REQUEST, "상품 이름은 null이거나 비어있을 수 없습니다.");
+            throw new CoreException(ErrorType.INVALID_INPUT, "상품 이름은 null이거나 비어있을 수 없습니다.");
         }
         this.name = name;
 
         if (quantity <= 0) {
-            throw new CoreException(ErrorType.BAD_REQUEST, "수량은 0보다 커야 합니다.");
+            throw new CoreException(ErrorType.INVALID_INPUT, "수량은 0보다 커야 합니다.");
         }
         this.quantity = quantity;
 

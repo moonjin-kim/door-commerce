@@ -58,6 +58,27 @@ class OrderTest {
             assertThat(result.getErrorType()).isEqualTo(ErrorType.INVALID_INPUT);
         }
 
+        @DisplayName("주문 수량이 0이하이면, INVALID_INPUT 예외가 발생한다.")
+        @Test
+        void throwBadRequest_whenQuantityIsZero(){
+            //given
+            OrderCommand.Order command = OrderCommand.Order.of(
+                    1L,
+                    List.of(
+                            OrderCommand.OrderItem.of(1L, "상품1", 1000L, 0),
+                            OrderCommand.OrderItem.of(2L, "상품2", -2000L, 5)
+                    )
+            );
+
+            //when
+            CoreException result = assertThrows(CoreException.class, () -> {
+                Order.order(command);
+            });
+
+            // then
+            assertThat(result.getErrorType()).isEqualTo(ErrorType.INVALID_INPUT);
+        }
+
         @DisplayName("주문 정보가 올바르게 맞으면, 주문이 생성된다.")
         @Test
         void returnOrder_whenValidData(){
