@@ -72,17 +72,18 @@ public class ProductQueryDslRepository{
         return product.brandId.eq(brandId);
     }
 
-    private OrderSpecifier<?> getOrderSpecifier(String sort) {
-        if (sort == null || sort.isEmpty()) {
-            return new OrderSpecifier<>(Order.DESC, product.id);
-        }
-
-        if (sort.equals("price_asc")) {
+    private OrderSpecifier<?> getOrderSpecifier(ProductParams.ProductSortOption sort) {
+        if (sort.equals(ProductParams.ProductSortOption.PRICE_ASC)) {
             return new OrderSpecifier<>(Order.ASC, product.price.value);
         }
 
-        if(sort.equals("like_desc")) {
+        if(sort.equals(ProductParams.ProductSortOption.LIKE_DESC)) {
             return new OrderSpecifier<>(Order.DESC, like.id.count());
+
+        }
+
+        if(sort.equals(ProductParams.ProductSortOption.LATEST)) {
+            return new OrderSpecifier<>(Order.DESC, product.id);
 
         }
 
