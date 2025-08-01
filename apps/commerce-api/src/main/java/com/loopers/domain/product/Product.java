@@ -1,7 +1,7 @@
 package com.loopers.domain.product;
 
-import com.loopers.domain.Amount;
 import com.loopers.domain.BaseEntity;
+import com.loopers.domain.Money;
 import com.loopers.domain.product.vo.ProductStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -22,7 +22,7 @@ public class Product extends BaseEntity {
     @Column(unique = true)
     private String imageUrl;
     @Embedded
-    private Amount price;
+    private Money price;
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
@@ -40,7 +40,7 @@ public class Product extends BaseEntity {
         this.imageUrl = imageUrl;
 
 
-        this.price = new Amount(price);
+        this.price = new Money(price);
 
         this.status = status;
     }

@@ -36,7 +36,7 @@ class ProductTest {
             });
 
             // then
-            assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+            assertThat(result.getErrorType()).isEqualTo(ErrorType.INVALID_INPUT);
         }
 
         @DisplayName("브랜드 ID가 null이면 BadRequest 예외가 발생한다.")
@@ -153,7 +153,7 @@ class ProductTest {
                 () -> assertEquals(command.name(), product.getName()),
                 () -> assertEquals(command.description(), product.getDescription()),
                 () -> assertEquals(command.imageUrl(), product.getImageUrl()),
-                () -> assertEquals(command.price(), product.getPrice().getPrice())
+                () -> assertEquals(command.price(), product.getPrice().value())
             );
         }
     }

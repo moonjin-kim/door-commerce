@@ -85,6 +85,55 @@ class ProductV1E2ETest {
             );
         }
 
+        @DisplayName("상품 아이디로 상품 정보를 요청시, 로그인 되지 않으면 좋아요 여부가 false 인 상품 정보를 받는다.")
+        @Test
+        void returnLikeFalseProduct_whenNotLogin(){
+            //given
+            var brand = brandJpaRepository.save(
+                    Brand.create(
+                            new BrandCommand.Create("루퍼스", "루퍼스 공식 브랜드", "https://loopers.com/brand/logo.png")
+                    )
+            );
+            var product = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 티셔츠",
+                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/t-shirt.png",
+                            20000L
+                    ))
+            );
+
+            likeJpaRepository.saveAll(List.of(
+                    Like.create(new LikeCommand.Like(1L, product.getId()))
+            ));
+            String requestUrl = ENDPOINT_GET.apply(1L);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            //when
+            ParameterizedTypeReference<ApiResponse<ProductV1Response.ProductDetail>> responseType = new ParameterizedTypeReference<>() {
+            };
+            ResponseEntity<ApiResponse<ProductV1Response.ProductDetail>> response =
+                    testRestTemplate.exchange(
+                            requestUrl,
+                            HttpMethod.GET,
+                            new HttpEntity<ProductV1Response.ProductDetail>(null, headers),
+                            responseType
+                    );
+
+            //then
+            assertAll(
+                    () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
+                    () -> assertThat(response.getBody().data().productId()).isEqualTo(1L),
+                    () -> assertThat(response.getBody().data().name()).isEqualTo("루퍼스 공식 티셔츠"),
+                    () -> assertThat(response.getBody().data().description()).isEqualTo("루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다."),
+                    () -> assertThat(response.getBody().data().imageUrl()).isEqualTo("https://loopers.com/product/t-shirt.png"),
+                    () -> assertThat(response.getBody().data().price()).isEqualTo(20000L),
+                    () -> assertThat(response.getBody().data().isLiked()).isEqualTo(false)
+            );
+        }
+
 
         @DisplayName("상품 아이디로 상품 정보를 요청시, 상품 정보를 받는다.")
         @Test

@@ -30,7 +30,7 @@ public class ProductQueryDslRepository{
                         product.brandId,
                         product.description,
                         product.imageUrl,
-                        product.price.price, // Amount 객체의 값을 가져옴
+                        product.price.value, // Amount 객체의 값을 가져옴
                         product.status,
                         like.id.count()// 좋아요 개수 카운트
                 ))
@@ -78,7 +78,7 @@ public class ProductQueryDslRepository{
         }
 
         if (sort.equals("price_asc")) {
-            return new OrderSpecifier<>(Order.ASC, product.price.price);
+            return new OrderSpecifier<>(Order.ASC, product.price.value);
         }
 
         if(sort.equals("like_desc")) {

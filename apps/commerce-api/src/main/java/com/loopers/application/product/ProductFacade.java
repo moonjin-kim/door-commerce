@@ -28,6 +28,7 @@ public class ProductFacade {
 
         BrandInfo brandInfo = brandService.findBy(product.brandId());
 
+        // 유저의 좋아요 여부 조회
         LikeInfo.IsLiked likeInfo = likeService.isLiked(
                 LikeCommand.IsLiked.of(userId, productId)
         );

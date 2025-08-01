@@ -37,11 +37,11 @@ public class QOrder extends EntityPathBase<Order> {
 
     public final ListPath<OrderItem, QOrderItem> orderItems = this.<OrderItem, QOrderItem>createList("orderItems", OrderItem.class, QOrderItem.class, PathInits.DIRECT2);
 
-    public final QMoney pointUsed;
+    public final com.loopers.domain.QMoney pointUsed;
 
     public final EnumPath<OrderStatus> status = createEnum("status", OrderStatus.class);
 
-    public final QMoney totalAmount;
+    public final com.loopers.domain.QMoney totalAmount;
 
     //inherited
     public final DateTimePath<java.time.ZonedDateTime> updatedAt = _super.updatedAt;
@@ -66,8 +66,8 @@ public class QOrder extends EntityPathBase<Order> {
 
     public QOrder(Class<? extends Order> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.pointUsed = inits.isInitialized("pointUsed") ? new QMoney(forProperty("pointUsed")) : null;
-        this.totalAmount = inits.isInitialized("totalAmount") ? new QMoney(forProperty("totalAmount")) : null;
+        this.pointUsed = inits.isInitialized("pointUsed") ? new com.loopers.domain.QMoney(forProperty("pointUsed")) : null;
+        this.totalAmount = inits.isInitialized("totalAmount") ? new com.loopers.domain.QMoney(forProperty("totalAmount")) : null;
     }
 
 }

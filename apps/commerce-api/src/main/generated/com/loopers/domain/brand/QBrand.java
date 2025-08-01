@@ -36,6 +36,8 @@ public class QBrand extends EntityPathBase<Brand> {
 
     public final StringPath name = createString("name");
 
+    public final EnumPath<BrandStatus> status = createEnum("status", BrandStatus.class);
+
     //inherited
     public final DateTimePath<java.time.ZonedDateTime> updatedAt = _super.updatedAt;
 

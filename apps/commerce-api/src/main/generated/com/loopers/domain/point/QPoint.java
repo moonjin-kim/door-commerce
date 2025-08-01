@@ -24,7 +24,7 @@ public class QPoint extends EntityPathBase<Point> {
 
     public final com.loopers.domain.QBaseEntity _super = new com.loopers.domain.QBaseEntity(this);
 
-    public final QMoney balance;
+    public final com.loopers.domain.QMoney balance;
 
     //inherited
     public final DateTimePath<java.time.ZonedDateTime> createdAt = _super.createdAt;
@@ -58,7 +58,7 @@ public class QPoint extends EntityPathBase<Point> {
 
     public QPoint(Class<? extends Point> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.balance = inits.isInitialized("balance") ? new QMoney(forProperty("balance")) : null;
+        this.balance = inits.isInitialized("balance") ? new com.loopers.domain.QMoney(forProperty("balance")) : null;
     }
 
 }
