@@ -31,6 +31,13 @@ public class Money {
         return new Money(this.value - value);
     }
 
+    public Money multiply(int factor) {
+        if (factor < 0) {
+            throw new CoreException(ErrorType.INVALID_INPUT);
+        }
+        return new Money(this.value * factor);
+    }
+
     public Long value() {
         return value;
     }

@@ -33,8 +33,13 @@ public class OrderItem {
             throw new CoreException(ErrorType.BAD_REQUEST, "상품 이름은 null이거나 비어있을 수 없습니다.");
         }
         this.name = name;
-        this.productPrice = new Money(productPrice);
+
+        if (quantity <= 0) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "수량은 0보다 커야 합니다.");
+        }
         this.quantity = quantity;
+
+        this.productPrice = new Money(productPrice);
     }
 
     public static OrderItem create(OrderCommand.OrderItem command) {
@@ -42,6 +47,6 @@ public class OrderItem {
     }
 
     public Long getTotalAmount() {
-        return ((long) productPrice.value() * quantity);
+        return productPrice.multiply(quantity).value();
     }
 }

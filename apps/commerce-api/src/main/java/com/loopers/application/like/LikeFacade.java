@@ -27,14 +27,14 @@ public class LikeFacade {
     public String like(LikeCriteria.Like like) {
         productService.getBy(like.productId());
 
-        LikeInfo.LikeResult productLike = likeService.like(like.toCommand());
+        likeService.like(like.toCommand());
         return "좋아요에 성공했습니다";
     }
 
     public String unLike(LikeCriteria.UnLike like) {
         productService.getBy(like.productId());
 
-        LikeInfo.UnLikeResult productLike = likeService.unlike(like.toCommand());
+        likeService.unlike(like.toCommand());
         return "좋아요에 성공했습니다";
     }
 
