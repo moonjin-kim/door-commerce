@@ -4,6 +4,7 @@ import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
+import com.loopers.domain.product.ProductView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +33,7 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public PageResponse<Product> search(PageRequest<ProductParams.Search> productSearch) {
+    public PageResponse<ProductView> search(PageRequest<ProductParams.Search> productSearch) {
         return productQueryDslRepository.search(productSearch);
     }
 }

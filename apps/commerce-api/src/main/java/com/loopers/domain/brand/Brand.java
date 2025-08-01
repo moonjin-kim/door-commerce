@@ -1,9 +1,9 @@
 package com.loopers.domain.brand;
 
 import com.loopers.domain.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.loopers.support.error.CoreException;
+import com.loopers.support.error.ErrorType;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,8 +18,11 @@ public class Brand extends BaseEntity {
     String description;
     @Column(length = 200)
     String logoUrl;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    BrandStatus status;
 
-    public Brand(String name, String description, String logoUrl) {
+    public Brand(String name, String description, String logoUrl, BrandStatus status) {
         BrandValidator.validateName(name);
         this.name = name;
 
@@ -28,13 +31,19 @@ public class Brand extends BaseEntity {
 
         BrandValidator.validateLogoUrl(logoUrl);
         this.logoUrl = logoUrl;
+
+        if(status == null) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "Status cannot be null");
+        }
+        this.status = status;
     }
 
     public static Brand create(BrandCommand.Create command) {
         return new Brand(
                 command.name(),
                 command.description(),
-                command.logoUrl()
+                command.logoUrl(),
+                BrandStatus.ACTIVE
         );
     }
 }

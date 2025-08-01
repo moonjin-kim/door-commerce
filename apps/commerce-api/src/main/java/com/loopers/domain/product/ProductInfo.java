@@ -11,6 +11,13 @@ public record ProductInfo(
     static public ProductInfo of(
             Product product
     ) {
-        return new ProductInfo(product.getId(), product.getBrandId(),product.getName(), product.getDescription(), product.getImageUrl(), product.getPrice().getPrice());
+        return new ProductInfo(
+                product.getId(),
+                product.getBrandId(),
+                product.getName(),
+                product.getDescription(),
+                product.getImageUrl(),
+                product.getPrice().value()
+        );
     }
 }

@@ -42,4 +42,11 @@ public class LikeService {
 
         return LikeInfo.UnLikeResult.fail();
     }
+
+    @Transactional(readOnly = true)
+    public LikeInfo.GetLikeCount getLikeCount(Long productId) {
+        Long count = likeRepository.countBy(productId);
+        return LikeInfo.GetLikeCount.of(count);
+
+    }
 }
