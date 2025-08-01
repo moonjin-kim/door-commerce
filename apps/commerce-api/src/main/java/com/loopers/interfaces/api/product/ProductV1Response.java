@@ -11,7 +11,7 @@ public class ProductV1Response {
             String description,
             String imageUrl,
             Long price,
-//            long lickCount,
+            long lickCount,
             boolean isLiked
     ) {
         public static ProductDetail of(ProductResult.ProductDetail product) {
@@ -23,6 +23,7 @@ public class ProductV1Response {
                     product.description(),
                     product.imageUrl(),
                     product.price(),
+                    product.likeCount(),
                     product.isLiked()
             );
         }

@@ -39,8 +39,6 @@ public class QProduct extends EntityPathBase<Product> {
 
     public final StringPath imageUrl = createString("imageUrl");
 
-    public final NumberPath<Long> likeCount = createNumber("likeCount", Long.class);
-
     public final StringPath name = createString("name");
 
     public final com.loopers.domain.QAmount price;

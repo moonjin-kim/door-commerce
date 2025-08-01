@@ -25,8 +25,6 @@ public class Product extends BaseEntity {
     private Amount price;
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
-    @Column()
-    private Long likeCount;
 
     protected Product(String name, Long brandId, String description, String imageUrl, Long price, ProductStatus status, Long likeCount) {
         ProductValidator.validateName(name);
@@ -57,21 +55,6 @@ public class Product extends BaseEntity {
                 ProductStatus.SALE,
                 0L
         );
-    }
-
-    public void increaseLikeCount() {
-        if (this.likeCount == null) {
-            this.likeCount = 0L;
-        }
-        this.likeCount++;
-    }
-
-    public void decreaseLikeCount() {
-        if (this.likeCount == null || this.likeCount <= 0) {
-            this.likeCount = 0L;
-        } else {
-            this.likeCount--;
-        }
     }
 
 }

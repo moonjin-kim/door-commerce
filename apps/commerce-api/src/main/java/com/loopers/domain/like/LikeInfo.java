@@ -26,6 +26,14 @@ public class LikeInfo {
         }
     }
 
+    public record GetLikeCount(
+            long count
+    ) {
+        public static GetLikeCount of(long count) {
+            return new GetLikeCount(count);
+        }
+    }
+
     public record IsLiked(
             boolean isLiked
     ) {

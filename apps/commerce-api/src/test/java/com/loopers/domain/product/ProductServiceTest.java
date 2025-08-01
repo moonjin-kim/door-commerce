@@ -3,7 +3,10 @@ package com.loopers.domain.product;
 import com.loopers.application.product.ProductResult;
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
+import com.loopers.domain.like.Like;
+import com.loopers.domain.like.LikeCommand;
 import com.loopers.domain.point.PointInfo;
+import com.loopers.infrastructure.like.LikeJpaRepository;
 import com.loopers.infrastructure.product.ProductJpaRepository;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
@@ -25,6 +28,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class ProductServiceTest {
     @Autowired
     private ProductJpaRepository productJpaRepository;
+    @Autowired
+    private LikeJpaRepository likeJpaRepository;
     @Autowired
     private ProductService productService;
     @Autowired
@@ -81,7 +86,7 @@ class ProductServiceTest {
     @DisplayName("상품을 검색할 때")
     @Nested
     class GetOrdersBy {
-        @DisplayName("검색 조건이 주어지면 해당 조건에 맞는 상품 페이지를 반환한다.")
+        @DisplayName("좋아요순 정렬 조건이 주어지면 해당 조건에 맞는 상품 페이지를 반환한다.")
         @Test
         void returnProductPage_whenSearchQueryIsProvided() {
             //given
@@ -103,11 +108,57 @@ class ProductServiceTest {
                             30000L
                     ))
             );
+            likeJpaRepository.saveAll(List.of(
+                    Like.create(new LikeCommand.Like(1L, product1.getId())),
+                    Like.create(new LikeCommand.Like(2L, product1.getId())),
+                    Like.create(new LikeCommand.Like(1L, product2.getId()))
+            ));
+
+            PageRequest<ProductCommand.Search> query = PageRequest.of(1, 10, ProductCommand.Search.of("like_desc", null));
+
+            //when
+            PageResponse<ProductView> productPage = productService.search(query);
+
+            //then
+            assertAll(
+                    () -> assertThat(productPage.getPage()).isEqualTo(1),
+                    () -> assertThat(productPage.getSize()).isEqualTo(10),
+                    () -> assertThat(productPage.getTotalCount()).isEqualTo(2),
+                    () -> assertThat(productPage.getItems()).hasSize(2),
+                    () -> assertThat(productPage.getItems().get(0).getId()).isEqualTo(product1.getId()),
+                    () -> assertThat(productPage.getItems().get(0).getLikeCount()).isEqualTo(2),
+                    () -> assertThat(productPage.getItems().get(1).getId()).isEqualTo(product2.getId())
+            );
+        }
+
+        @DisplayName("검색 조건이 주어지면 해당 조건에 맞는 상품 페이지를 반환한다.")
+        @Test
+        void returnSortLikeCount_whenSearchQueryIsProvided() {
+            //given
+            var product1 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 티셔츠",
+                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/t-shirt.png",
+                            20000L
+                    ))
+            );
+            var product2 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 후드티",
+                            "루퍼스의 공식 후드티입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/hoodie.png",
+                            30000L
+                    ))
+            );
+
 
             PageRequest<ProductCommand.Search> query = PageRequest.of(1, 10, ProductCommand.Search.of(null, null));
 
             //when
-            PageResponse<ProductInfo> productPage = productService.search(query);
+            PageResponse<ProductView> productPage = productService.search(query);
 
             //then
             assertAll(
@@ -144,14 +195,14 @@ class ProductServiceTest {
             PageRequest<ProductCommand.Search> query = PageRequest.of(1, 10, ProductCommand.Search.of(null, 1L));
 
             //when
-            PageResponse<ProductInfo> productPage = productService.search(query);
+            PageResponse<ProductView> productPage = productService.search(query);
 
             //then
             assertAll(
                     () -> assertThat(productPage.getPage()).isEqualTo(1),
                     () -> assertThat(productPage.getSize()).isEqualTo(10),
                     () -> assertThat(productPage.getItems()).hasSize(1),
-                    () -> assertThat(productPage.getItems().get(0).id()).isEqualTo(product1.getId())
+                    () -> assertThat(productPage.getItems().get(0).getId()).isEqualTo(product1.getId())
             );
         }
 
@@ -181,14 +232,14 @@ class ProductServiceTest {
             PageRequest<ProductCommand.Search> query = PageRequest.of(1, 10, ProductCommand.Search.of("price_asc", null));
 
             //when
-            PageResponse<ProductInfo> productPage = productService.search(query);
+            PageResponse<ProductView> productPage = productService.search(query);
 
             //then
             assertAll(
                     () -> assertThat(productPage.getPage()).isEqualTo(1),
                     () -> assertThat(productPage.getSize()).isEqualTo(10),
                     () -> assertThat(productPage.getItems()).hasSize(2),
-                    () -> assertThat(productPage.getItems().get(0).id()).isEqualTo(
+                    () -> assertThat(productPage.getItems().get(0).getId()).isEqualTo(
                             product2.getId())
             );
         }

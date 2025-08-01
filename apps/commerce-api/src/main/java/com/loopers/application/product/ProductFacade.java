@@ -10,6 +10,7 @@ import com.loopers.domain.like.LikeService;
 import com.loopers.domain.product.ProductCommand;
 import com.loopers.domain.product.ProductInfo;
 import com.loopers.domain.product.ProductService;
+import com.loopers.domain.product.ProductView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,14 +32,16 @@ public class ProductFacade {
                 LikeCommand.IsLiked.of(userId, productId)
         );
 
-        return ProductResult.ProductDetail.from(product, brandInfo, likeInfo.isLiked());
+        LikeInfo.GetLikeCount likeCount = likeService.getLikeCount(productId);
+
+        return ProductResult.ProductDetail.from(product, brandInfo, likeInfo.isLiked(), likeCount.count());
     }
 
 
     public PageResponse<ProductResult.ProductDto> search(PageRequest<ProductCriteria.Search> criteria) {
         PageRequest<ProductCommand.Search> searchCommand = criteria.map(ProductCriteria.Search::toCommand);
 
-        PageResponse<ProductInfo> productPage = productService.search(searchCommand);
+        PageResponse<ProductView> productPage = productService.search(searchCommand);
 
         return productPage.map(ProductResult.ProductDto::from);
     }
