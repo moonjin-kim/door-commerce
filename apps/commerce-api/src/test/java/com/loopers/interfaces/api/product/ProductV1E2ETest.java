@@ -3,9 +3,12 @@ package com.loopers.interfaces.api.product;
 import com.loopers.domain.PageResponse;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandCommand;
+import com.loopers.domain.like.Like;
+import com.loopers.domain.like.LikeCommand;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductCommand;
 import com.loopers.infrastructure.brand.BrandJpaRepository;
+import com.loopers.infrastructure.like.LikeJpaRepository;
 import com.loopers.infrastructure.product.ProductJpaRepository;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.utils.DatabaseCleanUp;
@@ -19,6 +22,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 
+import java.util.List;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +33,8 @@ class ProductV1E2ETest {
     @Autowired
     private final ProductJpaRepository productJpaRepository;
     @Autowired
+    private final LikeJpaRepository likeJpaRepository;
+    @Autowired
     private final BrandJpaRepository brandJpaRepository;
     @Autowired
     private final TestRestTemplate testRestTemplate;
@@ -36,8 +42,9 @@ class ProductV1E2ETest {
     private final DatabaseCleanUp databaseCleanUp;
 
     @Autowired
-    public ProductV1E2ETest(ProductJpaRepository productJpaRepository,BrandJpaRepository brandJpaRepository, TestRestTemplate testRestTemplate, DatabaseCleanUp databaseCleanUp) {
+    public ProductV1E2ETest(ProductJpaRepository productJpaRepository,LikeJpaRepository likeJpaRepository, BrandJpaRepository brandJpaRepository, TestRestTemplate testRestTemplate, DatabaseCleanUp databaseCleanUp) {
         this.productJpaRepository = productJpaRepository;
+        this.likeJpaRepository = likeJpaRepository;
         this.brandJpaRepository = brandJpaRepository;
         this.testRestTemplate = testRestTemplate;
         this.databaseCleanUp = databaseCleanUp;
@@ -52,7 +59,6 @@ class ProductV1E2ETest {
     @Nested
     class GetProduct {
         private static final Function<Long, String> ENDPOINT_GET = id -> "/api/v1/products/" + id;
-
         @DisplayName("존재하지 않는 상품ID로 요청 시, 404 Not_Found 예외를 바는다.")
         @Test
         void throwNotFound_whenProductIdIsNoExist(){
@@ -76,6 +82,157 @@ class ProductV1E2ETest {
             //then
             assertAll(
                 () -> assertEquals(404, response.getStatusCodeValue())
+            );
+        }
+
+        @DisplayName("상품 아이디로 상품 정보를 요청시, 로그인 되지 않으면 좋아요 여부가 false 인 상품 정보를 받는다.")
+        @Test
+        void returnLikeFalseProduct_whenNotLogin(){
+            //given
+            var brand = brandJpaRepository.save(
+                    Brand.create(
+                            new BrandCommand.Create("루퍼스", "루퍼스 공식 브랜드", "https://loopers.com/brand/logo.png")
+                    )
+            );
+            var product = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 티셔츠",
+                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/t-shirt.png",
+                            20000L
+                    ))
+            );
+
+            likeJpaRepository.saveAll(List.of(
+                    Like.create(new LikeCommand.Like(1L, product.getId()))
+            ));
+            String requestUrl = ENDPOINT_GET.apply(1L);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            //when
+            ParameterizedTypeReference<ApiResponse<ProductV1Response.ProductDetail>> responseType = new ParameterizedTypeReference<>() {
+            };
+            ResponseEntity<ApiResponse<ProductV1Response.ProductDetail>> response =
+                    testRestTemplate.exchange(
+                            requestUrl,
+                            HttpMethod.GET,
+                            new HttpEntity<ProductV1Response.ProductDetail>(null, headers),
+                            responseType
+                    );
+
+            //then
+            assertAll(
+                    () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
+                    () -> assertThat(response.getBody().data().productId()).isEqualTo(1L),
+                    () -> assertThat(response.getBody().data().name()).isEqualTo("루퍼스 공식 티셔츠"),
+                    () -> assertThat(response.getBody().data().description()).isEqualTo("루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다."),
+                    () -> assertThat(response.getBody().data().imageUrl()).isEqualTo("https://loopers.com/product/t-shirt.png"),
+                    () -> assertThat(response.getBody().data().price()).isEqualTo(20000L),
+                    () -> assertThat(response.getBody().data().isLiked()).isEqualTo(false)
+            );
+        }
+
+
+        @DisplayName("상품 아이디로 상품 정보를 요청시, 상품 정보를 받는다.")
+        @Test
+        void returnProductWithLike_whenUserLikeProduct(){
+            //given
+            var brand = brandJpaRepository.save(
+                    Brand.create(
+                            new BrandCommand.Create("루퍼스", "루퍼스 공식 브랜드", "https://loopers.com/brand/logo.png")
+                    )
+            );
+            var product = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 티셔츠",
+                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/t-shirt.png",
+                            20000L
+                    ))
+            );
+
+            likeJpaRepository.saveAll(List.of(
+                    Like.create(new LikeCommand.Like(1L, product.getId()))
+            ));
+            String requestUrl = ENDPOINT_GET.apply(1L);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("X-USER-ID", "1");
+
+            //when
+            ParameterizedTypeReference<ApiResponse<ProductV1Response.ProductDetail>> responseType = new ParameterizedTypeReference<>() {
+            };
+            ResponseEntity<ApiResponse<ProductV1Response.ProductDetail>> response =
+                    testRestTemplate.exchange(
+                            requestUrl,
+                            HttpMethod.GET,
+                            new HttpEntity<ProductV1Response.ProductDetail>(null, headers),
+                            responseType
+                    );
+
+            //then
+            assertAll(
+                    () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
+                    () -> assertThat(response.getBody().data().productId()).isEqualTo(1L),
+                    () -> assertThat(response.getBody().data().name()).isEqualTo("루퍼스 공식 티셔츠"),
+                    () -> assertThat(response.getBody().data().description()).isEqualTo("루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다."),
+                    () -> assertThat(response.getBody().data().imageUrl()).isEqualTo("https://loopers.com/product/t-shirt.png"),
+                    () -> assertThat(response.getBody().data().price()).isEqualTo(20000L),
+                    () -> assertThat(response.getBody().data().isLiked()).isEqualTo(true)
+            );
+        }
+
+        @DisplayName("상품 아이디로 상품 정보를 요청시, 좋아요 수를 포함한 상품 정보를 받는다.")
+        @Test
+        void returnProductWithLikeCount_whenUserLikeProduct(){
+            //given
+            var brand = brandJpaRepository.save(
+                    Brand.create(
+                            new BrandCommand.Create("루퍼스", "루퍼스 공식 브랜드", "https://loopers.com/brand/logo.png")
+                    )
+            );
+            var product = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 티셔츠",
+                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/t-shirt.png",
+                            20000L
+                    ))
+            );
+
+            likeJpaRepository.saveAll(List.of(
+                    Like.create(new LikeCommand.Like(1L, product.getId()))
+            ));
+            String requestUrl = ENDPOINT_GET.apply(1L);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("X-USER-ID", "1");
+
+            //when
+            ParameterizedTypeReference<ApiResponse<ProductV1Response.ProductDetail>> responseType = new ParameterizedTypeReference<>() {
+            };
+            ResponseEntity<ApiResponse<ProductV1Response.ProductDetail>> response =
+                    testRestTemplate.exchange(
+                            requestUrl,
+                            HttpMethod.GET,
+                            new HttpEntity<ProductV1Response.ProductDetail>(null, headers),
+                            responseType
+                    );
+
+            //then
+            assertAll(
+                    () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
+                    () -> assertThat(response.getBody().data().productId()).isEqualTo(1L),
+                    () -> assertThat(response.getBody().data().name()).isEqualTo("루퍼스 공식 티셔츠"),
+                    () -> assertThat(response.getBody().data().description()).isEqualTo("루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다."),
+                    () -> assertThat(response.getBody().data().imageUrl()).isEqualTo("https://loopers.com/product/t-shirt.png"),
+                    () -> assertThat(response.getBody().data().price()).isEqualTo(20000L),
+                    () -> assertThat(response.getBody().data().isLiked()).isEqualTo(true),
+            () -> assertThat(response.getBody().data().lickCount()).isEqualTo(1L)
             );
         }
 

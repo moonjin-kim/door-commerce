@@ -1,7 +1,7 @@
 package com.loopers.domain.product;
 
-import com.loopers.domain.Amount;
 import com.loopers.domain.BaseEntity;
+import com.loopers.domain.Money;
 import com.loopers.domain.product.vo.ProductStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -22,11 +22,9 @@ public class Product extends BaseEntity {
     @Column(unique = true)
     private String imageUrl;
     @Embedded
-    private Amount price;
+    private Money price;
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
-    @Column()
-    private Long likeCount;
 
     protected Product(String name, Long brandId, String description, String imageUrl, Long price, ProductStatus status, Long likeCount) {
         ProductValidator.validateName(name);
@@ -42,7 +40,7 @@ public class Product extends BaseEntity {
         this.imageUrl = imageUrl;
 
 
-        this.price = new Amount(price);
+        this.price = new Money(price);
 
         this.status = status;
     }
@@ -57,21 +55,6 @@ public class Product extends BaseEntity {
                 ProductStatus.SALE,
                 0L
         );
-    }
-
-    public void increaseLikeCount() {
-        if (this.likeCount == null) {
-            this.likeCount = 0L;
-        }
-        this.likeCount++;
-    }
-
-    public void decreaseLikeCount() {
-        if (this.likeCount == null || this.likeCount <= 0) {
-            this.likeCount = 0L;
-        } else {
-            this.likeCount--;
-        }
     }
 
 }

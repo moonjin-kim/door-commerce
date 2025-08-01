@@ -27,12 +27,10 @@ public class ProductService {
                 );
     }
 
-    public PageResponse<ProductInfo> search(PageRequest<ProductCommand.Search> command) {
+    public PageResponse<ProductView> search(PageRequest<ProductCommand.Search> command) {
         PageRequest<ProductParams.Search> productParams = command.map(ProductCommand.Search::toParams);
 
-        PageResponse<Product> productPage = productRepository.search(productParams);
-
-        return productPage.map(ProductInfo::of);
+        return productRepository.search(productParams);
     }
 
     public List<ProductInfo> findAllBy(List<Long> productIds) {

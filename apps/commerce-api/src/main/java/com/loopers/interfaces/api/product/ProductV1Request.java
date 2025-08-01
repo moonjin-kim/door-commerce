@@ -1,6 +1,7 @@
 package com.loopers.interfaces.api.product;
 
 import com.loopers.application.product.ProductCriteria;
+import lombok.Getter;
 
 public class ProductV1Request {
     public record Search(
@@ -14,5 +15,4 @@ public class ProductV1Request {
             );
         }
     }
-
 }

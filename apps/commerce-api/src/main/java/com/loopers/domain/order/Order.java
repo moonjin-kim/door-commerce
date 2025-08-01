@@ -1,6 +1,7 @@
 package com.loopers.domain.order;
 
 import com.loopers.domain.BaseEntity;
+import com.loopers.domain.Money;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import jakarta.persistence.*;

@@ -1,4 +1,4 @@
-package com.loopers.interfaces.point;
+package com.loopers.interfaces.api.point;
 
 import com.loopers.domain.point.Point;
 import com.loopers.domain.user.User;
@@ -6,8 +6,6 @@ import com.loopers.fixture.UserFixture;
 import com.loopers.infrastructure.point.PointJpaRepository;
 import com.loopers.infrastructure.user.UserJpaRepository;
 import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.interfaces.api.point.PointV1Request;
-import com.loopers.interfaces.api.point.PointV1Response;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;

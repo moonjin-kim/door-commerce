@@ -36,7 +36,7 @@ class ProductTest {
             });
 
             // then
-            assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+            assertThat(result.getErrorType()).isEqualTo(ErrorType.INVALID_INPUT);
         }
 
         @DisplayName("브랜드 ID가 null이면 BadRequest 예외가 발생한다.")
@@ -153,83 +153,8 @@ class ProductTest {
                 () -> assertEquals(command.name(), product.getName()),
                 () -> assertEquals(command.description(), product.getDescription()),
                 () -> assertEquals(command.imageUrl(), product.getImageUrl()),
-                () -> assertEquals(command.price(), product.getPrice().getPrice())
+                () -> assertEquals(command.price(), product.getPrice().value())
             );
-        }
-    }
-
-    @DisplayName("좋아요 횟수를 증가시킬 때,")
-    @Nested
-    class increaseLikeCount {
-        @DisplayName("좋아요 횟수를 1 증가시킨다.")
-        @Test
-        void increaseLikeCount() {
-            // given
-            Product product = new Product(
-                    "상품명",
-                    1L,
-                    "상품 설명",
-                    "https://example.com/image.png",
-                    10000L,
-                    ProductStatus.SALE,
-                    0L
-            );
-
-            // when
-            product.increaseLikeCount();
-
-            // then
-            assertEquals(1L, product.getLikeCount());
-        }
-    }
-
-    @DisplayName("좋아요 횟수를 감소시킬 때,")
-    @Nested
-    class decreaseLikeCount {
-        @DisplayName("좋아요 횟수가 1이상이면 1 감소시킨다..")
-        @Test
-        void increaseLikeCount() {
-            // given
-            Product product = new Product(
-                    "상품명",
-                    1L,
-                    "상품 설명",
-                    "https://example.com/image.png",
-                    10000L,
-                    ProductStatus.SALE,
-                    1L
-            );
-
-            // when
-            product.decreaseLikeCount();
-
-            // then
-            assertEquals(0L, product.getLikeCount());
-        }
-
-        @DisplayName("좋아요 횟수가 0이하이면 좋아요횟수가 0이된다.")
-        @ParameterizedTest
-        @ValueSource(longs = {
-                0L,
-                -1L
-        })
-        void zeroLikeCount_whenLikeCountIsLowZero(long likeCount) {
-            // given
-            Product product = new Product(
-                    "상품명",
-                    1L,
-                    "상품 설명",
-                    "https://example.com/image.png",
-                    10000L,
-                    ProductStatus.SALE,
-                    likeCount
-            );
-
-            // when
-            product.decreaseLikeCount();
-
-            // then
-            assertEquals(0L, product.getLikeCount());
         }
     }
 

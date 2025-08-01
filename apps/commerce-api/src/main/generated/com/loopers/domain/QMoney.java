@@ -1,4 +1,4 @@
-package com.loopers.domain.order;
+package com.loopers.domain;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -15,7 +15,7 @@ import com.querydsl.core.types.Path;
 @Generated("com.querydsl.codegen.DefaultEmbeddableSerializer")
 public class QMoney extends BeanPath<Money> {
 
-    private static final long serialVersionUID = 36033935L;
+    private static final long serialVersionUID = 1420438383L;
 
     public static final QMoney money = new QMoney("money");
 

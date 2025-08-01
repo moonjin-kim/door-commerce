@@ -26,7 +26,7 @@ public class QOrderItem extends BeanPath<OrderItem> {
 
     public final NumberPath<Long> productId = createNumber("productId", Long.class);
 
-    public final QMoney productPrice;
+    public final com.loopers.domain.QMoney productPrice;
 
     public final NumberPath<Integer> quantity = createNumber("quantity", Integer.class);
 
@@ -48,7 +48,7 @@ public class QOrderItem extends BeanPath<OrderItem> {
 
     public QOrderItem(Class<? extends OrderItem> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.productPrice = inits.isInitialized("productPrice") ? new QMoney(forProperty("productPrice")) : null;
+        this.productPrice = inits.isInitialized("productPrice") ? new com.loopers.domain.QMoney(forProperty("productPrice")) : null;
     }
 
 }

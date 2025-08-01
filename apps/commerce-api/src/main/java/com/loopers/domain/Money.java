@@ -1,9 +1,8 @@
-package com.loopers.domain.point;
+package com.loopers.domain;
 
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import jakarta.persistence.Embeddable;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Embeddable
@@ -19,10 +18,16 @@ public class Money {
     }
 
     public Money plus(Long value) {
+        if( value < 0) {
+            throw new CoreException(ErrorType.INVALID_INPUT);
+        }
         return new Money(this.value + value);
     }
 
     public Money minus(Long value) {
+        if (value < 0) {
+            throw new CoreException(ErrorType.INVALID_INPUT);
+        }
         return new Money(this.value - value);
     }
 

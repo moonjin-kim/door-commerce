@@ -2,6 +2,7 @@ package com.loopers.application.product;
 
 import com.loopers.domain.brand.BrandInfo;
 import com.loopers.domain.product.ProductInfo;
+import com.loopers.domain.product.ProductView;
 
 public class ProductResult {
     public record ProductDto(
@@ -10,16 +11,18 @@ public class ProductResult {
             String name,
             String description,
             String imageUrl,
-            Long price
+            Long price,
+            Long likeCount
     ) {
-        public static ProductDto from(ProductInfo product) {
+        public static ProductDto from(ProductView product) {
             return new ProductDto(
-                    product.id(),
-                    product.brandId(),
-                    product.name(),
-                    product.description(),
-                    product.imageUrl(),
-                    product.price()
+                    product.getId(),
+                    product.getBrandId(),
+                    product.getName(),
+                    product.getDescription(),
+                    product.getImageUrl(),
+                    product.getPrice(),
+                    product.getLikeCount()
             );
         }
     }
@@ -32,9 +35,10 @@ public class ProductResult {
             String description,
             String imageUrl,
             Long price,
+            Long likeCount,
             Boolean isLiked
     ) {
-        public static ProductDetail from(ProductInfo product, BrandInfo brandInfo, Boolean isLiked) {
+        public static ProductDetail from(ProductInfo product, BrandInfo brandInfo, Boolean isLiked, Long likeCount) {
             return new ProductDetail(
                     product.id(),
                     product.brandId(),
@@ -43,6 +47,7 @@ public class ProductResult {
                     product.description(),
                     product.imageUrl(),
                     product.price(),
+                    likeCount,
                     isLiked
             );
         }

@@ -11,5 +11,7 @@ public interface LikeRepository {
 
     PageResponse<Like> search(PageRequest<LikeParams.Search> likeSearch);
 
+    Long countBy(Long productId);
+
     void delete(Long userId, Long productId);
 }
