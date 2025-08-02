@@ -10,12 +10,12 @@ public interface PointV1ApiSpec {
             summary = "포인트 충전",
             description = "현재 유저에 amont만큼의 포인트를 추가한다."
     )
-    ApiResponse<PointV1ResponseDto.PointBalance> register(Long userId, PointV1RequestDto.PointChargeRequest chargeRequest);
+    ApiResponse<PointV1Response.PointBalance> register(Long userId, PointV1Request.PointChargeRequest chargeRequest);
 
 
     @Operation(
             summary = "포인트 잔액 조회",
             description = "현재 유저의 포인트 잔액을 조회한다"
     )
-    ApiResponse<PointV1ResponseDto.PointBalance> getBalance(Long userId);
+    ApiResponse<PointV1Response.PointBalance> getBalance(Long userId);
 }

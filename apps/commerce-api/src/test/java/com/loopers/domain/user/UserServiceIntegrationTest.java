@@ -2,7 +2,7 @@ package com.loopers.domain.user;
 
 import com.loopers.fixture.UserFixture;
 import com.loopers.infrastructure.user.UserJpaRepository;
-import com.loopers.interfaces.api.user.UserV1RequestDto;
+import com.loopers.interfaces.api.user.UserV1Request;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
@@ -44,7 +44,7 @@ class UserServiceIntegrationTest {
         @Test
         void registerMember_whenAllMemberInfoAreProvide(){
             //given
-            UserV1RequestDto.Register request = UserFixture.createUserRegisterRequest();
+            UserV1Request.Register request = UserFixture.createUserRegisterRequest();
 
             //when
             User user = userService.registerMember(request);
@@ -67,7 +67,7 @@ class UserServiceIntegrationTest {
         @Test
         void throwsException_whenAlreadyRegisteredMember() {
             //given
-            UserV1RequestDto.Register request = UserFixture.createUserRegisterRequest();
+            UserV1Request.Register request = UserFixture.createUserRegisterRequest();
             User user = userJpaRepository.save(
                     User.register(request.toCommand())
             );

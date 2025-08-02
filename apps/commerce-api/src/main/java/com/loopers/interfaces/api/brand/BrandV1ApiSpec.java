@@ -1,7 +1,6 @@
 package com.loopers.interfaces.api.brand;
 
 import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.interfaces.api.user.UserV1ResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -9,8 +8,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public interface BrandV1ApiSpec
 {
     @Operation(
-            summary = "회원조회",
-            description = "ID로 유저를 조회합니다."
+            summary = "브랜드 조회",
+            description = "ID로 브랜드를 조회합니다."
     )
-    ApiResponse<UserV1ResponseDto.User> get(Long userId);
+    ApiResponse<BrandV1Response.Brand> get(Long brandId);
 }

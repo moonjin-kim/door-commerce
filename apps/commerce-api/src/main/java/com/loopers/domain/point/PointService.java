@@ -13,9 +13,10 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class PointService {
     private final PointRepository pointRepository;
+    private final PointHistoryRepository pointHistoryRepository;
 
     @Transactional
-    public Point initPoint(Long userId) {
+    public Point init(Long userId) {
         if(userId == null) {
             throw new CoreException(ErrorType.NOT_FOUND, "유저 정보가 없습니다.");
         }
@@ -28,23 +29,40 @@ public class PointService {
     }
 
     @Transactional
-    public Point chargePoint(PointCommand.Charge chargeCommand) {
-        // Point Service에서 user를 Null 체크할 이유가 있을까?
-        if(chargeCommand.userId() == null) {
+    public PointInfo charge(PointCommand.Charge command) {
+        if(command.userId() == null) {
             throw new CoreException(ErrorType.NOT_FOUND, "유저 정보가 없습니다.");
         }
-        Point point = pointRepository.findBy(chargeCommand.userId()).orElseGet(() ->
-            initPoint(chargeCommand.userId()) // 유저가 처음 포인트를 충전하는 경우
+
+        Point point = pointRepository.findBy(command.userId()).orElseGet(() ->
+            init(command.userId())
         );
+        point.charge(command.amount());
 
-        point.charge(chargeCommand.amount());
+        pointHistoryRepository.save(PointHistory.charge(point.getId(), command));
 
-        return point;
+        return PointInfo.of(point);
     }
 
     @Transactional
-    public Optional<Point> getPoint(Long userId) {
-        return pointRepository.findBy(userId);
+    public PointInfo using(PointCommand.Using command) {
+        Point point = pointRepository.findBy(command.userId()).orElseThrow(() ->
+                new CoreException(ErrorType.NOT_FOUND, "포인트 정보가 없습니다.")
+        );
+        point.use(command.amount());
+
+        pointHistoryRepository.save(PointHistory.use(point.getId(), command));
+
+        return PointInfo.of(point);
+    }
+
+    @Transactional
+    public PointInfo get(Long userId) {
+        return pointRepository.findBy(userId)
+                .map(PointInfo::of)
+                .orElseThrow(() ->
+                    new CoreException(ErrorType.NOT_FOUND, "포인트 정보가 없습니다.")
+                );
     }
 
 }

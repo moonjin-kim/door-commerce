@@ -2,6 +2,7 @@ package com.loopers.domain.user;
 
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import java.util.regex.Pattern;
 @Embeddable
 @NoArgsConstructor
 public class Account {
+    @Column(length = 30, nullable = false)
     private String account;
 
     private static final String ACCOUNT_REGEX = "^[a-zA-Z0-9]{1,10}$";
