@@ -84,7 +84,7 @@ class OrderServiceTest {
             assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
         }
 
-        @DisplayName("유저 ID가 null인 경우 BadRequest 예외를 발생시켜야 한다.")
+        @DisplayName("유저 ID가 null인 경우 INVALID_INPUT 예외를 발생시켜야 한다.")
         @Test
         void throwBadRequest_whenInvalidOrderItem() {
             // given
@@ -99,7 +99,7 @@ class OrderServiceTest {
             });
 
             //then
-            assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+            assertThat(result.getErrorType()).isEqualTo(ErrorType.INVALID_INPUT);
         }
     }
 
