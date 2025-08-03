@@ -24,17 +24,13 @@ public class Brand extends BaseEntity {
 
     public Brand(String name, String description, String logoUrl, BrandStatus status) {
         BrandValidator.validateName(name);
-        this.name = name;
-
         BrandValidator.validateDescription(description);
-        this.description = description;
-
         BrandValidator.validateLogoUrl(logoUrl);
-        this.logoUrl = logoUrl;
+        BrandValidator.validateStatus(status);
 
-        if(status == null) {
-            throw new CoreException(ErrorType.BAD_REQUEST, "Status cannot be null");
-        }
+        this.name = name;
+        this.description = description;
+        this.logoUrl = logoUrl;
         this.status = status;
     }
 

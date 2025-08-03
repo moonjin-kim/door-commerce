@@ -60,7 +60,6 @@ public class Order extends BaseEntity {
                 .map(OrderItem::create)
                 .toList();
 
-
         return new Order(command.userId(), orderItems,OrderStatus.CONFIRMED);
     }
 

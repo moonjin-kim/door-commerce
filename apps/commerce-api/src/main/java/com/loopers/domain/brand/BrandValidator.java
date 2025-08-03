@@ -29,4 +29,10 @@ public class BrandValidator {
             throw new CoreException(ErrorType.BAD_REQUEST, "로고 이미지 url 형식이 잘못되었습니다.");
         }
     }
+
+    static void validateStatus(BrandStatus status) {
+        if(status == null) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "Status cannot be null");
+        }
+    }
 }

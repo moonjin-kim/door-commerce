@@ -24,10 +24,11 @@ public class Like extends BaseEntity {
         if(userId == null) {
             throw new CoreException(ErrorType.BAD_REQUEST, "사용자 ID는 비어있을 수 없습니다.");
         }
-        this.userId = userId;
         if(productId == null) {
             throw new CoreException(ErrorType.BAD_REQUEST, "사용자 ID는 비어있을 수 없습니다.");
         }
+
+        this.userId = userId;
         this.productId = productId;
     }
 

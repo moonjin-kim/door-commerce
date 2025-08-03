@@ -29,28 +29,26 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     Gender gender;
 
-    protected User(Account account, String name, Email email, LocalDate birthday, Gender gender) {
-        this.account = account;
+    protected User(String account, String name, String email, String birthday, Gender gender){
+        UserValidator.validateName(name);
+        UserValidator.validateBirthday(birthday);
+
+        this.account = new Account(account);
         this.name = name;
-        this.email = email;
-        this.birthday = birthday;
+        this.email = new Email(email);
+        this.birthday = LocalDate.parse(birthday);;
         this.gender = gender;
     }
 
     public static User create(UserCommand.Create command) {
-        UserValidator.validateName(command.name());
-        UserValidator.validateBirthday(command.birthday());
-        UserValidator.validateGender(command.gender());
 
-        User user = new User();
-
-        user.name = command.name();
-        user.account = new Account(command.account());
-        user.email = new Email(command.email());
-        user.birthday = LocalDate.parse(command.birthday());
-        user.gender = command.gender();
-
-        return user;
+        return new User(
+                command.account(),
+                command.name(),
+                command.email(),
+                command.birthday(),
+                command.gender()
+        );
     }
 
 
