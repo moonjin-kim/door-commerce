@@ -19,7 +19,7 @@ public class StockService {
 
     @Transactional
     public void decrease(StockCommand.Decrease command) {
-        Stock stock = stockRepository.findBy(command.productId())
+        Stock stock = stockRepository.findByIdWithPessimisticWriteLock(command.productId())
                 .orElseThrow(() ->
                         new CoreException(ErrorType.BAD_REQUEST, "[productId = " + command.productId() + "] 존재하지 않는 재고입니다.")
                 );
@@ -33,7 +33,7 @@ public class StockService {
                 .map(StockCommand.Decrease::productId)
                 .toList();
 
-        List<Stock> stocks = stockRepository.findAllBy(productIds);
+        List<Stock> stocks = stockRepository.findAllByWithPessimisticWriteLock(productIds);
         Map<Long, Stock> productMap = stocks.stream()
                 .collect(Collectors.toMap(Stock::getProductId, stock -> stock));
 

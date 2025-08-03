@@ -1,5 +1,9 @@
 package com.loopers.domain.stock;
 
+import com.loopers.domain.point.Point;
+import com.loopers.domain.point.PointCommand;
+import com.loopers.domain.user.User;
+import com.loopers.fixture.UserFixture;
 import com.loopers.infrastructure.stock.StockJpaRepository;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
@@ -10,9 +14,15 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.testcontainers.shaded.org.checkerframework.checker.units.qual.A;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -190,6 +200,38 @@ class StockServiceTest {
             assertAll(
                     () -> assertThat(foundStock1.getQuantity()).isEqualTo(stock1.getQuantity() - 10),
                     () -> assertThat(foundStock2.getQuantity()).isEqualTo(stock2.getQuantity() - 5)
+            );
+        }
+
+
+
+        @DisplayName("재고 차감이 동시에 이루어져도 정상적으로 처리된다.")
+        @Test
+        void decreaseStockSuccessfully_whenPointIsUsedSimultaneously() throws InterruptedException {
+            //given
+            int threadCount = 10;
+            ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+            CountDownLatch latch = new CountDownLatch(threadCount);
+            Stock stock1 = stockJpaRepository.save(new Stock(1L, 10));
+
+            //when
+            for (int i = 0; i < threadCount; i++) {
+                executor.submit(() -> {
+                    try {
+                        stockService.decrease(StockCommand.Decrease.of(1L, 1));
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    } finally {
+                        latch.countDown();
+                    }
+                });
+            }
+            latch.await();
+
+            //then
+            Stock foundStock1 = stockJpaRepository.findById(stock1.getProductId()).get();
+            assertAll(
+                    () -> assertThat(foundStock1.getQuantity()).isEqualTo(stock1.getQuantity() - 10)
             );
         }
     }

@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import java.util.ArrayList;
@@ -340,7 +341,7 @@ public class PointServiceIntegrationTest {
             assertThat(exception.getErrorType()).isEqualTo(ErrorType.INVALID_POINT_AMOUNT);
         }
 
-        @DisplayName("포인트가 동시에 사용되면 충돌이 발생한다.")
+        @DisplayName("포인트가 동시에 사용되면 충돌이 발생하요 OptimisticLockingFailureException에러를 반환받는다.")
         @Test
         void throwConcurrentModificationException_whenPointIsUsedSimultaneously() throws InterruptedException  {
             //given
@@ -370,9 +371,14 @@ public class PointServiceIntegrationTest {
 
             //then
             latch.await();
-
             Point afterPoint = pointJpaRepository.findById(point.getId()).orElseThrow();
             assertThat(afterPoint.getBalance().value()).isEqualTo(90000L);
+
+            // 낙관적 락 예외가 발생했는지 확인
+            boolean hasOptimisticLock = exceptions.stream().anyMatch(
+                    e -> e instanceof OptimisticLockingFailureException
+            );
+            assertThat(hasOptimisticLock).isTrue();
             assertThat(exceptions).hasSize(9);
         }
     }
