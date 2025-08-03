@@ -582,5 +582,85 @@ class OrderV1ControllerTest {
                     () -> assertThat(response.getBody().data().getItems().get(0).id()).isEqualTo(order.getId())
             );
         }
+
+        @DisplayName("동시에 같은 유저의 가은 주문건이 요청되면, 1번의 주문만 성공하고 나머지는 실패한다.")
+        @Test
+        void notAllowNegativeStock_whenConcurrentOrder() throws InterruptedException {
+            //given
+            User user = userJpaRepository.save(
+                    UserFixture.createMember()
+            );
+
+            Point point = Point.init(user.getId());
+            point.charge(100000L);
+            pointJpaRepository.save(point);
+
+            var product = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 티셔츠",
+                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/t-shirt.png",
+                            10000L
+                    ))
+            );
+
+            stockJpaRepository.save(Stock.init(
+                    StockCommand.Create.of(product.getId(), 10)
+            ));
+
+            var request = new OrderV1Request.Order(
+                    List.of(new OrderV1Request.OrderItem(product.getId(), 1))
+            );
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("X-USER-ID", user.getId().toString());
+
+            int threadCount = 10;
+            Thread[] threads = new Thread[threadCount];
+            ResponseEntity<ApiResponse<OrderV1Response.Order>>[] responses = new ResponseEntity[threadCount];
+
+            for (int i = 0; i < threadCount; i++) {
+                final int idx = i;
+                threads[i] = new Thread(() -> {
+                    ParameterizedTypeReference<ApiResponse<OrderV1Response.Order>> responseType = new ParameterizedTypeReference<>() {};
+                    responses[idx] = testRestTemplate.exchange(
+                            "/api/v1/orders",
+                            HttpMethod.POST,
+                            new HttpEntity<>(request, headers),
+                            responseType
+                    );
+                });
+            }
+
+            //when
+            for (Thread thread : threads) {
+                thread.start();
+            }
+            for (Thread thread : threads) {
+                thread.join();
+            }
+
+            //then
+            long successCount = 0;
+            long failCount = 0;
+            for (ResponseEntity<ApiResponse<OrderV1Response.Order>> response : responses) {
+                if (response != null && response.getStatusCode().is2xxSuccessful()) {
+                    successCount++;
+                } else {
+                    failCount++;
+                }
+            }
+            Point point1 = pointJpaRepository.findByUserId(user.getId()).get();
+
+            long finalFailCount = failCount;
+            long finalSuccessCount = successCount;
+            assertAll(
+                    () -> assertThat(finalSuccessCount).isEqualTo(1),
+                    () -> assertThat(finalFailCount).isEqualTo(9),
+                    () -> assertThat(point1.getBalance().value()).isEqualTo(90000L) // 10 * 10000
+            );
+        }
     }
 }

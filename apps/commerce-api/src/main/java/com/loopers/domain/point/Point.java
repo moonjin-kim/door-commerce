@@ -20,6 +20,8 @@ public class Point extends BaseEntity {
             @AttributeOverride(name="value", column = @Column(name="balance"))
     })
     private Money balance;
+    @Version
+    private Long version;
 
     public static Point init(Long userId) {
         Point point = new Point();
