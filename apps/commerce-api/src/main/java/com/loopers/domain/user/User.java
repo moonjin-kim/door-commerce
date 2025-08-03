@@ -15,8 +15,6 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
-
-//    @Column(length = 100, unique = true, nullable = false)
     @Embedded
     Account account;
     @Column(length = 100, unique = true, nullable = false)
@@ -31,21 +29,25 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     Gender gender;
 
-    public static User register(UserCommand.Create command) {
+    protected User(Account account, String name, Email email, LocalDate birthday, Gender gender) {
+        this.account = account;
+        this.name = name;
+        this.email = email;
+        this.birthday = birthday;
+        this.gender = gender;
+    }
+
+    public static User create(UserCommand.Create command) {
+        UserValidator.validateName(command.name());
+        UserValidator.validateBirthday(command.birthday());
+        UserValidator.validateGender(command.gender());
+
         User user = new User();
 
-        UserValidator.validateName(command.name());
         user.name = command.name();
-
         user.account = new Account(command.account());
-
-
         user.email = new Email(command.email());
-
-        UserValidator.validateBirthday(command.birthday());
         user.birthday = LocalDate.parse(command.birthday());
-
-        UserValidator.validateGender(command.gender());
         user.gender = command.gender();
 
         return user;

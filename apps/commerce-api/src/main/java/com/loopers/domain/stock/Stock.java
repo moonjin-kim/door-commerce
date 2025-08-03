@@ -32,7 +32,7 @@ public class Stock extends BaseEntity {
         this.quantity = quantity;
     }
 
-    public static Stock init(StockCommand.Create command) {
+    public static Stock create(StockCommand.Create command) {
         return new Stock(command.productId(), command.quantity());
     }
 

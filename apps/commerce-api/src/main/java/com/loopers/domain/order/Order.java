@@ -55,7 +55,7 @@ public class Order extends BaseEntity {
         this.pointUsed = this.totalAmount;
     }
 
-    public static Order order(OrderCommand.Order command) {
+    public static Order create(OrderCommand.Order command) {
         List<OrderItem> orderItems = command.orderItems().stream()
                 .map(OrderItem::create)
                 .toList();

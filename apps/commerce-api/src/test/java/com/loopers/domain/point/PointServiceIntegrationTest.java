@@ -8,8 +8,6 @@ import com.loopers.infrastructure.user.UserJpaRepository;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
-import jakarta.persistence.OptimisticLockException;
-import org.hibernate.StaleObjectStateException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -57,7 +55,7 @@ public class PointServiceIntegrationTest {
         void throwBadRequest_whenAlreadySavePointByUserId(){
             //given
             Long userId = 1L;
-            pointJpaRepository.save(Point.init(userId));
+            pointJpaRepository.save(Point.create(userId));
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
@@ -114,7 +112,7 @@ public class PointServiceIntegrationTest {
         void savedRequest_whenAmountLessThanBalance() {
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
-            Point point = pointJpaRepository.save(Point.init(user.getId()));
+            Point point = pointJpaRepository.save(Point.create(user.getId()));
 
             //when
             PointInfo result = pointService.charge(PointCommand.Charge.of(user.getId(),500L));
@@ -134,7 +132,7 @@ public class PointServiceIntegrationTest {
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
 
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(1000);
             Point chargedPoint = pointJpaRepository.save(
                     point
@@ -157,7 +155,7 @@ public class PointServiceIntegrationTest {
         void throwNotFound_whenNullUser(){
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(1000);
             Point chargedPoint = pointJpaRepository.save(
                     point
@@ -223,7 +221,7 @@ public class PointServiceIntegrationTest {
             User user = userJpaRepository.save(
                     UserFixture.createMember()
             );
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(1000);
             Point chargedPoint = pointJpaRepository.save(
                     point
@@ -259,7 +257,7 @@ public class PointServiceIntegrationTest {
         void throwInsufficientBalance_whenAmountMoreThanBalance() {
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(1000);
             pointJpaRepository.save(point);
 
@@ -292,7 +290,7 @@ public class PointServiceIntegrationTest {
         void deductBalance_whenAmountLessThanBalance() {
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(1000);
             pointJpaRepository.save(point);
 
@@ -308,7 +306,7 @@ public class PointServiceIntegrationTest {
         void savedRequest_whenAmountLessThanBalance() {
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(1000);
             pointJpaRepository.save(point);
 
@@ -328,7 +326,7 @@ public class PointServiceIntegrationTest {
         void throwInvalidPointAmount_whenZeroOrLessAmount() {
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(1000);
             pointJpaRepository.save(point);
 
@@ -349,7 +347,7 @@ public class PointServiceIntegrationTest {
             ExecutorService executor = Executors.newFixedThreadPool(threadCount);
             CountDownLatch latch = new CountDownLatch(threadCount);
             User user = userJpaRepository.save(UserFixture.createMember());
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(100000);
             point = pointJpaRepository.save(point);
 

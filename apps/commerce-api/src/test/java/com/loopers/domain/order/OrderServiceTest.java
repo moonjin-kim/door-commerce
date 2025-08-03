@@ -43,7 +43,7 @@ class OrderServiceTest {
     class Order {
         @DisplayName("올바른 주문정보를 주면, 주문이 성공적으로 생성되어야 한다.")
         @Test
-        void returnOrderInfo_whenCorrectOrderCommand() {
+        void returnOrderInfo_whenCorrectCreateCommand() {
             // given
             OrderCommand.Order orderCommand = new OrderCommand.Order(
                     1L,
@@ -86,7 +86,7 @@ class OrderServiceTest {
 
         @DisplayName("유저 ID가 null인 경우 INVALID_INPUT 예외를 발생시켜야 한다.")
         @Test
-        void throwBadRequest_whenInvalidOrderItem() {
+        void throwBadRequest_whenInvalidCreateItem() {
             // given
             OrderCommand.Order orderCommand = new OrderCommand.Order(
                     1L,
@@ -163,7 +163,7 @@ class OrderServiceTest {
     class getOrders {
         @DisplayName("사용자 Id가 주어지면, 사용자의 주문 정보 목록을 반환해야 한다.")
         @Test
-        void returnOrderList_whenGetOrders() {
+        void returnCreateList_whenGetOrders() {
             // given
             OrderCommand.Order orderCommand1 = new OrderCommand.Order(
                     1L,

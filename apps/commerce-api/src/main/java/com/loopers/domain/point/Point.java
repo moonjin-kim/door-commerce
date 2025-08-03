@@ -23,7 +23,7 @@ public class Point extends BaseEntity {
     @Version
     private Long version;
 
-    public static Point init(Long userId) {
+    public static Point create(Long userId) {
         Point point = new Point();
         point.userId = userId;
         point.balance = new Money(0L);
