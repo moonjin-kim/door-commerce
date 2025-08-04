@@ -84,6 +84,35 @@ erDiagram
         LocalDateTime updatedAt
         LocalDateTime deletedAt 
     }
+    apply_coupon {
+        bigint id PK
+        bigint order_id FK
+        bigint coupon_id FK
+        bigint discount_amount
+        varchar coupon_name
+        LocalDateTime applied_at
+        LocalDateTime created_at
+        LocalDateTime updated_at
+        LocalDateTime deleted_at
+    }
+    published_coupon {
+        bigint id PK
+        bigint user_id FK
+        bigint coupon_id FK
+        varchar name
+        bigint discount_amount
+        LocalDateTime start_date
+        LocalDateTime end_date
+        LocalDateTime created_at
+        LocalDateTime updated_at
+        LocalDateTime deleted_at
+    }
+    coupon {
+        bigint id PK
+        varchar name
+        CouponType type
+        bigint value
+    }
 
     user ||..o{ like : ""
     user ||..o{ order : ""
@@ -94,5 +123,10 @@ erDiagram
     like }o--|| product : ""
     order ||--|{ orderItem : ""
     order ||--|| payment : ""
+    order ||--|| apply_coupon : ""
+    coupon ||--o{ published_coupon : ""
+    apply_coupon ||--o{ published_coupon : ""
+    
+    
     
 ```

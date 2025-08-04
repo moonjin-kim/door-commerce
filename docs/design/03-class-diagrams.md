@@ -92,6 +92,13 @@ classDiagram
         +int quantity
         +getTotalPrice(): Long
     }
+    class ApplyCoupon {
+        +Long id
+        -Order order
+        -PublishedCoupon coupon
+        +discountAmount(): Long
+        +apply(): void
+    }
     
     class Point {
         +Long id
@@ -113,6 +120,24 @@ classDiagram
         CHARGE
         USE
     }
+    class Coupon {
+        +String code
+        +String name
+        +Long value
+        -CouponType type
+    }
+    class PublishedCoupon {
+        +Long id
+        -User user
+        -Coupon coupon
+        +boolean isUsed
+        +use(): Long
+    }
+    class CouponType {
+        <<enum>>
+        AMOUNT
+        RATE
+    }
 User "1" --* "1" Point
 User "1" -- "0..*" Order
 User "1" -- "0..*" Like
@@ -132,7 +157,12 @@ PointHistory "1" -- "1" TransactionType
 Order "1" --* "1..*" OrderItem
 Order "1" --* "1..*" Payment
 Order "1" --* "1" OrderStatus
+Order "1" --* "1" ApplyCoupon
 
 OrderItem "1" -- "1" Product
+
+Coupon "1" --* "0..*" PublishedCoupon
+ApplyCoupon "1" -- "1" PublishedCoupon
+
 
 ```
