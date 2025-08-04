@@ -126,7 +126,7 @@ classDiagram
         +Long value
         -CouponType type
     }
-    class PublishedCoupon {
+    class UserCoupon {
         +Long id
         -User user
         -Coupon coupon
@@ -161,8 +161,8 @@ Order "1" --* "1" ApplyCoupon
 
 OrderItem "1" -- "1" Product
 
-Coupon "1" --* "0..*" PublishedCoupon
-ApplyCoupon "1" -- "1" PublishedCoupon
+Coupon "1" --* "0..*" UserCoupon
+ApplyCoupon "1" -- "1" UserCoupon
 
 
 ```
