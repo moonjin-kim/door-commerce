@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import java.time.ZonedDateTime;
 
@@ -16,6 +17,7 @@ import java.time.ZonedDateTime;
  */
 @MappedSuperclass
 @Getter
+@EqualsAndHashCode(of = "id")
 public abstract class BaseEntity {
 
     @Id
@@ -70,4 +72,5 @@ public abstract class BaseEntity {
             this.deletedAt = null;
         }
     }
+
 }

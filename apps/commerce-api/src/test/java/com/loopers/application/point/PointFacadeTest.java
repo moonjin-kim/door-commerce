@@ -5,7 +5,7 @@ import com.loopers.domain.user.User;
 import com.loopers.fixture.UserFixture;
 import com.loopers.infrastructure.point.PointJpaRepository;
 import com.loopers.infrastructure.user.UserJpaRepository;
-import com.loopers.interfaces.api.point.PointV1RequestDto;
+import com.loopers.interfaces.api.point.PointV1Request;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
@@ -47,10 +47,10 @@ class PointFacadeTest {
         void returnPoint(){
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
-            var chargeRequest = new PointV1RequestDto.PointChargeRequest(1000);
+            var chargeRequest = new PointV1Request.PointChargeRequest(1000L);
 
             //when
-            PointInfo result = pointFacade.charge(user.getId(), chargeRequest);
+            PointResult result = pointFacade.charge(user.getId(), chargeRequest);
 
             //then
             assertAll(
@@ -72,16 +72,18 @@ class PointFacadeTest {
                     point
             );
 
-            var chargeRequest = new PointV1RequestDto.PointChargeRequest(1000);
+            var chargeRequest = new PointV1Request.PointChargeRequest(1000L);
 
             //when
-            PointInfo result = pointFacade.charge(user.getId(), chargeRequest);
+            PointResult result = pointFacade.charge(user.getId(), chargeRequest);
 
             //then
             assertAll(
                     () -> assertThat(result).isNotNull(),
                     () -> assertThat(result.userId()).isEqualTo(user.getId()),
-                    () -> assertThat(result.balance()).isEqualTo(chargedPoint.getBalance() + chargeRequest.amount())
+                    () -> assertThat(result.balance()).isEqualTo(
+                            chargedPoint.getBalance().plus(chargeRequest.amount()).value()
+                    )
             );
         }
 
@@ -89,7 +91,7 @@ class PointFacadeTest {
         @Test
         void throwException_whenInvalidIdIsProvided(){
             //given
-            var chargeRequest = new PointV1RequestDto.PointChargeRequest(1000);
+            var chargeRequest = new PointV1Request.PointChargeRequest(1000L);
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
@@ -120,13 +122,13 @@ class PointFacadeTest {
             );
 
             //when
-            PointInfo result = pointFacade.getBalance(user.getId());
+            PointResult result = pointFacade.getBalance(user.getId());
 
             //then
             assertAll(
                     () -> assertThat(result).isNotNull(),
                     () -> assertThat(result.userId()).isEqualTo(user.getId()),
-                    () -> assertThat(result.balance()).isEqualTo(chargedPoint.getBalance())
+                    () -> assertThat(result.balance()).isEqualTo(chargedPoint.getBalance().value())
             );
         }
 
@@ -144,7 +146,7 @@ class PointFacadeTest {
             assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
         }
 
-        @DisplayName("유저의 포인트가 없는 경우, 포인트가 새로 생성되고 조회된다.")
+        @DisplayName("유저의 포인트가 없는 경우, NOT_FOUND 예외가 발생한다.")
         @Test
         void savePoint_whenPointDoesntExist(){
             //given
@@ -153,15 +155,12 @@ class PointFacadeTest {
             );
 
             //when
-            PointInfo pointInfo = pointFacade.getBalance(user.getId());
+            CoreException exception = assertThrows(CoreException.class, () -> {
+                pointFacade.getBalance(user.getId());
+            });
 
             //then
-            Optional<Point> savedPoint = pointJpaRepository.findByUserId(user.getId());
-            assertAll(
-                    () -> assertThat(savedPoint).isNotNull(),
-                    () -> assertThat(savedPoint.get().getUserId()).isEqualTo(pointInfo.userId()),
-                    () -> assertThat(savedPoint.get().getBalance()).isEqualTo(pointInfo.balance())
-            );
+            assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
         }
     }
 }

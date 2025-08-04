@@ -2,18 +2,20 @@ package com.loopers.application.user;
 
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserService;
-import com.loopers.interfaces.api.user.UserV1RequestDto;
+import com.loopers.interfaces.api.user.UserV1Request;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Component
+@Transactional
 public class UserFacade {
     private final UserService userService;
 
-    public UserInfo registerUser(UserV1RequestDto.Register request) {
+    public UserInfo registerUser(UserV1Request.Register request) {
         return UserInfo.from(userService.registerMember(request));
     }
 
