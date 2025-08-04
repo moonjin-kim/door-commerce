@@ -69,7 +69,7 @@ class UserServiceIntegrationTest {
             //given
             UserV1Request.Register request = UserFixture.createUserRegisterRequest();
             User user = userJpaRepository.save(
-                    User.register(request.toCommand())
+                    User.create(request.toCommand())
             );
 
             //when

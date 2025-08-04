@@ -16,8 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -66,7 +64,7 @@ class PointFacadeTest {
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
 
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(1000);
             Point chargedPoint = pointJpaRepository.save(
                     point
@@ -115,7 +113,7 @@ class PointFacadeTest {
                     UserFixture.createMember()
             );
 
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(1000);
             Point chargedPoint = pointJpaRepository.save(
                    point

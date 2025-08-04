@@ -19,7 +19,6 @@ import com.loopers.infrastructure.product.ProductJpaRepository;
 import com.loopers.infrastructure.stock.StockJpaRepository;
 import com.loopers.infrastructure.user.UserJpaRepository;
 import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.interfaces.api.product.ProductV1Response;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,11 +30,9 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -91,13 +88,13 @@ class OrderV1ControllerTest {
 
         @DisplayName("주문 생성 성공")
         @Test
-        void returnOrder_whenCurrenOrder(){
+        void returnOrder_whenCurrenCreate(){
             //given
             User user = userJpaRepository.save(
                     UserFixture.createMember()
             );
 
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(20000L);
             Point chargePoint = pointJpaRepository.save(
                     point
@@ -112,7 +109,7 @@ class OrderV1ControllerTest {
                             10000L
                     )));
 
-            Stock stock = stockJpaRepository.save(Stock.init(
+            Stock stock = stockJpaRepository.save(Stock.create(
                     StockCommand.Create.of(product1.getId(),2)
             ));
 
@@ -152,13 +149,13 @@ class OrderV1ControllerTest {
 
         @DisplayName("주문이 생성되었을 때, 주문 수량만큼 재고가 차감된다.")
         @Test
-        void decreaseStock_whenSuccessOrder(){
+        void decreaseStock_whenSuccessCreate(){
             //given
             User user = userJpaRepository.save(
                     UserFixture.createMember()
             );
 
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(20000L);
             Point chargePoint = pointJpaRepository.save(
                     point
@@ -173,7 +170,7 @@ class OrderV1ControllerTest {
                             10000L
                     )));
 
-            Stock stock = stockJpaRepository.save(Stock.init(
+            Stock stock = stockJpaRepository.save(Stock.create(
                     StockCommand.Create.of(product1.getId(),2)
             ));
 
@@ -206,13 +203,13 @@ class OrderV1ControllerTest {
 
         @DisplayName("주문이 생성되었을 때, 사용한 포인트만큼 포인트가 차감된다.")
         @Test
-        void decreasePoint_whenSuccessOrder(){
+        void decreasePoint_whenSuccessCreate(){
             //given
             User user = userJpaRepository.save(
                     UserFixture.createMember()
             );
 
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(20000L);
             Point chargePoint = pointJpaRepository.save(
                     point
@@ -227,7 +224,7 @@ class OrderV1ControllerTest {
                             10000L
                     )));
 
-            Stock stock = stockJpaRepository.save(Stock.init(
+            Stock stock = stockJpaRepository.save(Stock.create(
                     StockCommand.Create.of(product1.getId(),2)
             ));
 
@@ -273,7 +270,7 @@ class OrderV1ControllerTest {
                     UserFixture.createMember()
             );
 
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(20000L);
             Point chargePoint = pointJpaRepository.save(
                     point
@@ -288,7 +285,7 @@ class OrderV1ControllerTest {
                             10000L
                     )));
 
-            Stock stock = stockJpaRepository.save(Stock.init(
+            Stock stock = stockJpaRepository.save(Stock.create(
                     StockCommand.Create.of(product1.getId(),1)
             ));
 
@@ -326,7 +323,7 @@ class OrderV1ControllerTest {
                     UserFixture.createMember()
             );
 
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(19999L);
             Point chargePoint = pointJpaRepository.save(
                     point
@@ -341,7 +338,7 @@ class OrderV1ControllerTest {
                             10000L
                     )));
 
-            Stock stock = stockJpaRepository.save(Stock.init(
+            Stock stock = stockJpaRepository.save(Stock.create(
                     StockCommand.Create.of(product1.getId(),2)
             ));
 
@@ -379,7 +376,7 @@ class OrderV1ControllerTest {
                     UserFixture.createMember()
             );
 
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(19999L);
             Point chargePoint = pointJpaRepository.save(
                     point
@@ -394,7 +391,7 @@ class OrderV1ControllerTest {
                             10000L
                     )));
 
-            Stock stock = stockJpaRepository.save(Stock.init(
+            Stock stock = stockJpaRepository.save(Stock.create(
                     StockCommand.Create.of(product1.getId(),2)
             ));
 
@@ -435,7 +432,7 @@ class OrderV1ControllerTest {
         @Test
         void returnOrder_whenSuccessGetBy() {
             //given
-            var order = orderJpaRepository.save(Order.order(
+            var order = orderJpaRepository.save(Order.create(
                     OrderCommand.Order.of(
                             1L,
                             List.of(
@@ -477,7 +474,7 @@ class OrderV1ControllerTest {
         @Test
         void throw403_whenNotPermissionByUser() {
             //given
-            var order = orderJpaRepository.save(Order.order(
+            var order = orderJpaRepository.save(Order.create(
                     OrderCommand.Order.of(
                             1L,
                             List.of(
@@ -544,9 +541,9 @@ class OrderV1ControllerTest {
 
         @DisplayName("주문 조회 성공")
         @Test
-        void returnOrder_whenSuccessGetBy() {
+        void returnCreate_whenSuccessGetBy() {
             //given
-            var order = orderJpaRepository.save(Order.order(
+            var order = orderJpaRepository.save(Order.create(
                     OrderCommand.Order.of(
                             2L,
                             List.of(
@@ -580,6 +577,86 @@ class OrderV1ControllerTest {
                     () -> assertThat(response.getBody().data().getSize()).isEqualTo(10),
                     () -> assertThat(response.getBody().data().getItems()).hasSize(1),
                     () -> assertThat(response.getBody().data().getItems().get(0).id()).isEqualTo(order.getId())
+            );
+        }
+
+        @DisplayName("동시에 같은 유저의 가은 주문건이 요청되면, 1번의 주문만 성공하고 나머지는 실패한다.")
+        @Test
+        void notAllowNegativeStock_whenConcurrentCreate() throws InterruptedException {
+            //given
+            User user = userJpaRepository.save(
+                    UserFixture.createMember()
+            );
+
+            Point point = Point.create(user.getId());
+            point.charge(100000L);
+            pointJpaRepository.save(point);
+
+            var product = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 티셔츠",
+                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/t-shirt.png",
+                            10000L
+                    ))
+            );
+
+            stockJpaRepository.save(Stock.create(
+                    StockCommand.Create.of(product.getId(), 10)
+            ));
+
+            var request = new OrderV1Request.Order(
+                    List.of(new OrderV1Request.OrderItem(product.getId(), 1))
+            );
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("X-USER-ID", user.getId().toString());
+
+            int threadCount = 10;
+            Thread[] threads = new Thread[threadCount];
+            ResponseEntity<ApiResponse<OrderV1Response.Order>>[] responses = new ResponseEntity[threadCount];
+
+            for (int i = 0; i < threadCount; i++) {
+                final int idx = i;
+                threads[i] = new Thread(() -> {
+                    ParameterizedTypeReference<ApiResponse<OrderV1Response.Order>> responseType = new ParameterizedTypeReference<>() {};
+                    responses[idx] = testRestTemplate.exchange(
+                            "/api/v1/orders",
+                            HttpMethod.POST,
+                            new HttpEntity<>(request, headers),
+                            responseType
+                    );
+                });
+            }
+
+            //when
+            for (Thread thread : threads) {
+                thread.start();
+            }
+            for (Thread thread : threads) {
+                thread.join();
+            }
+
+            //then
+            long successCount = 0;
+            long failCount = 0;
+            for (ResponseEntity<ApiResponse<OrderV1Response.Order>> response : responses) {
+                if (response != null && response.getStatusCode().is2xxSuccessful()) {
+                    successCount++;
+                } else {
+                    failCount++;
+                }
+            }
+            Point point1 = pointJpaRepository.findByUserId(user.getId()).get();
+
+            long finalFailCount = failCount;
+            long finalSuccessCount = successCount;
+            assertAll(
+                    () -> assertThat(finalSuccessCount).isEqualTo(1),
+                    () -> assertThat(finalFailCount).isEqualTo(9),
+                    () -> assertThat(point1.getBalance().value()).isEqualTo(90000L) // 10 * 10000
             );
         }
     }

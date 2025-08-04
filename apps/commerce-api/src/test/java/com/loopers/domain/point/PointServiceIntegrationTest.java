@@ -14,10 +14,16 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -49,7 +55,7 @@ public class PointServiceIntegrationTest {
         void throwBadRequest_whenAlreadySavePointByUserId(){
             //given
             Long userId = 1L;
-            pointJpaRepository.save(Point.init(userId));
+            pointJpaRepository.save(Point.create(userId));
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
@@ -106,7 +112,7 @@ public class PointServiceIntegrationTest {
         void savedRequest_whenAmountLessThanBalance() {
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
-            Point point = pointJpaRepository.save(Point.init(user.getId()));
+            Point point = pointJpaRepository.save(Point.create(user.getId()));
 
             //when
             PointInfo result = pointService.charge(PointCommand.Charge.of(user.getId(),500L));
@@ -126,7 +132,7 @@ public class PointServiceIntegrationTest {
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
 
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(1000);
             Point chargedPoint = pointJpaRepository.save(
                     point
@@ -149,7 +155,7 @@ public class PointServiceIntegrationTest {
         void throwNotFound_whenNullUser(){
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(1000);
             Point chargedPoint = pointJpaRepository.save(
                     point
@@ -215,7 +221,7 @@ public class PointServiceIntegrationTest {
             User user = userJpaRepository.save(
                     UserFixture.createMember()
             );
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(1000);
             Point chargedPoint = pointJpaRepository.save(
                     point
@@ -251,7 +257,7 @@ public class PointServiceIntegrationTest {
         void throwInsufficientBalance_whenAmountMoreThanBalance() {
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(1000);
             pointJpaRepository.save(point);
 
@@ -284,7 +290,7 @@ public class PointServiceIntegrationTest {
         void deductBalance_whenAmountLessThanBalance() {
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(1000);
             pointJpaRepository.save(point);
 
@@ -300,7 +306,7 @@ public class PointServiceIntegrationTest {
         void savedRequest_whenAmountLessThanBalance() {
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(1000);
             pointJpaRepository.save(point);
 
@@ -320,7 +326,7 @@ public class PointServiceIntegrationTest {
         void throwInvalidPointAmount_whenZeroOrLessAmount() {
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(1000);
             pointJpaRepository.save(point);
 
@@ -331,6 +337,47 @@ public class PointServiceIntegrationTest {
 
             //then
             assertThat(exception.getErrorType()).isEqualTo(ErrorType.INVALID_POINT_AMOUNT);
+        }
+
+        @DisplayName("포인트가 동시에 사용되면 충돌이 발생하요 OptimisticLockingFailureException에러를 반환받는다.")
+        @Test
+        void throwConcurrentModificationException_whenPointIsUsedSimultaneously() throws InterruptedException  {
+            //given
+            int threadCount = 10;
+            ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+            CountDownLatch latch = new CountDownLatch(threadCount);
+            User user = userJpaRepository.save(UserFixture.createMember());
+            Point point = Point.create(user.getId());
+            point.charge(100000);
+            point = pointJpaRepository.save(point);
+
+            // 포인트 사용 실패 에러 저장 위치
+            List<Exception> exceptions = Collections.synchronizedList(new ArrayList<>());
+
+            //when
+            for (int i = 0; i < threadCount; i++) {
+                executor.submit(() -> {
+                    try {
+                        pointService.using(PointCommand.Using.of(user.getId(), 1L, 10000L));
+                    } catch (Exception e) {
+                        exceptions.add(e);
+                    } finally {
+                        latch.countDown();
+                    }
+                });
+            }
+
+            //then
+            latch.await();
+            Point afterPoint = pointJpaRepository.findById(point.getId()).orElseThrow();
+            assertThat(afterPoint.getBalance().value()).isEqualTo(90000L);
+
+            // 낙관적 락 예외가 발생했는지 확인
+            boolean hasOptimisticLock = exceptions.stream().anyMatch(
+                    e -> e instanceof OptimisticLockingFailureException
+            );
+            assertThat(hasOptimisticLock).isTrue();
+            assertThat(exceptions).hasSize(9);
         }
     }
 }
