@@ -56,7 +56,7 @@ class OrderV1ControllerTest {
     private final DatabaseCleanUp databaseCleanUp;
 
     @Autowired
-    public createV1ControllerTest(
+    public OrderV1ControllerTest(
             ProductJpaRepository productJpaRepository,
             PointJpaRepository pointJpaRepository,
             PointHistoryJpaRepository pointHistoryJpaRepository,

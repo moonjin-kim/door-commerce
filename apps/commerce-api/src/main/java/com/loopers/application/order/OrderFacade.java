@@ -1,10 +1,13 @@
 package com.loopers.application.order;
 
+import com.loopers.application.payment.PaymentProcess;
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
 import com.loopers.domain.order.OrderCommand;
 import com.loopers.domain.order.OrderInfo;
 import com.loopers.domain.order.OrderService;
+import com.loopers.domain.payment.PaymentCommand;
+import com.loopers.domain.payment.PaymentInfo;
 import com.loopers.domain.point.PointCommand;
 import com.loopers.domain.point.PointService;
 import com.loopers.domain.product.ProductInfo;
@@ -30,6 +33,7 @@ public class OrderFacade {
     private final StockService stockService;
     private final PointService pointService;
     private final UserService userService;
+    private final PaymentProcess paymentProcess;
 
     @Transactional
     public OrderResult.Order order(OrderCriteria.Order criteria) {
@@ -67,7 +71,15 @@ public class OrderFacade {
         OrderInfo.OrderDto orderInfo = orderService.order(OrderCommand.Order.of(criteria.userId(), orderItems));
 
         // 포인트 사용
-        pointService.using(PointCommand.Using.of(orderInfo.userId(), orderInfo.orderId(), orderInfo.totalPrice()));
+        PaymentInfo.Pay payInfo = paymentProcess.processPayment(
+            PaymentCommand.Pay.of(
+                orderInfo.orderId(),
+                orderInfo.userId(),
+                orderInfo.totalPrice(),
+                "pointPayment"
+            )
+        );
+//        pointService.using(PointCommand.Using.of(orderInfo.userId(), orderInfo.orderId(), orderInfo.totalPrice()));
 
         // 재고 차감
         List<StockCommand.Decrease> stockCommands = orderItems.stream()

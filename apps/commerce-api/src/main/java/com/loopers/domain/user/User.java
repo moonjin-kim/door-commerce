@@ -32,6 +32,7 @@ public class User extends BaseEntity {
     protected User(String account, String name, String email, String birthday, Gender gender){
         UserValidator.validateName(name);
         UserValidator.validateBirthday(birthday);
+        UserValidator.validateGender(gender);
 
         this.account = new Account(account);
         this.name = name;

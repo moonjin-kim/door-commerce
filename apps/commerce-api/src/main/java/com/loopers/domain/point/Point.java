@@ -26,7 +26,6 @@ public class Point extends BaseEntity {
     protected Point(Long userId, Long balance) {
         this.userId = userId;
         this.balance = new Money(balance);
-        this.version = 0L;
     }
 
     public static Point create(Long userId) {
