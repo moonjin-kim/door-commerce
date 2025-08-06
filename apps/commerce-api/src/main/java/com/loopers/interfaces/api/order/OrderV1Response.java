@@ -11,7 +11,6 @@ public class OrderV1Response {
             Long userId,
             List<OrderV1Response.OrderItem> items,
             long totalPrice,
-            long pointUsed,
             String status
     ) {
         public static OrderV1Response.Order from(OrderResult.Order orderResult) {
@@ -26,7 +25,6 @@ public class OrderV1Response {
                                     item.quantity()))
                             .toList(),
                     orderResult.totalPrice(),
-                    orderResult.pointUsed(),
                     orderResult.status()
             );
         }

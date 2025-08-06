@@ -114,7 +114,7 @@ class OrderV1ControllerTest {
             ));
 
             var request = new OrderV1Request.Order(
-                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2))
+                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)),null
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -175,7 +175,7 @@ class OrderV1ControllerTest {
             ));
 
             var request = new OrderV1Request.Order(
-                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2))
+                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)), null
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -229,7 +229,7 @@ class OrderV1ControllerTest {
             ));
 
             var request = new OrderV1Request.Order(
-                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2))
+                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)), null
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -290,7 +290,7 @@ class OrderV1ControllerTest {
             ));
 
             var request = new OrderV1Request.Order(
-                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2))
+                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)), null
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -343,7 +343,7 @@ class OrderV1ControllerTest {
             ));
 
             var request = new OrderV1Request.Order(
-                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2))
+                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)), null
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -396,7 +396,7 @@ class OrderV1ControllerTest {
             ));
 
             var request = new OrderV1Request.Order(
-                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2),new OrderV1Request.OrderItem(2L, 2))
+                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2),new OrderV1Request.OrderItem(2L, 2)), null
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -607,7 +607,8 @@ class OrderV1ControllerTest {
             ));
 
             var request = new OrderV1Request.Order(
-                    List.of(new OrderV1Request.OrderItem(product.getId(), 1))
+                    List.of(new OrderV1Request.OrderItem(product.getId(), 1)),
+                    null
             );
 
             HttpHeaders headers = new HttpHeaders();

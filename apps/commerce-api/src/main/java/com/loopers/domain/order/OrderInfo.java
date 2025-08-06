@@ -9,7 +9,6 @@ public class OrderInfo {
             Long userId,
             List<OrderItemDto> orderItemDtos,
             Long totalPrice,
-            Long pointUsed,
             LocalDateTime orderDate,
             OrderStatus status
     ) {
@@ -23,7 +22,6 @@ public class OrderInfo {
                     order.getUserId(),
                     orderItemDtos,
                     order.getTotalAmount().value(),
-                    order.getPointUsed().value(),
                     order.getOrderDate(),
                     order.getStatus()
             );

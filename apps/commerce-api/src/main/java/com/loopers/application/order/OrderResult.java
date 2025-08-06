@@ -1,5 +1,6 @@
 package com.loopers.application.order;
 
+import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderInfo;
 
 import java.util.List;
@@ -10,23 +11,21 @@ public class OrderResult {
             Long userId,
             List<OrderItem> items,
             long totalPrice,
-            long pointUsed,
             String status
     ) {
-        public static Order of(OrderInfo.OrderDto orderInfo) {
+        public static OrderResult.Order from(com.loopers.domain.order.Order order) {
             return new Order(
-                    orderInfo.orderId(),
-                    orderInfo.userId(),
-                    orderInfo.orderItemDtos().stream()
+                    order.getId(),
+                    order.getUserId(),
+                    order.getOrderItems().stream()
                             .map(item -> new OrderItem(
-                                    item.productId(),
-                                    item.name(),
-                                    item.price(),
-                                    item.quantity()))
+                                    item.getProductId(),
+                                    item.getName(),
+                                    item.getProductPrice().value(),
+                                    item.getQuantity()))
                             .toList(),
-                    orderInfo.totalPrice(),
-                    orderInfo.pointUsed(),
-                    orderInfo.status().name()
+                    order.getTotalAmount().value(),
+                    order.getStatus().name()
             );
         }
     }

@@ -43,7 +43,7 @@ public class Coupon extends BaseEntity {
         return new Coupon(command.name(), command.description(), command.value(), command.type());
     }
 
-    public BigDecimal applyDiscount(BigDecimal price) {
+    public BigDecimal calculateDiscountAmount(BigDecimal price) {
         DiscountPolicy policy = switch (discountType) {
             case DiscountType.PERCENT -> new PercentDiscountPolicy(discountValue);
             case DiscountType.FIXED -> new FixedAmountDiscountPolicy(discountValue);

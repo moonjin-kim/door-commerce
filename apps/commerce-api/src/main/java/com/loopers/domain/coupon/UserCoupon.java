@@ -1,10 +1,12 @@
 package com.loopers.domain.coupon;
 
 import com.loopers.domain.BaseEntity;
+import com.loopers.domain.Money;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,6 +90,14 @@ public class UserCoupon extends BaseEntity {
         this.usedAt = null;
 
         userCouponHistories.add(UserCouponHistory.create(orderId, CouponHistoryType.CANCELLED));
+    }
+
+    public Money caculateDiscountAmount(Long orderId, BigDecimal originalAmount) {
+        if (coupon == null) {
+            throw new IllegalStateException("쿠폰 정보가 없습니다.");
+        }
+        BigDecimal discountAmount = coupon.calculateDiscountAmount(originalAmount);
+        return new Money(discountAmount.longValue());
     }
 
     public boolean isUsed() {

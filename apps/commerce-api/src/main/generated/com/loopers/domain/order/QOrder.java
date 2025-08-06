@@ -24,11 +24,15 @@ public class QOrder extends EntityPathBase<Order> {
 
     public final com.loopers.domain.QBaseEntity _super = new com.loopers.domain.QBaseEntity(this);
 
+    public final com.loopers.domain.QMoney couponDiscounted;
+
     //inherited
     public final DateTimePath<java.time.ZonedDateTime> createdAt = _super.createdAt;
 
     //inherited
     public final DateTimePath<java.time.ZonedDateTime> deletedAt = _super.deletedAt;
+
+    public final com.loopers.domain.QMoney finalAmount;
 
     //inherited
     public final NumberPath<Long> id = _super.id;
@@ -37,14 +41,14 @@ public class QOrder extends EntityPathBase<Order> {
 
     public final ListPath<OrderItem, QOrderItem> orderItems = this.<OrderItem, QOrderItem>createList("orderItems", OrderItem.class, QOrderItem.class, PathInits.DIRECT2);
 
-    public final com.loopers.domain.QMoney pointUsed;
-
     public final EnumPath<OrderStatus> status = createEnum("status", OrderStatus.class);
 
     public final com.loopers.domain.QMoney totalAmount;
 
     //inherited
     public final DateTimePath<java.time.ZonedDateTime> updatedAt = _super.updatedAt;
+
+    public final NumberPath<Long> userCouponId = createNumber("userCouponId", Long.class);
 
     public final NumberPath<Long> userId = createNumber("userId", Long.class);
 
@@ -66,7 +70,8 @@ public class QOrder extends EntityPathBase<Order> {
 
     public QOrder(Class<? extends Order> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.pointUsed = inits.isInitialized("pointUsed") ? new com.loopers.domain.QMoney(forProperty("pointUsed")) : null;
+        this.couponDiscounted = inits.isInitialized("couponDiscounted") ? new com.loopers.domain.QMoney(forProperty("couponDiscounted")) : null;
+        this.finalAmount = inits.isInitialized("finalAmount") ? new com.loopers.domain.QMoney(forProperty("finalAmount")) : null;
         this.totalAmount = inits.isInitialized("totalAmount") ? new com.loopers.domain.QMoney(forProperty("totalAmount")) : null;
     }
 
