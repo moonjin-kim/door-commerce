@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Getter
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "coupon_type")
 @NoArgsConstructor
 @Entity
 @Table(name = "coupon")

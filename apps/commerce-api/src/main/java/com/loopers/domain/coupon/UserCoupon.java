@@ -16,15 +16,24 @@ import java.util.List;
 public class UserCoupon extends BaseEntity {
     @Column(nullable = false)
     private Long userId;
+
+    @Column(nullable = false)
+    private LocalDateTime issuedAt;
+
+    @Column(nullable = true)
+    private LocalDateTime usedAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coupon_id", nullable = false)
     private Coupon coupon;
-    @Column(nullable = false)
-    private LocalDateTime issuedAt;
-    @Column(nullable = false)
-    private LocalDateTime usedAt;
-    @OneToMany(mappedBy = "userCoupon", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "user_coupon_history", // OrderItem 정보를 저장할 별도 테이블의 이름
+            joinColumns = @JoinColumn(name = "user_coupon_id") // 이 테이블에서 Order를 참조할 외래 키(FK)
+    )
     private List<UserCouponHistory> userCouponHistories = new ArrayList<>();
+
     @Version()
     private Long Version;
 
@@ -81,4 +90,7 @@ public class UserCoupon extends BaseEntity {
         userCouponHistories.add(UserCouponHistory.create(orderId, CouponHistoryType.CANCELLED));
     }
 
+    public boolean isUsed() {
+        return this.usedAt != null;
+    }
 }

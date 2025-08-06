@@ -13,4 +13,13 @@ public class CouponCommand {
             return new Create(name, description, value, type);
         }
     }
+
+    public record Get(
+        Long userId,
+        Long couponId
+    ) {
+        public static Get of(Long userId, Long couponId) {
+            return new Get(userId, couponId);
+        }
+    }
 }
