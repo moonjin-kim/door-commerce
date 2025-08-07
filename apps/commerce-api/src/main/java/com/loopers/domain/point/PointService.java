@@ -34,7 +34,7 @@ public class PointService {
             throw new CoreException(ErrorType.NOT_FOUND, "유저 정보가 없습니다.");
         }
 
-        Point point = pointRepository.findBy(command.userId()).orElseGet(() ->
+        Point point = pointRepository.findByForUpdate(command.userId()).orElseGet(() ->
             init(command.userId())
         );
         point.charge(command.amount());
@@ -46,7 +46,7 @@ public class PointService {
 
     @Transactional
     public PointInfo using(PointCommand.Using command) {
-        Point point = pointRepository.findBy(command.userId()).orElseThrow(() ->
+        Point point = pointRepository.findByForUpdate(command.userId()).orElseThrow(() ->
                 new CoreException(ErrorType.NOT_FOUND, "포인트 정보가 없습니다.")
         );
         point.use(command.amount());
