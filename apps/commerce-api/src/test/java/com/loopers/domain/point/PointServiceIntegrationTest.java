@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -81,7 +82,7 @@ public class PointServiceIntegrationTest {
                     () -> assertThat(savedPoint).isPresent(),
                     () -> assertThat(savedPoint.get().getId()).isEqualTo(point.getId()),
                     () -> assertThat(savedPoint.get().getUserId()).isEqualTo(userId),
-                    () -> assertThat(savedPoint.get().balance().value()).isEqualTo(0)
+                    () -> assertThat(savedPoint.get().balance().longValue()).isEqualTo(0)
             );
         }
     }
@@ -146,7 +147,9 @@ public class PointServiceIntegrationTest {
             assertAll(
                     () -> assertThat(result).isNotNull(),
                     () -> assertThat(result.userId()).isEqualTo(user.getId()),
-                    () -> assertThat(result.balance()).isEqualTo(point.balance().plus(chargeCommand.amount()).value())
+                    () -> assertThat(result.balance()).isEqualTo(point.balance().plus(
+                            BigDecimal.valueOf(chargeCommand.amount())
+                    ).longValue())
             );
         }
 
@@ -204,7 +207,7 @@ public class PointServiceIntegrationTest {
             assertAll(
                     () -> assertThat(savedPoint).isPresent(),
                     () -> assertThat(savedPoint.get().getUserId()).isEqualTo(user.getId()),
-                    () -> assertThat(savedPoint.get().balance().value()).isEqualTo(amount)
+                    () -> assertThat(savedPoint.get().balance().longValue()).isEqualTo(amount)
             );
         }
     }
@@ -231,7 +234,7 @@ public class PointServiceIntegrationTest {
             PointInfo result = pointService.get(user.getId());
 
             //then
-            assertThat(result.balance()).isEqualTo(point.balance().value());
+            assertThat(result.balance()).isEqualTo(point.balance().longValue());
         }
 
         @DisplayName("존재하지 않는 유저이면, NotFound 예외가 발생한다.")
@@ -370,7 +373,7 @@ public class PointServiceIntegrationTest {
             //then
             latch.await();
             Point afterPoint = pointJpaRepository.findById(point.getId()).orElseThrow();
-            assertThat(afterPoint.getBalance().value()).isEqualTo(90000L);
+            assertThat(afterPoint.getBalance().longValue()).isEqualTo(90000L);
 
         }
     }

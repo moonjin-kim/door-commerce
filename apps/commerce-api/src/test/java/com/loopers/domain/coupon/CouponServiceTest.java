@@ -94,7 +94,11 @@ class CouponServiceTest {
             assertAll(
                     () -> assertThat(result).isNotNull(),
                     () -> assertThat(result.getUserId()).isEqualTo(userId),
-                    () -> assertThat(result.getCoupon()).isEqualTo(coupon)
+                    () -> assertThat(result.getCouponId()).isEqualTo(coupon.getId()),
+                    () -> assertThat(result.getType()).isEqualTo(coupon.getType()),
+                    () -> assertThat(result.getValue().longValue()).isEqualTo(coupon.getValue().longValue()),
+                    () -> assertThat(result.getIssuedAt()).isNotNull(),
+                    () -> assertThat(result.getUsedAt()).isNull()
             );
         }
 

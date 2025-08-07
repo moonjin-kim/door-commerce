@@ -2,6 +2,9 @@ package com.loopers.domain.coupon;
 
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.Money;
+import com.loopers.domain.coupon.policy.DiscountPolicy;
+import com.loopers.domain.coupon.policy.FixedAmountDiscountPolicy;
+import com.loopers.domain.coupon.policy.PercentDiscountPolicy;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,9 +28,15 @@ public class UserCoupon extends BaseEntity {
     @Column(nullable = true)
     private LocalDateTime usedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coupon_id", nullable = false)
-    private Coupon coupon;
+    @Column(nullable = false)
+    private Long couponId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DiscountType type;
+
+    @Column(nullable = false)
+    private BigDecimal value;
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
@@ -41,14 +50,16 @@ public class UserCoupon extends BaseEntity {
 
     protected UserCoupon(
             Long userId,
-            Coupon coupon,
+            Long couponId,
+            DiscountType type,
+            BigDecimal value,
             LocalDateTime issuedAt,
             LocalDateTime usedAt
     ) {
         if (userId == null) {
             throw new IllegalArgumentException("유저 ID는 null일 수 없습니다.");
         }
-        if (coupon == null) {
+        if (couponId == null) {
             throw new IllegalArgumentException("쿠폰은 null일 수 없습니다.");
         }
         if (issuedAt == null) {
@@ -56,14 +67,23 @@ public class UserCoupon extends BaseEntity {
         }
 
         this.userId = userId;
-        this.coupon = coupon;
+        this.couponId = couponId;
         this.issuedAt = issuedAt;
+        this.type = type;
+        this.value = value;
         this.usedAt = usedAt;
         this.userCouponHistories = new ArrayList<>();
     }
 
     public static UserCoupon create(Long userId, Coupon coupon) {
-        return new UserCoupon(userId, coupon, LocalDateTime.now(), null);
+        return new UserCoupon(
+                userId,
+                coupon.getId(),
+                coupon.getType(),
+                coupon.getValue(),
+                LocalDateTime.now(),
+                null
+        );
     }
 
     public void use(Long orderId, LocalDateTime usedAt) {
@@ -92,15 +112,32 @@ public class UserCoupon extends BaseEntity {
         userCouponHistories.add(UserCouponHistory.create(orderId, CouponHistoryType.CANCELLED));
     }
 
-    public Money caculateDiscountAmount(Long orderId, BigDecimal originalAmount) {
-        if (coupon == null) {
-            throw new IllegalStateException("쿠폰 정보가 없습니다.");
-        }
-        BigDecimal discountAmount = coupon.calculateDiscountAmount(originalAmount);
-        return new Money(discountAmount.longValue());
+    public Money calculateDiscount(BigDecimal originalAmount) {
+        DiscountPolicy policy = switch (type) {
+            case PERCENT -> new PercentDiscountPolicy(value);
+            case FIXED -> new FixedAmountDiscountPolicy(value);
+            default -> throw new IllegalArgumentException("잘못된 타입의 쿠폰입니다. 타입: " + type);
+        };
+
+        BigDecimal discountAmount = policy.calculateDiscount(originalAmount);
+        return new Money(discountAmount);
+    }
+
+    public DiscountPolicy getDiscountPolicy() {
+        return switch (type) {
+            case PERCENT -> new PercentDiscountPolicy(value);
+            case FIXED -> new FixedAmountDiscountPolicy(value);
+            default -> throw new IllegalArgumentException("잘못된 타입의 쿠폰입니다. 타입: " + type);
+        };
     }
 
     public boolean isUsed() {
         return this.usedAt != null;
+    }
+
+    public void validate() {
+        if (this.usedAt != null) {
+            throw new IllegalArgumentException("이미 사용된 쿠폰입니다.");
+        }
     }
 }

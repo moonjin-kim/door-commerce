@@ -23,32 +23,24 @@ public class Coupon extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private DiscountType discountType;
+    private DiscountType type;
 
     @Column(nullable = false)
-    private BigDecimal discountValue;
+    private BigDecimal value;
 
-    protected Coupon(String name, String description, BigDecimal discountValue, DiscountType discountType) {
+    protected Coupon(String name, String description, BigDecimal value, DiscountType type) {
         CouponValid.validateName(name);
         CouponValid.validateDescription(description);
-        CouponValid.validateDiscountPolicy(discountValue, discountType);
+        CouponValid.validateDiscountPolicy(value, type);
 
         this.name = name;
         this.description = description;
-        this.discountType = discountType;
-        this.discountValue = discountValue;
+        this.type = type;
+        this.value = value;
     }
 
     public static Coupon create(CouponCommand.Create command) {
         return new Coupon(command.name(), command.description(), command.value(), command.type());
-    }
-
-    public BigDecimal calculateDiscountAmount(BigDecimal price) {
-        DiscountPolicy policy = switch (discountType) {
-            case DiscountType.PERCENT -> new PercentDiscountPolicy(discountValue);
-            case DiscountType.FIXED -> new FixedAmountDiscountPolicy(discountValue);
-        };
-        return policy.applyDiscount(price);
     }
 
 }

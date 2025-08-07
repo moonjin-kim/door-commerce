@@ -7,6 +7,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,24 +23,24 @@ class MoneyTest {
         @Test
         void returnMoney_ValidAmount() {
             //given
-            Money money = new Money(1000L);
+            Money money = new Money(BigDecimal.valueOf(1000L));
 
             //when
-            Money result = money.plus(500L);
+            Money result = money.plus(BigDecimal.valueOf(500L));
 
             //then
-            assertEquals(1500L, result.value());
+            assertThat(result.value()).isEqualTo(BigDecimal.valueOf(1500L));
         }
 
         @DisplayName("돈을 더할 때 음수는 허용하지 않는다.")
         @Test
         void throwBadRequest_whenRequestNagative() {
             //given
-            Money money = new Money(1000L);
+            Money money = new Money(BigDecimal.valueOf(1000L));
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                money.plus(-500L);
+                money.plus(BigDecimal.valueOf(-500L));
             });
 
             //then
@@ -52,24 +55,24 @@ class MoneyTest {
         @Test
         void returnMoney_ValidAmount() {
             //given
-            Money money = new Money(1000L);
+            Money money = new Money(BigDecimal.valueOf(1000L));
 
             //when
-            Money result = money.minus(500L);
+            Money result = money.minus(BigDecimal.valueOf(500L));
 
             //then
-            assertEquals(500L, result.value());
+            assertThat(result.value()).isEqualTo(BigDecimal.valueOf(500L));
         }
 
         @DisplayName("음수를 받으면, InvalidInput 예외를 던진다.")
         @Test
         void throwBadRequest_whenRequestNagative() {
             //given
-            Money money = new Money(1000L);
+            Money money = new Money(BigDecimal.valueOf(1000L));
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                money.minus(-500L);
+                money.minus(BigDecimal.valueOf(-500L));
             });
 
             //then
@@ -80,11 +83,11 @@ class MoneyTest {
         @Test
         void throwBadRequest_whenMoreThanBalance() {
             //given
-            Money money = new Money(1000L);
+            Money money = new Money(BigDecimal.valueOf(1000L));
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                money.minus(1001L);
+                money.minus(BigDecimal.valueOf(1001L));
             });
 
             //then

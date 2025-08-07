@@ -92,8 +92,8 @@ class CouponTest {
                     () -> assertThat(coupon).isNotNull(),
                     () -> assertThat(coupon.getName()).isEqualTo(name),
                     () -> assertThat(coupon.getDescription()).isEqualTo(description),
-                    () -> assertThat(coupon.getDiscountValue()).isEqualTo(percent),
-                    () -> assertThat(coupon.getDiscountType()).isEqualTo(type)
+                    () -> assertThat(coupon.getValue()).isEqualTo(percent),
+                    () -> assertThat(coupon.getType()).isEqualTo(type)
             );
         }
 
@@ -139,8 +139,8 @@ class CouponTest {
                     () -> assertThat(coupon).isNotNull(),
                     () -> assertThat(coupon.getName()).isEqualTo(name),
                     () -> assertThat(coupon.getDescription()).isEqualTo(description),
-                    () -> assertThat(coupon.getDiscountValue()).isEqualTo(value),
-                    () -> assertThat(coupon.getDiscountType()).isEqualTo(type)
+                    () -> assertThat(coupon.getValue()).isEqualTo(value),
+                    () -> assertThat(coupon.getType()).isEqualTo(type)
             );
         }
 

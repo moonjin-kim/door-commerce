@@ -77,18 +77,18 @@ public class OrderFacade {
             UserCoupon userCoupon = couponService.getUserCoupon(
                     CouponCommand.Get.of(criteria.userId(), criteria.couponId())
             );
-            order.applyCoupon(userCoupon);
+            order.applyCoupon(userCoupon.getId(), userCoupon.getDiscountPolicy());
 
             // 쿠폰 사용 기록 추가
             userCoupon.use(order.getId(), LocalDateTime.now());
         }
 
         // 포인트 사용
-        PaymentInfo.Pay payInfo = paymentProcess.processPayment(
+        paymentProcess.processPayment(
             PaymentCommand.Pay.of(
                 order.getId(),
                 order.getUserId(),
-                order.getTotalAmount().value(),
+                order.getTotalAmount().longValue(),
                 "pointPayment"
             )
         );

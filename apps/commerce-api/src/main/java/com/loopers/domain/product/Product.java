@@ -8,6 +8,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "product")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -36,7 +38,7 @@ public class Product extends BaseEntity {
         this.brandId = brandId;
         this.description = description;
         this.imageUrl = imageUrl;
-        this.price = new Money(price);
+        this.price = new Money(new BigDecimal(price));
 
         this.status = status;
     }

@@ -29,17 +29,17 @@ public class QCoupon extends EntityPathBase<Coupon> {
 
     public final StringPath description = createString("description");
 
-    public final EnumPath<DiscountType> discountType = createEnum("discountType", DiscountType.class);
-
-    public final NumberPath<java.math.BigDecimal> discountValue = createNumber("discountValue", java.math.BigDecimal.class);
-
     //inherited
     public final NumberPath<Long> id = _super.id;
 
     public final StringPath name = createString("name");
 
+    public final EnumPath<DiscountType> type = createEnum("type", DiscountType.class);
+
     //inherited
     public final DateTimePath<java.time.ZonedDateTime> updatedAt = _super.updatedAt;
+
+    public final NumberPath<java.math.BigDecimal> value = createNumber("value", java.math.BigDecimal.class);
 
     public QCoupon(String variable) {
         super(Coupon.class, forVariable(variable));

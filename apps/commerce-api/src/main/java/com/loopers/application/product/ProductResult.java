@@ -21,7 +21,7 @@ public class ProductResult {
                     product.getName(),
                     product.getDescription(),
                     product.getImageUrl(),
-                    product.getPrice(),
+                    product.getPrice().longValue(),
                     product.getLikeCount()
             );
         }

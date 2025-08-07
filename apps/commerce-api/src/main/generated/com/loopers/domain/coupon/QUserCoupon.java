@@ -18,13 +18,11 @@ public class QUserCoupon extends EntityPathBase<UserCoupon> {
 
     private static final long serialVersionUID = -1557768440L;
 
-    private static final PathInits INITS = PathInits.DIRECT2;
-
     public static final QUserCoupon userCoupon = new QUserCoupon("userCoupon");
 
     public final com.loopers.domain.QBaseEntity _super = new com.loopers.domain.QBaseEntity(this);
 
-    public final QCoupon coupon;
+    public final NumberPath<Long> couponId = createNumber("couponId", Long.class);
 
     //inherited
     public final DateTimePath<java.time.ZonedDateTime> createdAt = _super.createdAt;
@@ -37,6 +35,8 @@ public class QUserCoupon extends EntityPathBase<UserCoupon> {
 
     public final DateTimePath<java.time.LocalDateTime> issuedAt = createDateTime("issuedAt", java.time.LocalDateTime.class);
 
+    public final EnumPath<DiscountType> type = createEnum("type", DiscountType.class);
+
     //inherited
     public final DateTimePath<java.time.ZonedDateTime> updatedAt = _super.updatedAt;
 
@@ -46,27 +46,20 @@ public class QUserCoupon extends EntityPathBase<UserCoupon> {
 
     public final NumberPath<Long> userId = createNumber("userId", Long.class);
 
+    public final NumberPath<java.math.BigDecimal> value = createNumber("value", java.math.BigDecimal.class);
+
     public final NumberPath<Long> Version = createNumber("Version", Long.class);
 
     public QUserCoupon(String variable) {
-        this(UserCoupon.class, forVariable(variable), INITS);
+        super(UserCoupon.class, forVariable(variable));
     }
 
     public QUserCoupon(Path<? extends UserCoupon> path) {
-        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
+        super(path.getType(), path.getMetadata());
     }
 
     public QUserCoupon(PathMetadata metadata) {
-        this(metadata, PathInits.getFor(metadata, INITS));
-    }
-
-    public QUserCoupon(PathMetadata metadata, PathInits inits) {
-        this(UserCoupon.class, metadata, inits);
-    }
-
-    public QUserCoupon(Class<? extends UserCoupon> type, PathMetadata metadata, PathInits inits) {
-        super(type, metadata, inits);
-        this.coupon = inits.isInitialized("coupon") ? new QCoupon(forProperty("coupon")) : null;
+        super(UserCoupon.class, metadata);
     }
 
 }

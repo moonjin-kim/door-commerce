@@ -3,8 +3,6 @@ package com.loopers.domain.coupon;
 import com.loopers.domain.coupon.policy.DiscountPolicy;
 import com.loopers.domain.coupon.policy.FixedAmountDiscountPolicy;
 import com.loopers.domain.coupon.policy.PercentDiscountPolicy;
-import com.loopers.support.error.CoreException;
-import com.loopers.support.error.ErrorType;
 
 import java.math.BigDecimal;
 

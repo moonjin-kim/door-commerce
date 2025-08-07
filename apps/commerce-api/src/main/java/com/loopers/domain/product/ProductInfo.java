@@ -17,7 +17,7 @@ public record ProductInfo(
                 product.getName(),
                 product.getDescription(),
                 product.getImageUrl(),
-                product.getPrice().value()
+                product.getPrice().longValue()
         );
     }
 }

@@ -10,7 +10,10 @@ public class OrderResult {
             Long id,
             Long userId,
             List<OrderItem> items,
+            Long userCouponId,
             long totalPrice,
+            long couponDiscount,
+            long finalAmount,
             String status
     ) {
         public static OrderResult.Order from(com.loopers.domain.order.Order order) {
@@ -21,10 +24,13 @@ public class OrderResult {
                             .map(item -> new OrderItem(
                                     item.getProductId(),
                                     item.getName(),
-                                    item.getProductPrice().value(),
+                                    item.getProductPrice().value().longValue(),
                                     item.getQuantity()))
                             .toList(),
-                    order.getTotalAmount().value(),
+                    order.getUserCouponId(),
+                    order.getTotalAmount().value().longValue(),
+                    order.getCouponDiscountAmount().value().longValue(),
+                    order.getFinalAmount().value().longValue(),
                     order.getStatus().name()
             );
         }

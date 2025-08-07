@@ -18,7 +18,7 @@ public class PercentDiscountPolicy implements DiscountPolicy {
     }
 
     @Override
-    public BigDecimal applyDiscount(BigDecimal price) {
+    public BigDecimal calculateDiscount(BigDecimal price) {
         if(price.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("가격은 0 초과이어야 합니다.");
         }

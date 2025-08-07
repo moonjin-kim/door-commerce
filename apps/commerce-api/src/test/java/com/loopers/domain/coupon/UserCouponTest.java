@@ -32,7 +32,7 @@ class UserCouponTest {
             assertAll(
                     () -> assertThat(userCoupon.getId()).isNotNull(),
                     () -> assertThat(userCoupon.getUserId()).isEqualTo(1L),
-                    () -> assertThat(userCoupon.getCoupon()).isEqualTo(coupon),
+                    () -> assertThat(userCoupon.getCouponId()).isEqualTo(coupon.getId()),
                     () -> assertThat(userCoupon.getIssuedAt()).isNotNull(),
                     () -> assertThat(userCoupon.getUsedAt()).isNull()
             );
@@ -97,7 +97,7 @@ class UserCouponTest {
             assertAll(
                     () -> assertThat(userCoupon.getId()).isNotNull(),
                     () -> assertThat(userCoupon.getUserId()).isEqualTo(1L),
-                    () -> assertThat(userCoupon.getCoupon()).isEqualTo(coupon),
+                    () -> assertThat(userCoupon.getCouponId()).isEqualTo(coupon.getId()),
                     () -> assertThat(userCoupon.getIssuedAt()).isNotNull(),
                     () -> assertThat(userCoupon.getUsedAt()).isEqualTo(now)
             );
@@ -123,7 +123,7 @@ class UserCouponTest {
             assertAll(
                     () -> assertThat(userCoupon.getId()).isNotNull(),
                     () -> assertThat(userCoupon.getUserId()).isEqualTo(1L),
-                    () -> assertThat(userCoupon.getCoupon()).isEqualTo(coupon),
+                    () -> assertThat(userCoupon.getCouponId()).isEqualTo(coupon.getId()),
                     () -> assertThat(userCoupon.getIssuedAt()).isNotNull(),
                     () -> assertThat(userCoupon.getUsedAt()).isEqualTo(now),
                     () -> assertThat(userCoupon.getUserCouponHistories()).hasSize(1),

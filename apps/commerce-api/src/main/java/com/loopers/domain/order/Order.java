@@ -2,7 +2,7 @@ package com.loopers.domain.order;
 
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.Money;
-import com.loopers.domain.coupon.UserCoupon;
+import com.loopers.domain.coupon.policy.DiscountPolicy;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import jakarta.persistence.*;
@@ -31,7 +31,7 @@ public class Order extends BaseEntity {
     @AttributeOverrides({
             @AttributeOverride(name="value", column = @Column(name="coupont_discounted"))
     })
-    private Money couponDiscounted;
+    private Money couponDiscountAmount;
     @AttributeOverrides({
             @AttributeOverride(name="value", column = @Column(name="final_amount"))
     })
@@ -57,6 +57,8 @@ public class Order extends BaseEntity {
         this.orderItems = items;
         this.status = status;
         this.totalAmount = new Money(calculateTotalPrice());
+        this.couponDiscountAmount = new Money(BigDecimal.ZERO);
+        this.finalAmount = this.totalAmount;
         this.orderDate = LocalDateTime.now();
     }
 
@@ -68,10 +70,10 @@ public class Order extends BaseEntity {
         return new Order(command.userId(), orderItems, OrderStatus.CONFIRMED);
     }
 
-    private Long calculateTotalPrice() {
+    private BigDecimal calculateTotalPrice() {
         return orderItems.stream()
-                .mapToLong(OrderItem::getTotalAmount)
-                .sum();
+                .map(OrderItem::getTotalAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public void checkPermission(Long userId) {
@@ -84,26 +86,28 @@ public class Order extends BaseEntity {
         }
     }
 
-    public void applyCoupon(UserCoupon userCoupon) {
-        if (userCoupon == null) {
+    public void applyCoupon(Long userCouponId, DiscountPolicy discountPolicy) {
+        if (userCouponId == null) {
             throw new CoreException(ErrorType.BAD_REQUEST, "쿠폰 정보가 제공되지 않았습니다.");
         }
-
-        if (userCoupon.isUsed()) {
-            throw new CoreException(ErrorType.BAD_REQUEST, "이미 사용된 쿠폰입니다.");
+        if(discountPolicy == null) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "할인 정책이 제공되지 않았습니다.");
         }
+
+        BigDecimal discount = discountPolicy.calculateDiscount(calculateTotalPrice());
+
         // 쿠폰 적용 로직
-        this.couponDiscounted = userCoupon.caculateDiscountAmount(super.getId(), BigDecimal.valueOf(calculateTotalPrice()));
-        this.userCouponId = userCoupon.getId();
+        this.couponDiscountAmount = new Money(discount);
+        this.userCouponId = userCouponId;
 
         calculateFinalAmount();
     }
 
     public void calculateFinalAmount() {
-        if (this.couponDiscounted == null) {
+        if (this.couponDiscountAmount == null) {
             this.finalAmount = this.totalAmount;
         } else {
-            this.finalAmount = this.totalAmount.minus(this.couponDiscounted.value());
+            this.finalAmount = this.totalAmount.minus(this.couponDiscountAmount.value());
         }
     }
 }

@@ -57,11 +57,11 @@ class OrderServiceTest {
             assertAll(
                     () -> assertThat(orderDto.getId()).isNotNull(),
                     () -> assertThat(orderDto.getUserId()).isEqualTo(1L),
-                    () -> assertThat(orderDto.getTotalAmount().value()).isEqualTo(2000L),
+                    () -> assertThat(orderDto.getTotalAmount().longValue()).isEqualTo(2000L),
                     () -> assertThat(orderDto.getOrderItems()).hasSize(1),
                     () -> assertThat(orderDto.getOrderItems().get(0).getProductId()).isEqualTo(1L),
                     () -> assertThat(orderDto.getOrderItems().get(0).getName()).isEqualTo("Product A"),
-                    () -> assertThat(orderDto.getOrderItems().get(0).getProductPrice().value()).isEqualTo(1000L),
+                    () -> assertThat(orderDto.getOrderItems().get(0).getProductPrice().longValue()).isEqualTo(1000L),
                     () -> assertThat(orderDto.getOrderItems().get(0).getQuantity()).isEqualTo(2)
             );
         }

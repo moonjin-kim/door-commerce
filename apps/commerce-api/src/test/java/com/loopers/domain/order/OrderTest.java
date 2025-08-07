@@ -1,11 +1,15 @@
 package com.loopers.domain.order;
 
+import com.loopers.domain.coupon.policy.DiscountPolicy;
+import com.loopers.domain.coupon.policy.FixedAmountDiscountPolicy;
+import com.loopers.domain.coupon.policy.PercentDiscountPolicy;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -97,7 +101,7 @@ class OrderTest {
             //then
             assertAll(
                     ()-> assertEquals(1L, order.getUserId()),
-                    () -> assertEquals(11000L, order.getTotalAmount().value()),
+                    () -> assertEquals(11000L, order.getTotalAmount().longValue()),
                     () -> assertEquals(OrderStatus.CONFIRMED, order.getStatus()),
                     () -> assertEquals(2, order.getOrderItems().size()),
                     () -> assertEquals("상품1", order.getOrderItems().get(0).getName()),
@@ -170,6 +174,99 @@ class OrderTest {
 
             // then
             assertThat(result.getErrorType()).isEqualTo(ErrorType.FORBIDDEN);
+        }
+    }
+
+    @DisplayName("쿠폰을 적용할 때")
+    @Nested
+    class applyCoupon {
+
+        @DisplayName("쿠폰 ID가 null이면 BAD_REQUEST 예외가 발생한다.")
+        @Test
+        void throwBadRequest_whenCouponIdIsNull() {
+            //given
+            OrderCommand.Order command = OrderCommand.Order.of(
+                    1L,
+                    List.of(
+                            OrderCommand.OrderItem.of(1L, "상품1", 1000L, 1),
+                            OrderCommand.OrderItem.of(2L, "상품2", 1000L, 5)
+                    )
+            );
+            Order order = Order.create(command);
+
+            //when
+            CoreException result = assertThrows(CoreException.class, () -> {
+                order.applyCoupon(null, null);
+            });
+
+            // then
+            assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+        }
+
+        @DisplayName("할인 정책이 null이면 BAD_REQUEST 예외가 발생한다.")
+        @Test
+        void throwBadRequest_whenDiscountPolicyIsNull() {
+            //given
+            OrderCommand.Order command = OrderCommand.Order.of(
+                    1L,
+                    List.of(
+                            OrderCommand.OrderItem.of(1L, "상품1", 1000L, 1),
+                            OrderCommand.OrderItem.of(2L, "상품2", 1000L, 5)
+                    )
+            );
+            Order order = Order.create(command);
+
+            //when
+            CoreException result = assertThrows(CoreException.class, () -> {
+                order.applyCoupon(1L, null);
+            });
+
+            // then
+            assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+        }
+
+        @DisplayName("정액 할인 정책이 적용되면, 쿠폰 할인 금액이 계산된다.")
+        @Test
+        void discount_whenFixedDiscountPolicy() {
+            //given
+            OrderCommand.Order command = OrderCommand.Order.of(
+                    1L,
+                    List.of(
+                            OrderCommand.OrderItem.of(1L, "상품1", 1000L, 1),
+                            OrderCommand.OrderItem.of(2L, "상품2", 1000L, 5)
+                    )
+            );
+            Order order = Order.create(command);
+            DiscountPolicy discountPolicy = new FixedAmountDiscountPolicy(new BigDecimal(1000L)); // 정액 할인 2000원
+
+
+            //when
+            order.applyCoupon(1L, discountPolicy);
+
+            // then
+            assertThat(order.getFinalAmount().longValue()).isEqualTo(5000L);
+        }
+
+        @DisplayName("정률 할인 정책이 적용되면, 쿠폰 할인 금액이 계산된다.")
+        @Test
+        void discount_whenPercentDiscountPolicy() {
+            //given
+            OrderCommand.Order command = OrderCommand.Order.of(
+                    1L,
+                    List.of(
+                            OrderCommand.OrderItem.of(1L, "상품1", 1000L, 1),
+                            OrderCommand.OrderItem.of(2L, "상품2", 1000L, 5)
+                    )
+            );
+            Order order = Order.create(command);
+            DiscountPolicy discountPolicy = new PercentDiscountPolicy(new BigDecimal(10)); // 정액 할인 2000원
+
+
+            //when
+            order.applyCoupon(1L, discountPolicy);
+
+            // then
+            assertThat(order.getFinalAmount().longValue()).isEqualTo(5400L);
         }
     }
 

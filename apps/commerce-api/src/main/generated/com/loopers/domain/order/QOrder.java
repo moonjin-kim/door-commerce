@@ -24,7 +24,7 @@ public class QOrder extends EntityPathBase<Order> {
 
     public final com.loopers.domain.QBaseEntity _super = new com.loopers.domain.QBaseEntity(this);
 
-    public final com.loopers.domain.QMoney couponDiscounted;
+    public final com.loopers.domain.QMoney couponDiscountAmount;
 
     //inherited
     public final DateTimePath<java.time.ZonedDateTime> createdAt = _super.createdAt;
@@ -70,7 +70,7 @@ public class QOrder extends EntityPathBase<Order> {
 
     public QOrder(Class<? extends Order> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.couponDiscounted = inits.isInitialized("couponDiscounted") ? new com.loopers.domain.QMoney(forProperty("couponDiscounted")) : null;
+        this.couponDiscountAmount = inits.isInitialized("couponDiscountAmount") ? new com.loopers.domain.QMoney(forProperty("couponDiscountAmount")) : null;
         this.finalAmount = inits.isInitialized("finalAmount") ? new com.loopers.domain.QMoney(forProperty("finalAmount")) : null;
         this.totalAmount = inits.isInitialized("totalAmount") ? new com.loopers.domain.QMoney(forProperty("totalAmount")) : null;
     }
