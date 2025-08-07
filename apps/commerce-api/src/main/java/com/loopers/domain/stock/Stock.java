@@ -25,14 +25,16 @@ public class Stock extends BaseEntity {
         if (productId == null) {
             throw new CoreException(ErrorType.BAD_REQUEST, "Product id cannot be null");
         }
-        this.productId = productId;
+
         if (quantity < 0) {
             throw new CoreException(ErrorType.BAD_REQUEST, "재고는 음수가 될 수 없습니다.");
         }
+
+        this.productId = productId;
         this.quantity = quantity;
     }
 
-    public static Stock init(StockCommand.Create command) {
+    public static Stock create(StockCommand.Create command) {
         return new Stock(command.productId(), command.quantity());
     }
 

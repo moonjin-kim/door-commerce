@@ -24,6 +24,16 @@ public class StockRepositoryImpl implements StockRepository {
     }
 
     @Override
+    public Optional<Stock> findByIdWithPessimisticWriteLock(Long productId) {
+        return stockJpaRepository.findByIdWithPessimisticWriteLock(productId);
+    }
+
+    @Override
+    public List<Stock> findAllByWithPessimisticWriteLock(List<Long> productIds) {
+        return stockJpaRepository.findStocksByWithPessimisticWriteLock(productIds);
+    }
+
+    @Override
     public List<Stock> findAllBy(List<Long> productIds) {
         return stockJpaRepository.findByProductIdIn(productIds);
     }

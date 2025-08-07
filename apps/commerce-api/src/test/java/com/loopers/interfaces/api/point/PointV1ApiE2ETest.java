@@ -92,7 +92,7 @@ public class PointV1ApiE2ETest {
 
             Long amount = 10000L;
             Point point = pointJpaRepository.save(
-                    Point.init(user.getId())
+                    Point.create(user.getId())
             );
             var request = new PointV1Request.PointChargeRequest(amount);
 
@@ -163,7 +163,7 @@ public class PointV1ApiE2ETest {
             );
 
             // 충전 이력을 생성
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(1000);
             Point chargePoint = pointJpaRepository.save(
                     point

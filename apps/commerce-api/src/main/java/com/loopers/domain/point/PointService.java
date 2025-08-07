@@ -25,7 +25,7 @@ public class PointService {
             throw new CoreException(ErrorType.BAD_REQUEST, "포인트 정보가 없습니다.");
         }
 
-        return pointRepository.save(Point.init(userId));
+        return pointRepository.save(Point.create(userId));
     }
 
     @Transactional

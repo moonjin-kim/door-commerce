@@ -1,6 +1,5 @@
 package com.loopers.domain.user;
 
-import com.loopers.domain.point.Point;
 import com.loopers.fixture.UserFixture;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
@@ -24,7 +23,7 @@ class UserTest {
             UserCommand.Create request = UserFixture.createUserCreateCommand();
 
             //when
-            User user = User.register(request);
+            User user = User.create(request);
 
             //then
             assertThat(user.getId()).isNotNull();
@@ -46,7 +45,7 @@ class UserTest {
 
             //when
             CoreException result = assertThrows(CoreException.class, () -> {
-                User.register(request1);
+                User.create(request1);
             });
 
             //then
@@ -69,7 +68,7 @@ class UserTest {
 
             //when
             CoreException result = assertThrows(CoreException.class, () -> {
-                User.register(request1);
+                User.create(request1);
             });
 
             //then
@@ -92,7 +91,7 @@ class UserTest {
 
             //when
             CoreException result = assertThrows(CoreException.class, () -> {
-                User.register(request);
+                User.create(request);
             });
 
             //then
@@ -115,7 +114,7 @@ class UserTest {
 
             //when
             CoreException result = assertThrows(CoreException.class, () -> {
-                User.register(request);
+                User.create(request);
             });
 
             //then
@@ -132,7 +131,7 @@ class UserTest {
 
             //when
             CoreException result = assertThrows(CoreException.class, () -> {
-                User.register(request);
+                User.create(request);
             });
 
             //then

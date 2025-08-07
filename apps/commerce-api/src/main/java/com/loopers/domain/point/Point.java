@@ -20,13 +20,19 @@ public class Point extends BaseEntity {
             @AttributeOverride(name="value", column = @Column(name="balance"))
     })
     private Money balance;
+    @Version
+    private Long version;
 
-    public static Point init(Long userId) {
-        Point point = new Point();
-        point.userId = userId;
-        point.balance = new Money(0L);
+    protected Point(Long userId, Long balance) {
+        this.userId = userId;
+        this.balance = new Money(balance);
+    }
 
-        return point;
+    public static Point create(Long userId) {
+        return new Point(
+                userId,
+                0L
+        );
     }
 
     public void charge(long amount) {

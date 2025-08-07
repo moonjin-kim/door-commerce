@@ -20,7 +20,10 @@ public enum ErrorType {
     INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(), "포인트 잔액이 부족합니다."),
 
     /** 재고 에러 **/
-    INSUFFICIENT_STOCK(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(), "재고가 부족합니다.");
+    INSUFFICIENT_STOCK(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(), "재고가 부족합니다."),
+
+    /** 결제 에러 **/
+    UNSUPPORTED_PAYMENT_METHOD(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(), "지원하지 않는 결제수단입니다.");
 
     private final HttpStatus status;
     private final String code;

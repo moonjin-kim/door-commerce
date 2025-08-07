@@ -18,7 +18,7 @@ class OrderTest {
     class OrderCreate {
         @DisplayName("상품의 가격에 음수가 포함되면, INVALID_INPUT 예외가 발생한다.")
         @Test
-        void returnOrder_whenProductPriceIsNegative(){
+        void returnCreate_whenProductPriceIsNegative(){
             //given
             OrderCommand.Order command = OrderCommand.Order.of(
                     1L,
@@ -30,7 +30,7 @@ class OrderTest {
 
             //when
             CoreException result = assertThrows(CoreException.class, () -> {
-                Order.order(command);
+                Order.create(command);
             });
 
             // then
@@ -51,7 +51,7 @@ class OrderTest {
 
             //when
             CoreException result = assertThrows(CoreException.class, () -> {
-                Order.order(command);
+                Order.create(command);
             });
 
             // then
@@ -72,7 +72,7 @@ class OrderTest {
 
             //when
             CoreException result = assertThrows(CoreException.class, () -> {
-                Order.order(command);
+                Order.create(command);
             });
 
             // then
@@ -81,7 +81,7 @@ class OrderTest {
 
         @DisplayName("주문 정보가 올바르게 맞으면, 주문이 생성된다.")
         @Test
-        void returnOrder_whenValidData(){
+        void returnCreate_whenValidData(){
             //given
             OrderCommand.Order command = OrderCommand.Order.of(
                     1L,
@@ -92,7 +92,7 @@ class OrderTest {
             );
 
             //when
-            Order order = Order.order(command);
+            Order order = Order.create(command);
 
             //then
             assertAll(
@@ -121,7 +121,7 @@ class OrderTest {
                             OrderCommand.OrderItem.of(2L, "상품2", 1000L, 5)
                     )
             );
-            Order order = Order.order(command);
+            Order order = Order.create(command);
 
             //when
             order.checkPermission(1L);
@@ -140,7 +140,7 @@ class OrderTest {
                             OrderCommand.OrderItem.of(2L, "상품2", 1000L, 5)
                     )
             );
-            Order order = Order.order(command);
+            Order order = Order.create(command);
 
             //when
             CoreException result = assertThrows(CoreException.class, () -> {
@@ -162,7 +162,7 @@ class OrderTest {
                             OrderCommand.OrderItem.of(2L, "상품2", 1000L, 5)
                     )
             );
-            Order order = Order.order(command);
+            Order order = Order.create(command);
 
             //when
             CoreException result = assertThrows(CoreException.class, () -> {
