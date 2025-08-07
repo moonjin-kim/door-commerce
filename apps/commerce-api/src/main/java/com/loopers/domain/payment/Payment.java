@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -42,7 +43,7 @@ public class Payment extends BaseEntity {
 
         this.orderId = orderId;
         this.userId = userId;
-        this.paymentAmount = new Money(paymentAmount);
+        this.paymentAmount = new Money(new BigDecimal(paymentAmount));
         this.status = status;
         this.paymentType = paymentType;
         this.paymentDate = paymentDate;

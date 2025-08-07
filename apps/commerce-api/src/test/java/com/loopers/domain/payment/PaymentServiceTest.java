@@ -42,7 +42,7 @@ class PaymentServiceTest {
             // then
             assertAll(
             () -> assertThat(paymentInfo).isNotNull(),
-                    () -> assertThat(paymentInfo.paymentAmount()).isEqualTo(10000L),
+                    () -> assertThat(paymentInfo.paymentAmount().longValue()).isEqualTo(10000L),
                     () -> assertThat(paymentInfo.type()).isEqualTo(PaymentType.POINT)
             );
         }
@@ -62,7 +62,7 @@ class PaymentServiceTest {
                     () -> assertThat(payment).isNotNull(),
                     () -> assertThat(payment.getOrderId()).isEqualTo(1L),
                     () -> assertThat(payment.getUserId()).isEqualTo(1000L),
-                    () -> assertThat(payment.getPaymentAmount().value()).isEqualTo(10000L),
+                    () -> assertThat(payment.getPaymentAmount().longValue()).isEqualTo(10000L),
                     () -> assertThat(payment.getPaymentType()).isEqualTo(PaymentType.POINT),
                     () -> assertThat(payment.getStatus()).isEqualTo(PaymentStatus.COMPLETED)
             );

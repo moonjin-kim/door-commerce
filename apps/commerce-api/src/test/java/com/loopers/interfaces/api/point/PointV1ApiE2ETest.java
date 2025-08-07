@@ -17,6 +17,8 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 
+import java.math.BigDecimal;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -115,7 +117,9 @@ public class PointV1ApiE2ETest {
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
                     () -> assertThat(response.getBody().data().balance()).isEqualTo(
-                            point.getBalance().plus(amount).value()
+                            point.getBalance().plus(
+                                    new BigDecimal(amount)
+                            ).longValue()
                     )
             );
         }
@@ -187,7 +191,7 @@ public class PointV1ApiE2ETest {
             //then
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().balance()).isEqualTo(chargePoint.getBalance().value())
+                    () -> assertThat(response.getBody().data().balance()).isEqualTo(chargePoint.getBalance().longValue())
             );
         }
 

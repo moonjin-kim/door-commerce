@@ -113,6 +113,17 @@ public class ApiControllerAdvice {
         return failureResponse(ErrorType.INTERNAL_ERROR, null);
     }
 
+    @ExceptionHandler
+    public ResponseEntity<ApiResponse<?>> handleIllegalArgumentException(IllegalArgumentException e) {
+        String missingParams = extractMissingParameter(e.getMessage() != null ? e.getMessage() : "");
+        if (!missingParams.isEmpty()) {
+            String message = String.format(missingParams);
+            return failureResponse(ErrorType.BAD_REQUEST, message);
+        } else {
+            return failureResponse(ErrorType.BAD_REQUEST, null);
+        }
+    }
+
     private String extractMissingParameter(String message) {
         Pattern pattern = Pattern.compile("'(.+?)'");
         Matcher matcher = pattern.matcher(message);

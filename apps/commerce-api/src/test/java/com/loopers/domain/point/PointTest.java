@@ -30,7 +30,7 @@ class PointTest {
             point.charge(amount);
 
             //then
-            assertThat(point.getBalance().value()).isEqualTo(20000);
+            assertThat(point.getBalance().longValue()).isEqualTo(20000);
         }
 
         @DisplayName("0 이하의 정수로 포인트를 충전 시 INVALID_POINT_AMOUNT 예외가 반환된다.")
@@ -97,7 +97,7 @@ class PointTest {
             point.use(1000L);
 
             //then
-            assertThat(point.getBalance().value()).isEqualTo(0L);
+            assertThat(point.getBalance().longValue()).isEqualTo(0L);
         }
     }
 }

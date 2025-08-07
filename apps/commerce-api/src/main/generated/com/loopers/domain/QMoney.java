@@ -19,7 +19,7 @@ public class QMoney extends BeanPath<Money> {
 
     public static final QMoney money = new QMoney("money");
 
-    public final NumberPath<Long> value = createNumber("value", Long.class);
+    public final NumberPath<java.math.BigDecimal> value = createNumber("value", java.math.BigDecimal.class);
 
     public QMoney(String variable) {
         super(Money.class, forVariable(variable));

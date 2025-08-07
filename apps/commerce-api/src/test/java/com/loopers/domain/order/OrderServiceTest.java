@@ -16,8 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
-import static com.loopers.domain.order.OrderCommand.GetOrdersBy.of;
 import static java.util.List.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -40,7 +40,7 @@ class OrderServiceTest {
 
     @DisplayName("주문을 생성할 때")
     @Nested
-    class Order {
+    class OrderTest {
         @DisplayName("올바른 주문정보를 주면, 주문이 성공적으로 생성되어야 한다.")
         @Test
         void returnOrderInfo_whenCorrectCreateCommand() {
@@ -51,18 +51,18 @@ class OrderServiceTest {
             );
 
             // when
-            OrderDto orderDto = orderService.order(orderCommand);
+            Order orderDto = orderService.order(orderCommand);
 
             // then
             assertAll(
-                    () -> assertThat(orderDto.orderId()).isNotNull(),
-                    () -> assertThat(orderDto.userId()).isEqualTo(1L),
-                    () -> assertThat(orderDto.totalPrice()).isEqualTo(2000L),
-                    () -> assertThat(orderDto.orderItemDtos()).hasSize(1),
-                    () -> assertThat(orderDto.orderItemDtos().get(0).productId()).isEqualTo(1L),
-                    () -> assertThat(orderDto.orderItemDtos().get(0).name()).isEqualTo("Product A"),
-                    () -> assertThat(orderDto.orderItemDtos().get(0).price()).isEqualTo(1000L),
-                    () -> assertThat(orderDto.orderItemDtos().get(0).quantity()).isEqualTo(2)
+                    () -> assertThat(orderDto.getId()).isNotNull(),
+                    () -> assertThat(orderDto.getUserId()).isEqualTo(1L),
+                    () -> assertThat(orderDto.getTotalAmount().longValue()).isEqualTo(2000L),
+                    () -> assertThat(orderDto.getOrderItems()).hasSize(1),
+                    () -> assertThat(orderDto.getOrderItems().get(0).getProductId()).isEqualTo(1L),
+                    () -> assertThat(orderDto.getOrderItems().get(0).getName()).isEqualTo("Product A"),
+                    () -> assertThat(orderDto.getOrderItems().get(0).getProductPrice().longValue()).isEqualTo(1000L),
+                    () -> assertThat(orderDto.getOrderItems().get(0).getQuantity()).isEqualTo(2)
             );
         }
 
@@ -114,47 +114,27 @@ class OrderServiceTest {
                     2L,
                     of(new OrderCommand.OrderItem(1L, "Product A", 1000L, 2))
             );
-            OrderDto createdOrder1 = orderService.order(orderCommand);
+            Order createdOrder1 = orderService.order(orderCommand);
 
             // when
-            OrderDto orderDto = orderService.getBy(new OrderCommand.GetBy(createdOrder1.orderId(), 2L));
+            Optional<Order> orderDto = orderService.getBy(new OrderCommand.GetBy(createdOrder1.getId(), 2L));
 
             // then
-            assertThat(orderDto).isEqualTo(createdOrder1);
+            assertThat(orderDto.get()).isEqualTo(createdOrder1);
         }
 
-        @DisplayName("존재하지 않는 주문 ID를 주면, NOT_FOUND 예외를 발생시켜야 한다.")
+        @DisplayName("존재하지 않는 주문 ID를 주면, 빈 주문을 받는다.")
         @Test
         void throwNotFound_whenInvalidOrderId() {
             // given
             Long invalidOrderId = 999L;
 
             // when
-            CoreException result = assertThrows(CoreException.class, () -> {
-                orderService.getBy(new OrderCommand.GetBy(invalidOrderId, 1L));
-            });
+
+            Optional<Order> order = orderService.getBy(new OrderCommand.GetBy(invalidOrderId, 1L));
 
             // then
-            assertThat(result.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
-        }
-
-        @DisplayName("주문자가 아닌 유저 ID를 주면, FORBIDDEN 예외를 발생시켜야 한다.")
-        @Test
-        void throwForbidden_whenUnauthorizedUser() {
-            // given
-            OrderCommand.Order orderCommand = new OrderCommand.Order(
-                    1L,
-                    of(new OrderCommand.OrderItem(1L, "Product A", 1000L, 2))
-            );
-            OrderDto createdOrder = orderService.order(orderCommand);
-
-            // when
-            CoreException result = assertThrows(CoreException.class, () -> {
-                orderService.getBy(new OrderCommand.GetBy(createdOrder.orderId(), 2L));
-            });
-
-            // then
-            assertThat(result.getErrorType()).isEqualTo(ErrorType.FORBIDDEN);
+            assertThat(order).isEmpty();
         }
     }
 
@@ -178,7 +158,7 @@ class OrderServiceTest {
             PageRequest<OrderCommand.GetOrdersBy> command = new PageRequest<>(1, 10, OrderCommand.GetOrdersBy.of(1L));
 
             // when
-            PageResponse<OrderDto> orders = orderService.getOrders(
+            PageResponse<com.loopers.domain.order.Order> orders = orderService.getOrders(
                     command
             );
 

@@ -9,7 +9,6 @@ public class OrderInfo {
             Long userId,
             List<OrderItemDto> orderItemDtos,
             Long totalPrice,
-            Long pointUsed,
             LocalDateTime orderDate,
             OrderStatus status
     ) {
@@ -22,8 +21,7 @@ public class OrderInfo {
                     order.getId(),
                     order.getUserId(),
                     orderItemDtos,
-                    order.getTotalAmount().value(),
-                    order.getPointUsed().value(),
+                    order.getTotalAmount().value().longValue(),
                     order.getOrderDate(),
                     order.getStatus()
             );
@@ -37,7 +35,7 @@ public class OrderInfo {
             int quantity
     ) {
         public static OrderItemDto from(OrderItem orderItem) {
-            return new OrderItemDto(orderItem.getProductId(), orderItem.getName(), orderItem.getProductPrice().value(), orderItem.getQuantity());
+            return new OrderItemDto(orderItem.getProductId(), orderItem.getName(), orderItem.getProductPrice().value().longValue(), orderItem.getQuantity());
         }
     }
 

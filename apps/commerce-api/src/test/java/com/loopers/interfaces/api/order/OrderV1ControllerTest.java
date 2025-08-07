@@ -1,6 +1,10 @@
 package com.loopers.interfaces.api.order;
 
 import com.loopers.domain.PageResponse;
+import com.loopers.domain.coupon.Coupon;
+import com.loopers.domain.coupon.CouponCommand;
+import com.loopers.domain.coupon.CouponJpaRepository;
+import com.loopers.domain.coupon.DiscountType;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderCommand;
 import com.loopers.domain.point.Point;
@@ -31,6 +35,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,6 +43,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class OrderV1ControllerTest {
+    @Autowired
+    private final CouponJpaRepository couponJpaRepository;
     @Autowired
     private final ProductJpaRepository productJpaRepository;
     @Autowired
@@ -57,6 +64,7 @@ class OrderV1ControllerTest {
 
     @Autowired
     public OrderV1ControllerTest(
+            CouponJpaRepository couponRepository,
             ProductJpaRepository productJpaRepository,
             PointJpaRepository pointJpaRepository,
             PointHistoryJpaRepository pointHistoryJpaRepository,
@@ -66,6 +74,7 @@ class OrderV1ControllerTest {
             TestRestTemplate testRestTemplate,
             DatabaseCleanUp databaseCleanUp
     ) {
+        this.couponJpaRepository = couponRepository;
         this.productJpaRepository = productJpaRepository;
         this.pointJpaRepository = pointJpaRepository;
         this.pointHistoryJpaRepository = pointHistoryJpaRepository;
@@ -114,7 +123,7 @@ class OrderV1ControllerTest {
             ));
 
             var request = new OrderV1Request.Order(
-                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2))
+                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)),null
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -133,7 +142,7 @@ class OrderV1ControllerTest {
                     );
 
             //then
-            com.loopers.domain.order.Order order = orderJpaRepository.findAll().get(0);
+            Order order = orderJpaRepository.findAll().get(0);
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
                     () -> assertNotNull(response.getBody()),
@@ -175,7 +184,7 @@ class OrderV1ControllerTest {
             ));
 
             var request = new OrderV1Request.Order(
-                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2))
+                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)), null
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -229,7 +238,7 @@ class OrderV1ControllerTest {
             ));
 
             var request = new OrderV1Request.Order(
-                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2))
+                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)), null
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -253,7 +262,7 @@ class OrderV1ControllerTest {
 
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(point1.balance().value()).isEqualTo(0)
+                    () -> assertThat(point1.balance().longValue()).isEqualTo(0L)
                     ,
                     () -> assertThat(pointHistory.getPointId()).isEqualTo(point1.getId()),
                     () -> assertThat(pointHistory.getAmount()).isEqualTo(-20000L),
@@ -290,7 +299,7 @@ class OrderV1ControllerTest {
             ));
 
             var request = new OrderV1Request.Order(
-                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2))
+                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)), null
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -343,7 +352,7 @@ class OrderV1ControllerTest {
             ));
 
             var request = new OrderV1Request.Order(
-                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2))
+                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)), null
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -396,7 +405,137 @@ class OrderV1ControllerTest {
             ));
 
             var request = new OrderV1Request.Order(
-                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2),new OrderV1Request.OrderItem(2L, 2))
+                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2),new OrderV1Request.OrderItem(2L, 2)), null
+            );
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("X-USER-ID", "1");
+
+            //when
+            ParameterizedTypeReference<ApiResponse<OrderV1Response.Order>> responseType = new ParameterizedTypeReference<>() {
+            };
+            ResponseEntity<ApiResponse<OrderV1Response.Order>> response =
+                    testRestTemplate.exchange(
+                            URL,
+                            HttpMethod.POST,
+                            new HttpEntity<OrderV1Request.Order>(request, headers),
+                            responseType
+                    );
+
+            //then
+            assertAll(
+                    () -> assertTrue(response.getStatusCode().is4xxClientError()),
+                    () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND)
+            );
+        }
+
+        @DisplayName("쿠폰이 주어지면, 쿠폰이 적용되어 할인된 주문을 생성한다.")
+        @Test
+        void applyCoupon_whenRequestCoupon(){
+            //given
+            User user = userJpaRepository.save(
+                    UserFixture.createMember()
+            );
+
+            Point point = Point.create(user.getId());
+            point.charge(20000L);
+            Point chargePoint = pointJpaRepository.save(
+                    point
+            );
+
+            Coupon coupon = couponJpaRepository.save(
+                    Coupon.create(
+                            CouponCommand.Create.of(
+                                    "10% 할인 쿠폰",
+                                    "10% 할인 쿠폰입니다.",
+                                    BigDecimal.valueOf(10),
+                                    DiscountType.PERCENT
+                            )
+                    )
+            );
+
+            var product1 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 티셔츠",
+                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/t-shirt.png",
+                            10000L
+                    )));
+
+            Stock stock = stockJpaRepository.save(Stock.create(
+                    StockCommand.Create.of(product1.getId(),2)
+            ));
+
+            var request = new OrderV1Request.Order(
+                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)),
+                    coupon.getId()
+            );
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("X-USER-ID", "1");
+
+            //when
+            ParameterizedTypeReference<ApiResponse<OrderV1Response.Order>> responseType = new ParameterizedTypeReference<>() {
+            };
+            ResponseEntity<ApiResponse<OrderV1Response.Order>> response =
+                    testRestTemplate.exchange(
+                            URL,
+                            HttpMethod.POST,
+                            new HttpEntity<OrderV1Request.Order>(request, headers),
+                            responseType
+                    );
+
+            //then
+            Order order = orderJpaRepository.findAll().get(0);
+            assertAll(
+                    () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
+                    () -> assertNotNull(response.getBody()),
+                    () -> assertNotNull(order),
+                    () -> assertThat(response.getBody().data().id()).isNotNull(),
+                    () -> assertThat(response.getBody().data().userId()).isEqualTo(user.getId()),
+                    () -> assertThat(response.getBody().data().items()).hasSize(1),
+                    () -> assertThat(response.getBody().data().items().get(0).productId()).isEqualTo(product1.getId()),
+                    () -> assertThat(response.getBody().data().items().get(0).quantity()).isEqualTo(2),
+                    () -> assertThat(response.getBody().data().totalPrice()).isEqualTo(20000L),
+                    () -> assertThat(response.getBody().data().userCouponId()).isEqualTo(coupon.getId()),
+                    () -> assertThat(response.getBody().data().couponDiscount()).isEqualTo(2000L),
+                    () -> assertThat(response.getBody().data().finalAmount()).isEqualTo(18000L)
+            );
+        }
+
+        @DisplayName("존재하지 않은 쿠폰이 주어지면 404 NOT_FOUND 에러를 발생시킨다.")
+        @Test
+        void throwNotFound_whenNotExistCoupon(){
+            //given
+            User user = userJpaRepository.save(
+                    UserFixture.createMember()
+            );
+
+            Point point = Point.create(user.getId());
+            point.charge(20000L);
+            Point chargePoint = pointJpaRepository.save(
+                    point
+            );
+
+            var product1 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 티셔츠",
+                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/t-shirt.png",
+                            10000L
+                    )));
+
+            Stock stock = stockJpaRepository.save(Stock.create(
+                    StockCommand.Create.of(product1.getId(),2)
+            ));
+
+            var request = new OrderV1Request.Order(
+                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)),
+                    1L
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -534,7 +673,7 @@ class OrderV1ControllerTest {
         }
     }
 
-    @DisplayName("Get /api/v1/orders - 주문 목로 조회")
+    @DisplayName("Get /api/v1/orders - 주문 목록 조회")
     @Nested
     class GetOrdersBy {
         private static final String URL = "/api/v1/orders";
@@ -607,7 +746,8 @@ class OrderV1ControllerTest {
             ));
 
             var request = new OrderV1Request.Order(
-                    List.of(new OrderV1Request.OrderItem(product.getId(), 1))
+                    List.of(new OrderV1Request.OrderItem(product.getId(), 1)),
+                    null
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -656,7 +796,7 @@ class OrderV1ControllerTest {
             assertAll(
                     () -> assertThat(finalSuccessCount).isEqualTo(1),
                     () -> assertThat(finalFailCount).isEqualTo(9),
-                    () -> assertThat(point1.getBalance().value()).isEqualTo(90000L) // 10 * 10000
+                    () -> assertThat(point1.getBalance().longValue()).isEqualTo(90000L) // 10 * 10000
             );
         }
     }

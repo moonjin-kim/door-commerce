@@ -3,13 +3,15 @@ package com.loopers.application.order;
 import com.loopers.application.payment.PaymentProcess;
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
+import com.loopers.domain.coupon.CouponCommand;
+import com.loopers.domain.coupon.CouponService;
+import com.loopers.domain.coupon.UserCoupon;
+import com.loopers.domain.coupon.policy.DiscountPolicy;
+import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderCommand;
-import com.loopers.domain.order.OrderInfo;
 import com.loopers.domain.order.OrderService;
 import com.loopers.domain.payment.PaymentCommand;
 import com.loopers.domain.payment.PaymentInfo;
-import com.loopers.domain.point.PointCommand;
-import com.loopers.domain.point.PointService;
 import com.loopers.domain.product.ProductInfo;
 import com.loopers.domain.product.ProductService;
 import com.loopers.domain.stock.StockCommand;
@@ -21,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,9 +34,9 @@ public class OrderFacade {
     private final OrderService orderService;
     private final ProductService productService;
     private final StockService stockService;
-    private final PointService pointService;
     private final UserService userService;
     private final PaymentProcess paymentProcess;
+    private final CouponApplier couponApplier;
 
     @Transactional
     public OrderResult.Order order(OrderCriteria.Order criteria) {
@@ -68,18 +71,25 @@ public class OrderFacade {
         ).toList();
 
         //주문서 생성
-        OrderInfo.OrderDto orderInfo = orderService.order(OrderCommand.Order.of(criteria.userId(), orderItems));
+        Order order = orderService.order(OrderCommand.Order.of(criteria.userId(), orderItems));
+
+        if(criteria.couponId() != null) {
+            order = couponApplier.applyCoupon(
+                    criteria.userId(),
+                    criteria.couponId(),
+                    order
+            );
+        }
 
         // 포인트 사용
-        PaymentInfo.Pay payInfo = paymentProcess.processPayment(
+        paymentProcess.processPayment(
             PaymentCommand.Pay.of(
-                orderInfo.orderId(),
-                orderInfo.userId(),
-                orderInfo.totalPrice(),
+                order.getId(),
+                order.getUserId(),
+                order.getTotalAmount().longValue(),
                 "pointPayment"
             )
         );
-//        pointService.using(PointCommand.Using.of(orderInfo.userId(), orderInfo.orderId(), orderInfo.totalPrice()));
 
         // 재고 차감
         List<StockCommand.Decrease> stockCommands = orderItems.stream()
@@ -87,25 +97,27 @@ public class OrderFacade {
                 .toList();
         stockService.decreaseAll(stockCommands);
 
-        return OrderResult.Order.of(orderInfo);
+        return OrderResult.Order.from(order);
     }
 
+    @Transactional(readOnly = true)
     public OrderResult.Order getBy(Long orderId, Long userId) {
         // 주문 정보 조회
-        OrderInfo.OrderDto orderInfo = orderService.getBy(OrderCommand.GetBy.of(orderId, userId));
-        if (orderInfo == null) {
-            throw new CoreException(ErrorType.NOT_FOUND, "Order not found: " + orderId);
-        }
+        Order order =  orderService.getBy(OrderCommand.GetBy.of(orderId, userId))
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "[id = " + orderId + "] 존재하지 않는 주문입니다."));
+
+        order.checkPermission(userId);
 
         // 주문 결과 반환
-        return OrderResult.Order.of(orderInfo);
+        return OrderResult.Order.from(order);
     }
 
+    @Transactional(readOnly = true)
     public PageResponse<OrderResult.Order> getOrders(PageRequest<OrderCriteria.GetOrdersBy> criteria) {
         // 주문 목록 조회
-        PageResponse<OrderInfo.OrderDto> orderPage = orderService.getOrders(criteria.map(OrderCriteria.GetOrdersBy::toCommand));
+        PageResponse<Order> orderPage = orderService.getOrders(criteria.map(OrderCriteria.GetOrdersBy::toCommand));
 
         // 페이지 응답 생성
-        return orderPage.map(OrderResult.Order::of);
+        return orderPage.map(OrderResult.Order::from);
     }
 }
