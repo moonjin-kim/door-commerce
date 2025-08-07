@@ -12,7 +12,15 @@ import java.util.List;
 
 @Entity
 @Getter
-@Table(name = "user_coupon")
+@Table(
+    name = "user_coupon",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uk_user_coupon_user_id_coupon_id",
+            columnNames = {"userId", "couponId"}
+        )
+    }
+)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class UserCoupon extends BaseEntity {
     @Column(nullable = false)
@@ -42,7 +50,7 @@ public class UserCoupon extends BaseEntity {
     private List<UserCouponHistory> userCouponHistories = new ArrayList<>();
 
     @Version()
-    private Long Version;
+    private Long version;
 
     protected UserCoupon(
             Long userId,

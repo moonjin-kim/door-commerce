@@ -48,7 +48,7 @@ public class QUserCoupon extends EntityPathBase<UserCoupon> {
 
     public final NumberPath<java.math.BigDecimal> value = createNumber("value", java.math.BigDecimal.class);
 
-    public final NumberPath<Long> Version = createNumber("Version", Long.class);
+    public final NumberPath<Long> version = createNumber("version", Long.class);
 
     public QUserCoupon(String variable) {
         super(UserCoupon.class, forVariable(variable));

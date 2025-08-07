@@ -35,9 +35,8 @@ public class OrderFacade {
     private final ProductService productService;
     private final StockService stockService;
     private final UserService userService;
-    private final CouponService couponService;
     private final PaymentProcess paymentProcess;
-    private final CouponPolicyAdapter couponPolicyAdapter;
+    private final CouponApplier couponApplier;
 
     @Transactional
     public OrderResult.Order order(OrderCriteria.Order criteria) {
@@ -75,15 +74,11 @@ public class OrderFacade {
         Order order = orderService.order(OrderCommand.Order.of(criteria.userId(), orderItems));
 
         if(criteria.couponId() != null) {
-            // 쿠폰 사용
-            UserCoupon userCoupon = couponService.getUserCoupon(
-                    CouponCommand.Get.of(criteria.userId(), criteria.couponId())
+            order = couponApplier.applyCoupon(
+                    criteria.userId(),
+                    criteria.couponId(),
+                    order
             );
-            DiscountPolicy discountPolicy = couponPolicyAdapter.getPolicy(userCoupon);
-            order.applyCoupon(userCoupon.getId(), discountPolicy);
-
-            // 쿠폰 사용 기록 추가
-            userCoupon.use(order.getId(), LocalDateTime.now());
         }
 
         // 포인트 사용

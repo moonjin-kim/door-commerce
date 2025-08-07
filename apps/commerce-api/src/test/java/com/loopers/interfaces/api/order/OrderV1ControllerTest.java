@@ -3,7 +3,7 @@ package com.loopers.interfaces.api.order;
 import com.loopers.domain.PageResponse;
 import com.loopers.domain.coupon.Coupon;
 import com.loopers.domain.coupon.CouponCommand;
-import com.loopers.domain.coupon.CouponRepository;
+import com.loopers.domain.coupon.CouponJpaRepository;
 import com.loopers.domain.coupon.DiscountType;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderCommand;
@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class OrderV1ControllerTest {
     @Autowired
-    private final CouponRepository couponRepository;
+    private final CouponJpaRepository couponJpaRepository;
     @Autowired
     private final ProductJpaRepository productJpaRepository;
     @Autowired
@@ -64,7 +64,7 @@ class OrderV1ControllerTest {
 
     @Autowired
     public OrderV1ControllerTest(
-            CouponRepository couponRepository,
+            CouponJpaRepository couponRepository,
             ProductJpaRepository productJpaRepository,
             PointJpaRepository pointJpaRepository,
             PointHistoryJpaRepository pointHistoryJpaRepository,
@@ -74,7 +74,7 @@ class OrderV1ControllerTest {
             TestRestTemplate testRestTemplate,
             DatabaseCleanUp databaseCleanUp
     ) {
-        this.couponRepository = couponRepository;
+        this.couponJpaRepository = couponRepository;
         this.productJpaRepository = productJpaRepository;
         this.pointJpaRepository = pointJpaRepository;
         this.pointHistoryJpaRepository = pointHistoryJpaRepository;
@@ -444,7 +444,7 @@ class OrderV1ControllerTest {
                     point
             );
 
-            Coupon coupon = couponRepository.save(
+            Coupon coupon = couponJpaRepository.save(
                     Coupon.create(
                             CouponCommand.Create.of(
                                     "10% 할인 쿠폰",
@@ -506,7 +506,7 @@ class OrderV1ControllerTest {
             );
         }
 
-        @DisplayName("쿠폰이 주어지면, 쿠폰이 적용되어 할인된 주문을 생성한다.")
+        @DisplayName("존재하지 않은 쿠폰이 주어지면 404 NOT_FOUND 에러를 발생시킨다.")
         @Test
         void throwNotFound_whenNotExistCoupon(){
             //given
