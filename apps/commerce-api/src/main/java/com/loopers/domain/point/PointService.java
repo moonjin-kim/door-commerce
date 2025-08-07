@@ -29,7 +29,7 @@ public class PointService {
     }
 
     @Transactional
-    public PointInfo charge(PointCommand.Charge command) {
+    public Point charge(PointCommand.Charge command) {
         if(command.userId() == null) {
             throw new CoreException(ErrorType.NOT_FOUND, "유저 정보가 없습니다.");
         }
@@ -41,11 +41,11 @@ public class PointService {
 
         pointHistoryRepository.save(PointHistory.charge(point.getId(), command));
 
-        return PointInfo.of(point);
+        return point;
     }
 
     @Transactional
-    public PointInfo using(PointCommand.Using command) {
+    public Point using(PointCommand.Using command) {
         Point point = pointRepository.findByForUpdate(command.userId()).orElseThrow(() ->
                 new CoreException(ErrorType.NOT_FOUND, "포인트 정보가 없습니다.")
         );
@@ -53,16 +53,12 @@ public class PointService {
 
         pointHistoryRepository.save(PointHistory.use(point.getId(), command));
 
-        return PointInfo.of(point);
+        return point;
     }
 
     @Transactional
-    public PointInfo get(Long userId) {
-        return pointRepository.findBy(userId)
-                .map(PointInfo::of)
-                .orElseThrow(() ->
-                    new CoreException(ErrorType.NOT_FOUND, "포인트 정보가 없습니다.")
-                );
+    public Optional<Point> getBy(Long userId) {
+        return pointRepository.findBy(userId);
     }
 
 }

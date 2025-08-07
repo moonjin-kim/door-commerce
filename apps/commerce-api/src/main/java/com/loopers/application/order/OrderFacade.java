@@ -12,6 +12,7 @@ import com.loopers.domain.order.OrderCommand;
 import com.loopers.domain.order.OrderService;
 import com.loopers.domain.payment.PaymentCommand;
 import com.loopers.domain.payment.PaymentInfo;
+import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductInfo;
 import com.loopers.domain.product.ProductService;
 import com.loopers.domain.stock.StockCommand;
@@ -47,32 +48,22 @@ public class OrderFacade {
         }
 
         //주문 상품 조회
-        List<Long> productIds = criteria.items().stream()
-                .map(OrderCriteria.OrderItem::productId)
-                .toList();
-        List<ProductInfo> productInfos = productService.findAllBy(productIds);
-        Map<Long, ProductInfo> productMap = productInfos.stream()
-                .collect(Collectors.toMap(ProductInfo::id, productInfo -> productInfo));
-
-        // 주문 아이템 생성
-        List<OrderCommand.OrderItem> orderItems = criteria.items().stream().map(
-                item -> {
-                    ProductInfo product = productMap.get(item.productId());
-                    if (product == null) {
-                        throw new CoreException(ErrorType.NOT_FOUND, "Product not found: " + item.productId());
-                    }
-                    return new OrderCommand.OrderItem(
-                            item.productId(),
-                            product.name(),
-                            product.price(),
+        List<OrderCommand.OrderItem> orderItems = criteria.items().stream()
+                .map(item -> {
+                    Product product = productService.findBy(item.productId()).orElseThrow(
+                            () -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 상품 : " + item.productId()
+                    ));
+                    return OrderCommand.OrderItem.from(
+                            product,
                             item.quantity()
                     );
-                }
-        ).toList();
+                })
+                .toList();
 
         //주문서 생성
         Order order = orderService.order(OrderCommand.Order.of(criteria.userId(), orderItems));
 
+        // 쿠폰 적용
         if(criteria.couponId() != null) {
             order = couponApplier.applyCoupon(
                     criteria.userId(),
@@ -81,7 +72,7 @@ public class OrderFacade {
             );
         }
 
-        // 포인트 사용
+        // 결제
         paymentProcess.processPayment(
             PaymentCommand.Pay.of(
                 order.getId(),
@@ -92,10 +83,9 @@ public class OrderFacade {
         );
 
         // 재고 차감
-        List<StockCommand.Decrease> stockCommands = orderItems.stream()
-                .map(item -> StockCommand.Decrease.of(item.productId(), item.quantity()))
-                .toList();
-        stockService.decreaseAll(stockCommands);
+        orderItems.stream().forEach(orderItem -> {
+            stockService.decrease(StockCommand.Decrease.from(orderItem));
+        });
 
         return OrderResult.Order.from(order);
     }

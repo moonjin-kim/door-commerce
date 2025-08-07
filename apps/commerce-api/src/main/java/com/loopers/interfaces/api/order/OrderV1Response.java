@@ -1,7 +1,6 @@
 package com.loopers.interfaces.api.order;
 
 import com.loopers.application.order.OrderResult;
-import com.loopers.domain.order.OrderInfo;
 
 import java.util.List;
 

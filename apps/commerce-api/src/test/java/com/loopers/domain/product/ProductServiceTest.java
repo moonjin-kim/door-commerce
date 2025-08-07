@@ -1,11 +1,9 @@
 package com.loopers.domain.product;
 
-import com.loopers.application.product.ProductResult;
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
 import com.loopers.domain.like.Like;
 import com.loopers.domain.like.LikeCommand;
-import com.loopers.domain.point.PointInfo;
 import com.loopers.infrastructure.like.LikeJpaRepository;
 import com.loopers.infrastructure.product.ProductJpaRepository;
 import com.loopers.support.error.CoreException;
@@ -50,12 +48,10 @@ class ProductServiceTest {
             Long productId = 1L;
 
             //when
-            CoreException exception = assertThrows(CoreException.class, () -> {
-                productService.getBy(productId);
-            });
+            Optional<Product> result = productService.findBy(productId);
 
             //then
-            assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
+            assertThat(result.isPresent()).isFalse();
         }
 
         @DisplayName("조회할 상품의 아이디가 주어지면 해당 상품을 반환한다.")
@@ -74,12 +70,11 @@ class ProductServiceTest {
             Long productId = 1L;
 
             //when
-            ProductInfo foundProduct = productService.getBy(productId);
+            Product foundProduct = productService.getBy(productId).get();
 
             //then
-            assertAll(
-                    () -> assertEquals(ProductInfo.of(product), foundProduct)
-            );
+            assertThat(foundProduct).isEqualTo(product);
+
         }
     }
 

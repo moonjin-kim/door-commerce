@@ -4,6 +4,8 @@ import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
 import com.loopers.infrastructure.like.LikeParams;
 
+import java.util.Optional;
+
 public interface LikeRepository {
     boolean existsBy(Long userId, Long productId);
 

@@ -2,12 +2,10 @@ package com.loopers.domain.order;
 
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
-import com.loopers.domain.order.OrderInfo.OrderDto;
 import com.loopers.infrastructure.order.OrderJpaRepository;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 import static java.util.List.of;
