@@ -6,6 +6,7 @@ import com.loopers.domain.PageResponse;
 import com.loopers.domain.coupon.CouponCommand;
 import com.loopers.domain.coupon.CouponService;
 import com.loopers.domain.coupon.UserCoupon;
+import com.loopers.domain.coupon.policy.DiscountPolicy;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderCommand;
 import com.loopers.domain.order.OrderService;
@@ -36,6 +37,7 @@ public class OrderFacade {
     private final UserService userService;
     private final CouponService couponService;
     private final PaymentProcess paymentProcess;
+    private final CouponPolicyAdapter couponPolicyAdapter;
 
     @Transactional
     public OrderResult.Order order(OrderCriteria.Order criteria) {
@@ -77,7 +79,8 @@ public class OrderFacade {
             UserCoupon userCoupon = couponService.getUserCoupon(
                     CouponCommand.Get.of(criteria.userId(), criteria.couponId())
             );
-            order.applyCoupon(userCoupon.getId(), userCoupon.getDiscountPolicy());
+            DiscountPolicy discountPolicy = couponPolicyAdapter.getPolicy(userCoupon);
+            order.applyCoupon(userCoupon.getId(), discountPolicy);
 
             // 쿠폰 사용 기록 추가
             userCoupon.use(order.getId(), LocalDateTime.now());

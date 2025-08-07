@@ -1,6 +1,5 @@
 package com.loopers.domain.coupon;
 
-import com.loopers.domain.coupon.policy.DiscountPolicy;
 import com.loopers.domain.coupon.policy.FixedAmountDiscountPolicy;
 import com.loopers.domain.coupon.policy.PercentDiscountPolicy;
 
@@ -20,7 +19,7 @@ public class CouponValid {
     }
 
     static void validateDiscountPolicy(BigDecimal value, DiscountType discountType) {
-        DiscountPolicy policy = switch (discountType) {
+        switch (discountType) {
             case PERCENT -> new PercentDiscountPolicy(value);
             case FIXED -> new FixedAmountDiscountPolicy(value);
             default -> throw new IllegalArgumentException("잘못된 타입의 쿠폰입니다. 타입: " + discountType);

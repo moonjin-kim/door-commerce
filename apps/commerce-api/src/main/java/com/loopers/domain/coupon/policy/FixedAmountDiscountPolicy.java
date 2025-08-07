@@ -15,7 +15,7 @@ public class FixedAmountDiscountPolicy implements DiscountPolicy {
 
     @Override
     public BigDecimal calculateDiscount(BigDecimal price) {
-        if(price.compareTo(amount) <= 0) {
+        if(price.compareTo(amount) < 0) {
             throw new IllegalArgumentException("주문 금액은 할인 가격보다 커야합니다.");
         }
 
