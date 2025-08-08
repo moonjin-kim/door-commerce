@@ -4,6 +4,8 @@ import com.loopers.domain.product.vo.ProductStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Getter
 @NoArgsConstructor
 public class ProductView {
@@ -12,7 +14,7 @@ public class ProductView {
     private Long brandId;
     private String description;
     private String imageUrl;
-    private Long price;
+    private BigDecimal price;
     private ProductStatus status;
     private Long likeCount;
 
@@ -22,7 +24,7 @@ public class ProductView {
             Long brandId,
             String description,
             String imageUrl,
-            Long price,
+            BigDecimal price,
             ProductStatus status,
             Long likeCount
     ) {

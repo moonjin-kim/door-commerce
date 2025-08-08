@@ -82,17 +82,46 @@ erDiagram
         int quantity
         LocalDateTime createdAt
         LocalDateTime updatedAt
-        LocalDateTime deletedAt 
+        LocalDateTime deletedAt
+    }
+    coupon {
+        bigint id PK
+        varchar name
+        varchar type "e.g., FIXED, PERCENTAGE"
+        int value
+        LocalDateTime created_at
+        LocalDateTime updated_at
+    }
+    user_coupon {
+        bigint id PK
+        bigint user_id FK
+        bigint coupon_id FK
+        boolean is_used "default: false"
+        LocalDateTime used_at
+        LocalDateTime issued_at
+        LocalDateTime valid_from
+        LocalDateTime valid_to
+    }
+    applied_coupon {
+        bigint id PK
+        bigint order_id FK
+        bigint user_coupon_id FK
+        varchar coupon_name "Snapshot of coupon name"
+        bigint discount_amount "Snapshot of discount amount"
+        LocalDateTime applied_at
     }
 
-    user ||..o{ like : ""
-    user ||..o{ order : ""
-    user ||--|| point : ""
-    point ||..o{ point_history : ""
-    brand ||..o{ product : ""
-    product ||--o{ orderItem : ""
-    like }o--|| product : ""
-    order ||--|{ orderItem : ""
-    order ||--|| payment : ""
-    
+    user ||--o{ like : "has many"
+    user ||--o{ order : "places"
+    user ||--o{ user_coupon : "is issued"
+    user ||--|| point : "has one"
+    point ||..o{ point_history : "has many"
+    brand ||..o{ product : "has many"
+    product ||--o{ orderItem : "can be in"
+    like }o--|| product : "targets"
+    order ||--|{ orderItem : "contains"
+    order ||--|{ payment : "has"
+    order ||--|| applied_coupon : "uses one"
+    coupon ||--o{ user_coupon : "is template for"
+    user_coupon ||--|| applied_coupon : "is applied as"
 ```

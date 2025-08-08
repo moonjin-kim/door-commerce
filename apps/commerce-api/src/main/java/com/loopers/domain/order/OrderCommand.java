@@ -1,5 +1,6 @@
 package com.loopers.domain.order;
 
+import com.loopers.domain.product.Product;
 import com.loopers.infrastructure.order.OrderParams;
 import com.loopers.infrastructure.product.ProductParams;
 
@@ -18,6 +19,10 @@ public class OrderCommand {
     public record OrderItem(Long productId, String name, long price, int quantity) {
         public static OrderItem of(Long productId, String name, long price, int quantity) {
             return new OrderItem(productId, name, price, quantity);
+        }
+
+        public static OrderItem from(Product product, int quantity) {
+            return new OrderItem(product.getId(), product.getName(), product.getPrice().longValue(), quantity);
         }
     }
 

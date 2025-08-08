@@ -19,12 +19,8 @@ import java.util.stream.Collectors;
 public class ProductService {
     private final ProductRepository productRepository;
 
-    public ProductInfo getBy(Long id) {
-        return productRepository.findBy(id)
-                .map(ProductInfo::of)
-                .orElseThrow(() ->
-                        new CoreException(ErrorType.NOT_FOUND, "[productId = " + id + "] 존재하지 않는 상품입니다.")
-                );
+    public Optional<Product> getBy(Long id) {
+        return productRepository.findBy(id);
     }
 
     public PageResponse<ProductView> search(PageRequest<ProductCommand.Search> command) {
@@ -35,5 +31,9 @@ public class ProductService {
 
     public List<ProductInfo> findAllBy(List<Long> productIds) {
         return productRepository.findAllBy(productIds).stream().map(ProductInfo::of).collect(Collectors.toList());
+    }
+
+    public Optional<Product> findBy(Long id) {
+        return productRepository.findBy(id);
     }
 }

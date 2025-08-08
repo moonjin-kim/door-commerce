@@ -153,7 +153,7 @@ class ProductTest {
                 () -> assertEquals(command.name(), product.getName()),
                 () -> assertEquals(command.description(), product.getDescription()),
                 () -> assertEquals(command.imageUrl(), product.getImageUrl()),
-                () -> assertEquals(command.price(), product.getPrice().value())
+                () -> assertEquals(command.price().longValue(), product.getPrice().longValue())
             );
         }
     }

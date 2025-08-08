@@ -8,6 +8,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -39,14 +41,14 @@ public class OrderItem {
         }
         this.quantity = quantity;
 
-        this.productPrice = new Money(productPrice);
+        this.productPrice = new Money(new BigDecimal(productPrice));
     }
 
     public static OrderItem create(OrderCommand.OrderItem command) {
         return new OrderItem(command.productId(), command.name(), command.price(), command.quantity());
     }
 
-    public Long getTotalAmount() {
+    public BigDecimal getTotalAmount() {
         return productPrice.multiply(quantity).value();
     }
 }

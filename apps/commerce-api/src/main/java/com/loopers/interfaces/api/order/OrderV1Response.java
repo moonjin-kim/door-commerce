@@ -1,7 +1,6 @@
 package com.loopers.interfaces.api.order;
 
 import com.loopers.application.order.OrderResult;
-import com.loopers.domain.order.OrderInfo;
 
 import java.util.List;
 
@@ -10,8 +9,10 @@ public class OrderV1Response {
             Long id,
             Long userId,
             List<OrderV1Response.OrderItem> items,
+            Long userCouponId,
             long totalPrice,
-            long pointUsed,
+            long couponDiscount,
+            long finalAmount,
             String status
     ) {
         public static OrderV1Response.Order from(OrderResult.Order orderResult) {
@@ -25,8 +26,10 @@ public class OrderV1Response {
                                     item.price(),
                                     item.quantity()))
                             .toList(),
+                    orderResult.userCouponId(),
                     orderResult.totalPrice(),
-                    orderResult.pointUsed(),
+                    orderResult.couponDiscount(),
+                    orderResult.finalAmount(),
                     orderResult.status()
             );
         }

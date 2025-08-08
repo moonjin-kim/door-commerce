@@ -8,11 +8,12 @@ import java.util.stream.Collectors;
 
 public class OrderV1Request {
     public record Order(
-            List<OrderV1Request.OrderItem> items
+            List<OrderV1Request.OrderItem> items,
+            Long couponId
     ){
         public OrderCriteria.Order toCommand(Long userId) {
             List<OrderCriteria.OrderItem> orderItems = items.stream().map(OrderItem::toCommand).collect(Collectors.toList());
-            return OrderCriteria.Order.of(userId, orderItems);
+            return OrderCriteria.Order.of(userId, orderItems, couponId);
         }
     }
 

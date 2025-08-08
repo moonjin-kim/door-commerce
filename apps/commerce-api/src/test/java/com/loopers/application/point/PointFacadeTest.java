@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Optional;
+import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -66,7 +66,7 @@ class PointFacadeTest {
             //given
             User user = userJpaRepository.save(UserFixture.createMember());
 
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(1000);
             Point chargedPoint = pointJpaRepository.save(
                     point
@@ -82,7 +82,9 @@ class PointFacadeTest {
                     () -> assertThat(result).isNotNull(),
                     () -> assertThat(result.userId()).isEqualTo(user.getId()),
                     () -> assertThat(result.balance()).isEqualTo(
-                            chargedPoint.getBalance().plus(chargeRequest.amount()).value()
+                            chargedPoint.getBalance().plus(
+                                    BigDecimal.valueOf(chargeRequest.amount())
+                            ).longValue()
                     )
             );
         }
@@ -115,7 +117,7 @@ class PointFacadeTest {
                     UserFixture.createMember()
             );
 
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(1000);
             Point chargedPoint = pointJpaRepository.save(
                    point
@@ -128,7 +130,7 @@ class PointFacadeTest {
             assertAll(
                     () -> assertThat(result).isNotNull(),
                     () -> assertThat(result.userId()).isEqualTo(user.getId()),
-                    () -> assertThat(result.balance()).isEqualTo(chargedPoint.getBalance().value())
+                    () -> assertThat(result.balance()).isEqualTo(chargedPoint.getBalance().longValue())
             );
         }
 

@@ -23,14 +23,14 @@ class PointTest {
             User user = UserFixture.createMember();
             int amount = 10000;
 
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
             point.charge(amount);
 
             //when
             point.charge(amount);
 
             //then
-            assertThat(point.getBalance().value()).isEqualTo(20000);
+            assertThat(point.getBalance().longValue()).isEqualTo(20000);
         }
 
         @DisplayName("0 이하의 정수로 포인트를 충전 시 INVALID_POINT_AMOUNT 예외가 반환된다.")
@@ -40,7 +40,7 @@ class PointTest {
             User user = UserFixture.createMember();
             int amount = 0;
 
-            Point point = Point.init(user.getId());
+            Point point = Point.create(user.getId());
 
             //when
             CoreException result = assertThrows(CoreException.class, () -> {
@@ -59,7 +59,7 @@ class PointTest {
         @Test
         void throwsBadRequestException_whenPointAmountIsInvalid(){
             //given
-            Point point = Point.init(1L);
+            Point point = Point.create(1L);
 
             //when
             CoreException result = assertThrows(CoreException.class, () -> {
@@ -74,7 +74,7 @@ class PointTest {
         @Test
         void throwsInsufficientBalance_whenBalanceLessThanPointAmount(){
             //given
-            Point point = Point.init(1L);
+            Point point = Point.create(1L);
             point.charge(1000L);
 
             //when
@@ -90,14 +90,14 @@ class PointTest {
         @Test
         void lessPoint_whenCorrectPointAmountProvider(){
             //given
-            Point point = Point.init(1L);
+            Point point = Point.create(1L);
             point.charge(1000L);
 
             //when
             point.use(1000L);
 
             //then
-            assertThat(point.getBalance().value()).isEqualTo(0L);
+            assertThat(point.getBalance().longValue()).isEqualTo(0L);
         }
     }
 }

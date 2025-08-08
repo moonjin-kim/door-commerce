@@ -19,6 +19,6 @@ public class UserFixture {
     }
 
     public static User createMember() {
-        return User.register(createUserCreateCommand());
+        return User.create(createUserCreateCommand());
     }
 }

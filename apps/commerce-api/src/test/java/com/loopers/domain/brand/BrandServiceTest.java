@@ -1,11 +1,6 @@
 package com.loopers.domain.brand;
 
-import com.loopers.domain.order.Order;
-import com.loopers.domain.user.UserService;
 import com.loopers.infrastructure.brand.BrandJpaRepository;
-import com.loopers.infrastructure.user.UserJpaRepository;
-import com.loopers.support.error.CoreException;
-import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,7 +8,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import java.util.Optional;
 
@@ -44,12 +38,10 @@ class BrandServiceTest {
             Long brandId = 1L;
 
             //when
-            CoreException result = assertThrows(CoreException.class, () -> {
-                brandService.findBy(brandId);
-            });
+            Optional<Brand> result = brandService.getBy(brandId);
 
             //then
-            assertThat(result.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
+            assertThat(result.isPresent()).isFalse();
         }
 
         @DisplayName("조회할 상품의 아이디가 주어지면 해당 브랜드를 반환한다.")
@@ -65,14 +57,14 @@ class BrandServiceTest {
             );
 
             //when
-            BrandInfo foundBrand = brandService.findBy(brand.getId());
+            Brand foundBrand = brandService.getBy(brand.getId()).get();
 
             //then
             assertAll(
-                    () -> assertEquals(brand.getId(), foundBrand.id()),
-                    () -> assertEquals(brand.getName(), foundBrand.name()),
-                    () -> assertEquals(brand.getDescription(), foundBrand.description()),
-                    () -> assertEquals(brand.getLogoUrl(), foundBrand.logoUrl())
+                    () -> assertEquals(brand.getId(), foundBrand.getId()),
+                    () -> assertEquals(brand.getName(), foundBrand.getName()),
+                    () -> assertEquals(brand.getDescription(), foundBrand.getDescription()),
+                    () -> assertEquals(brand.getLogoUrl(), foundBrand.getLogoUrl())
             );
         }
     }

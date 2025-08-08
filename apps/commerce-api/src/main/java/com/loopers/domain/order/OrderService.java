@@ -8,35 +8,27 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Component
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
 
     @Transactional
-    public OrderInfo.OrderDto order(OrderCommand.Order order) {
+    public Order order(OrderCommand.Order order) {
         // 주문 저장
-        Order savedOrder = orderRepository.save(Order.order(order));
-
-        // 주문 정보 반환
-        return OrderInfo.OrderDto.from(savedOrder);
+        return orderRepository.save(Order.create(order));
     }
 
     @Transactional(readOnly = true)
-    public OrderInfo.OrderDto getBy(OrderCommand.GetBy command) {
+    public Optional<Order> getBy(OrderCommand.GetBy command) {
         // 주문 조회
-        Order order = orderRepository.findById(command.orderId())
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "[id = " + command.orderId() + "] 존재하지 않는 주문입니다."));
-
-        // 주문자가 요청한 주문인지 확인
-        order.checkPermission(command.userId());
-
-        // 주문 정보 반환
-        return OrderInfo.OrderDto.from(order);
+        return orderRepository.findById(command.orderId());
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<OrderInfo.OrderDto> getOrders(
+    public PageResponse<Order> getOrders(
             PageRequest<OrderCommand.GetOrdersBy> command
     ) {
         // 주문 조회
@@ -45,6 +37,6 @@ public class OrderService {
         );
 
         // 주문 정보 반환
-        return orders.map(OrderInfo.OrderDto::from);
+        return orders;
     }
 }

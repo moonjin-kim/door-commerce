@@ -2,15 +2,14 @@ package com.loopers.application.product;
 
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
-import com.loopers.domain.brand.BrandInfo;
+import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandService;
 import com.loopers.domain.like.LikeCommand;
 import com.loopers.domain.like.LikeInfo;
 import com.loopers.domain.like.LikeService;
-import com.loopers.domain.product.ProductCommand;
-import com.loopers.domain.product.ProductInfo;
-import com.loopers.domain.product.ProductService;
-import com.loopers.domain.product.ProductView;
+import com.loopers.domain.product.*;
+import com.loopers.support.error.CoreException;
+import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,9 +23,13 @@ public class ProductFacade {
     private final LikeService likeService;
 
     public ProductResult.ProductDetail getBy(Long productId, Long userId) {
-        ProductInfo product = productService.getBy(productId);
+        Product product = productService.getBy(productId).orElseThrow(() -> {
+            throw new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 상품입니다.");
+        });
 
-        BrandInfo brandInfo = brandService.findBy(product.brandId());
+        Brand brand = brandService.getBy(product.getId()).orElseThrow(() -> {
+            throw new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 브랜드입니다.");
+        });
 
         // 유저의 좋아요 여부 조회
         LikeInfo.IsLiked likeInfo = likeService.isLiked(
@@ -35,7 +38,7 @@ public class ProductFacade {
 
         LikeInfo.GetLikeCount likeCount = likeService.getLikeCount(productId);
 
-        return ProductResult.ProductDetail.from(product, brandInfo, likeInfo.isLiked(), likeCount.count());
+        return ProductResult.ProductDetail.from(product, brand, likeInfo.isLiked(), likeCount.count());
     }
 
 

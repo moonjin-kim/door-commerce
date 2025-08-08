@@ -23,7 +23,7 @@ class StockTest {
             StockCommand.Create command = StockCommand.Create.of(productId, quantity);
 
             //when
-            Stock stock = Stock.init(command);
+            Stock stock = Stock.create(command);
 
             //then
             assertAll(
@@ -43,7 +43,7 @@ class StockTest {
             //when
             //then
             assertThrows(CoreException.class, () -> {
-                Stock.init(command);
+                Stock.create(command);
             });
         }
 
@@ -58,7 +58,7 @@ class StockTest {
             //when
             //then
             assertThrows(CoreException.class, () -> {
-                Stock.init(command);
+                Stock.create(command);
             });
         }
     }
@@ -74,7 +74,7 @@ class StockTest {
             Long productId = 1L;
             int quantity = 10;
             StockCommand.Create command = StockCommand.Create.of(productId, quantity);
-            Stock stock = Stock.init(command);
+            Stock stock = Stock.create(command);
 
             //when
             stock.decrease(5);
@@ -93,7 +93,7 @@ class StockTest {
             Long productId = 1L;
             int quantity = 5;
             StockCommand.Create command = StockCommand.Create.of(productId, quantity);
-            Stock stock = Stock.init(command);
+            Stock stock = Stock.create(command);
 
             //when
             //then
