@@ -122,6 +122,47 @@ class LikeServiceTest {
             );
 
         }
+
+        @DisplayName("여러 유저가 좋아요를 동시에 눌러도, 각 유저에 대해서 1개의 좋아요만 생성된다")
+        @Test
+        void success_whenPointIsUsedSimultaneously() throws InterruptedException  {
+            //given
+            int threadCount = 100;
+            ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+            CountDownLatch latch = new CountDownLatch(threadCount);
+            Long userId = 1L;
+            Long productId = 1L;
+
+            // 포인트 사용 실패 에러 저장 위치
+            List<Exception> exceptions = Collections.synchronizedList(new ArrayList<>());
+
+            //when
+            for (int i = 0; i < threadCount; i++) {
+                final int idx = i;
+                executor.submit(() -> {
+                    try {
+                        // 각 스레드마다 다른 유저 ID를 사용
+                        Long id = (long) idx;
+                        var command = LikeCommand.Like.of(id, productId);
+                        likeService.like(command);
+                    } catch (Exception e) {
+                        exceptions.add(e);
+                    } finally {
+                        latch.countDown();
+                    }
+                });
+            }
+
+            //then
+            latch.await();
+            List<Like> foundLike = likeJpaRepository.findAll();
+            assertAll(
+                    () -> assertThat(foundLike).hasSize(100),
+                    () -> assertThat(foundLike.get(0).getProductId()).isEqualTo(productId),
+                    () -> assertThat(exceptions).hasSize(0)
+            );
+
+        }
     }
 
     @DisplayName("좋아요를 취소할 때")
