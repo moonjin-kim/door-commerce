@@ -3,13 +3,11 @@ package com.loopers.application.payment;
 import com.loopers.domain.payment.PaymentCommand;
 import com.loopers.domain.payment.PaymentInfo;
 import com.loopers.domain.payment.PaymentService;
-import com.loopers.domain.payment.PaymentType;
+import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointCommand;
-import com.loopers.domain.point.PointInfo;
 import com.loopers.domain.point.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 @Component("pointPayment")
 @RequiredArgsConstructor
@@ -24,7 +22,7 @@ public class PointPaymentAdapter implements PaymentMethod {
                 command.orderId(),
                 command.amount()
         );
-        PointInfo pointInfo = pointService.using(pointUsingCommand);
+        Point point = pointService.using(pointUsingCommand);
 
         return paymentService.pay(command);
     }

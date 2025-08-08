@@ -17,12 +17,12 @@ public class LikeResult {
             Long likeCount,
             boolean isLiked
     ) {
-        public static LikeProduct of(ProductInfo product) {
+        public static LikeProduct of(Product product) {
             return new LikeProduct(
-                    product.id(),
-                    product.name(),
-                    product.imageUrl(),
-                    product.brandId(),
+                    product.getId(),
+                    product.getName(),
+                    product.getImageUrl(),
+                    product.getBrandId(),
                     0L,
                     true
             );

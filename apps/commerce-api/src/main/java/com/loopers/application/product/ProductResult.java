@@ -1,6 +1,8 @@
 package com.loopers.application.product;
 
+import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandInfo;
+import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductInfo;
 import com.loopers.domain.product.ProductView;
 
@@ -38,15 +40,15 @@ public class ProductResult {
             Long likeCount,
             Boolean isLiked
     ) {
-        public static ProductDetail from(ProductInfo product, BrandInfo brandInfo, Boolean isLiked, Long likeCount) {
+        public static ProductDetail from(Product product, Brand brand, Boolean isLiked, Long likeCount) {
             return new ProductDetail(
-                    product.id(),
-                    product.brandId(),
-                    brandInfo.name(),
-                    product.name(),
-                    product.description(),
-                    product.imageUrl(),
-                    product.price(),
+                    product.getId(),
+                    product.getBrandId(),
+                    brand.getName(),
+                    product.getName(),
+                    product.getDescription(),
+                    product.getImageUrl(),
+                    product.getPrice().longValue(),
                     likeCount,
                     isLiked
             );

@@ -719,7 +719,7 @@ class OrderV1ControllerTest {
             );
         }
 
-        @DisplayName("동시에 같은 유저의 가은 주문건이 요청되면, 1번의 주문만 성공하고 나머지는 실패한다.")
+        @DisplayName("동시에 같은 유저의 같은 주문건이 요청되어도, 포인트는 정상적으로 차감된다.")
         @Test
         void notAllowNegativeStock_whenConcurrentCreate() throws InterruptedException {
             //given
@@ -790,13 +790,8 @@ class OrderV1ControllerTest {
                 }
             }
             Point point1 = pointJpaRepository.findByUserId(user.getId()).get();
-
-            long finalFailCount = failCount;
-            long finalSuccessCount = successCount;
             assertAll(
-                    () -> assertThat(finalSuccessCount).isEqualTo(1),
-                    () -> assertThat(finalFailCount).isEqualTo(9),
-                    () -> assertThat(point1.getBalance().longValue()).isEqualTo(90000L) // 10 * 10000
+                    () -> assertThat(point1.getBalance().longValue()).isEqualTo(0L) // 10 * 10000
             );
         }
     }

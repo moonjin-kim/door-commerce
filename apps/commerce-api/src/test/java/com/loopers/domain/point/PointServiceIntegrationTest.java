@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import java.math.BigDecimal;
@@ -98,13 +97,13 @@ public class PointServiceIntegrationTest {
             PointCommand.Charge chargeCommand = PointCommand.Charge.of(user.getId(), 10000L);
 
             //when
-            PointInfo result = pointService.charge(chargeCommand);
+            Point result = pointService.charge(chargeCommand);
 
             //then
             assertAll(
                     () -> assertThat(result).isNotNull(),
-                    () -> assertThat(result.userId()).isEqualTo(user.getId()),
-                    () -> assertThat(result.balance()).isEqualTo(chargeCommand.amount())
+                    () -> assertThat(result.getUserId()).isEqualTo(user.getId()),
+                    () -> assertThat(result.getBalance().longValue()).isEqualTo(chargeCommand.amount())
             );
         }
 
@@ -116,15 +115,15 @@ public class PointServiceIntegrationTest {
             Point point = pointJpaRepository.save(Point.create(user.getId()));
 
             //when
-            PointInfo result = pointService.charge(PointCommand.Charge.of(user.getId(),500L));
+            Point result = pointService.charge(PointCommand.Charge.of(user.getId(),500L));
 
             //then
             List<PointHistory> savedPoint = pointHistoryJpaRepository.findAll();
             assertThat(savedPoint).hasSize(1);
             assertThat(savedPoint.get(0).getStatus()).isEqualTo(PointStatus.CHARGE);
             assertThat(savedPoint.get(0).getPointId()).isEqualTo(point.getId());
-            assertThat(savedPoint.get(0).getAmount()).isEqualTo(500L);
-            assertThat(result.balance()).isEqualTo(500L);
+            assertThat(savedPoint.get(0).getAmount().longValue()).isEqualTo(500L);
+            assertThat(result.getBalance().longValue()).isEqualTo(500L);
         }
 
         @DisplayName("해당 ID에 잔액이 남아있으면 잔액에 충전 포인트가 더해진다.")
@@ -141,13 +140,13 @@ public class PointServiceIntegrationTest {
             PointCommand.Charge chargeCommand = PointCommand.Charge.of(user.getId(), 10000L);
 
             //when
-            PointInfo result = pointService.charge(chargeCommand);
+            Point result = pointService.charge(chargeCommand);
 
             //then
             assertAll(
                     () -> assertThat(result).isNotNull(),
-                    () -> assertThat(result.userId()).isEqualTo(user.getId()),
-                    () -> assertThat(result.balance()).isEqualTo(point.balance().plus(
+                    () -> assertThat(result.getUserId()).isEqualTo(user.getId()),
+                    () -> assertThat(result.getBalance().longValue()).isEqualTo(point.balance().plus(
                             BigDecimal.valueOf(chargeCommand.amount())
                     ).longValue())
             );
@@ -200,7 +199,7 @@ public class PointServiceIntegrationTest {
             PointCommand.Charge chargeCommand = PointCommand.Charge.of(user.getId(), amount);
 
             //when
-            PointInfo result = pointService.charge(chargeCommand);
+            Point result = pointService.charge(chargeCommand);
 
             //then
             Optional<Point> savedPoint = pointJpaRepository.findByUserId(user.getId());
@@ -209,6 +208,41 @@ public class PointServiceIntegrationTest {
                     () -> assertThat(savedPoint.get().getUserId()).isEqualTo(user.getId()),
                     () -> assertThat(savedPoint.get().balance().longValue()).isEqualTo(amount)
             );
+        }
+
+
+        @DisplayName("포인트가 동시에 충전요청을 하여도 정상적으로 포인트가 충전된다.")
+        @Test
+        void chargeSuccess_whenPointChargeSimultaneously() throws InterruptedException  {
+            //given
+            int threadCount = 10;
+            ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+            CountDownLatch latch = new CountDownLatch(threadCount);
+            User user = userJpaRepository.save(UserFixture.createMember());
+            Point point = Point.create(user.getId());
+            point = pointJpaRepository.save(point);
+
+            // 포인트 사용 실패 에러 저장 위치
+            List<Exception> exceptions = Collections.synchronizedList(new ArrayList<>());
+
+            //when
+            for (int i = 0; i < threadCount; i++) {
+                executor.submit(() -> {
+                    try {
+                        pointService.charge(PointCommand.Charge.of(user.getId(), 10000L));
+                    } catch (Exception e) {
+                        exceptions.add(e);
+                    } finally {
+                        latch.countDown();
+                    }
+                });
+            }
+
+            //then
+            latch.await();
+            Point afterPoint = pointJpaRepository.findById(point.getId()).orElseThrow();
+            assertThat(afterPoint.getBalance().longValue()).isEqualTo(100000L);
+
         }
     }
 
@@ -231,10 +265,11 @@ public class PointServiceIntegrationTest {
             );
 
             //when
-            PointInfo result = pointService.get(user.getId());
+            Optional<Point> result = pointService.getBy(user.getId());
 
             //then
-            assertThat(result.balance()).isEqualTo(point.balance().longValue());
+
+            assertThat(result.get().balance().longValue()).isEqualTo(point.balance().longValue());
         }
 
         @DisplayName("존재하지 않는 유저이면, NotFound 예외가 발생한다.")
@@ -243,12 +278,10 @@ public class PointServiceIntegrationTest {
             //given
 
             //when
-            CoreException exception = assertThrows(CoreException.class, () -> {
-                pointService.get(null);
-            });
+            Optional<Point> result = pointService.getBy(2L);
 
             //then
-            assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
+            assertThat(result.isPresent()).isFalse();
         }
     }
 
@@ -298,10 +331,10 @@ public class PointServiceIntegrationTest {
             pointJpaRepository.save(point);
 
             //when
-            PointInfo result = pointService.using(PointCommand.Using.of(user.getId(), 1L,500L));
+            Point result = pointService.using(PointCommand.Using.of(user.getId(), 1L,500L));
 
             //then
-            assertThat(result.balance()).isEqualTo(500L);
+            assertThat(result.balance().longValue()).isEqualTo(500L);
         }
 
         @DisplayName("잔액이 정상적으로 차감되면 잔액 차감 후 포인트 사용 이력이 저장된다.")
@@ -314,14 +347,14 @@ public class PointServiceIntegrationTest {
             pointJpaRepository.save(point);
 
             //when
-            PointInfo result = pointService.using(PointCommand.Using.of(user.getId(), 1L,500L));
+            Point result = pointService.using(PointCommand.Using.of(user.getId(), 1L,500L));
 
             //then
             Optional<PointHistory> savedPoint = pointHistoryJpaRepository.findByOrderId(1L);
             assertThat(savedPoint).isPresent();
             assertThat(savedPoint.get().getStatus()).isEqualTo(PointStatus.USE);
-            assertThat(savedPoint.get().getAmount()).isEqualTo(-500L);
-            assertThat(result.balance()).isEqualTo(500L);
+            assertThat(savedPoint.get().getAmount().longValue()).isEqualTo(-500L);
+            assertThat(result.balance().longValue()).isEqualTo(500L);
         }
 
         @DisplayName("0 이하의 금액을 사용 요청하면, INVALID_POINT_AMOUNT 예외가 발생한다.")
@@ -344,7 +377,7 @@ public class PointServiceIntegrationTest {
 
         @DisplayName("포인트가 동시에 사용되어도 정상적으로 포인트가 차감된다.")
         @Test
-        void throwConcurrentModificationException_whenPointIsUsedSimultaneously() throws InterruptedException  {
+        void successUsed_whenPointIsUsedSimultaneously() throws InterruptedException  {
             //given
             int threadCount = 10;
             ExecutorService executor = Executors.newFixedThreadPool(threadCount);
@@ -373,7 +406,7 @@ public class PointServiceIntegrationTest {
             //then
             latch.await();
             Point afterPoint = pointJpaRepository.findById(point.getId()).orElseThrow();
-            assertThat(afterPoint.getBalance().longValue()).isEqualTo(90000L);
+            assertThat(afterPoint.getBalance().longValue()).isEqualTo(0L);
 
         }
     }
