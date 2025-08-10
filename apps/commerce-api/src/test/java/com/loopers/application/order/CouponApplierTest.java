@@ -102,14 +102,19 @@ class CouponApplierTest {
             Order order = orderJpaRepository.save(Order.create(command));
 
             //when
-            Order updatedOrder = couponApplier.applyCoupon(1L, coupon.getId(),order);
+            CouponApplierInfo.ApplyCoupon updatedOrder = couponApplier.applyCoupon(
+                    CouponApplierCommand.ApplyCoupon.of(
+                            1L,
+                            coupon.getId(),
+                            order.getId(),
+                            order.getTotalAmount().value()
+                    )
+            );
 
             //then
             assertAll(
-                    ()-> assertThat(updatedOrder.getUserCouponId()).isNotNull(),
-                    () -> assertThat(updatedOrder.getTotalAmount().longValue()).isEqualTo(6000L),
-                    () -> assertThat(updatedOrder.getCouponDiscountAmount().longValue()).isEqualTo(600L),
-                    () -> assertThat(updatedOrder.getFinalAmount().longValue()).isEqualTo(5400L)
+                    ()-> assertThat(updatedOrder.userCouponId()).isNotNull(),
+                    () -> assertThat(updatedOrder.discountAmount().longValue()).isEqualTo(600L)
             );
         }
 
@@ -138,14 +143,19 @@ class CouponApplierTest {
             Order order = orderJpaRepository.save(Order.create(command));
 
             //when
-            Order updatedOrder = couponApplier.applyCoupon(1L, coupon.getId(),order);
+            CouponApplierInfo.ApplyCoupon updatedOrder = couponApplier.applyCoupon(
+                    CouponApplierCommand.ApplyCoupon.of(
+                            1L,
+                            coupon.getId(),
+                            order.getId(),
+                            order.getTotalAmount().value()
+                    )
+            );
 
             //then
             assertAll(
-                    ()-> assertThat(updatedOrder.getUserCouponId()).isNotNull(),
-                    () -> assertThat(updatedOrder.getTotalAmount().longValue()).isEqualTo(6000L),
-                    () -> assertThat(updatedOrder.getCouponDiscountAmount().longValue()).isEqualTo(1000L),
-                    () -> assertThat(updatedOrder.getFinalAmount().longValue()).isEqualTo(5000L)
+                    ()-> assertThat(updatedOrder.userCouponId()).isNotNull(),
+                    () -> assertThat(updatedOrder.discountAmount().longValue()).isEqualTo(1000L)
             );
         }
 
@@ -164,7 +174,14 @@ class CouponApplierTest {
 
             //when
             CoreException result = assertThrows(CoreException.class, () -> {
-                couponApplier.applyCoupon(1L, 1L,order);
+                couponApplier.applyCoupon(
+                        CouponApplierCommand.ApplyCoupon.of(
+                                1L,
+                                1L, // 존재하지 않는 쿠폰 ID
+                                order.getId(),
+                                order.getTotalAmount().value()
+                        )
+                );
             });
 
             //then
@@ -206,7 +223,14 @@ class CouponApplierTest {
             for (int i = 0; i < threadCount; i++) {
                 executor.submit(() -> {
                     try {
-                        couponApplier.applyCoupon(1L, 1L, order);
+                        couponApplier.applyCoupon(
+                                CouponApplierCommand.ApplyCoupon.of(
+                                        1L,
+                                        coupon.getId(),
+                                        order.getId(),
+                                        order.getTotalAmount().value()
+                                )
+                        );
                     } catch (Exception e) {
                         exceptions.add(e);
                     } finally {
@@ -257,7 +281,14 @@ class CouponApplierTest {
             for (int i = 0; i < threadCount; i++) {
                 executor.submit(() -> {
                     try {
-                        couponApplier.applyCoupon(1L, 1L, order);
+                        couponApplier.applyCoupon(
+                                CouponApplierCommand.ApplyCoupon.of(
+                                        1L,
+                                        coupon.getId(),
+                                        order.getId(),
+                                        order.getTotalAmount().value()
+                                )
+                        );
                     } catch (Exception e) {
                         exceptions.add(e);
                     } finally {

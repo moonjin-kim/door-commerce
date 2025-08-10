@@ -196,36 +196,14 @@ class OrderTest {
 
             //when
             CoreException result = assertThrows(CoreException.class, () -> {
-                order.applyCoupon(null, null);
+                order.applyCoupon(null, new BigDecimal(0));
             });
 
             // then
             assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
         }
 
-        @DisplayName("할인 정책이 null이면 BAD_REQUEST 예외가 발생한다.")
-        @Test
-        void throwBadRequest_whenDiscountPolicyIsNull() {
-            //given
-            OrderCommand.Order command = OrderCommand.Order.of(
-                    1L,
-                    List.of(
-                            OrderCommand.OrderItem.of(1L, "상품1", 1000L, 1),
-                            OrderCommand.OrderItem.of(2L, "상품2", 1000L, 5)
-                    )
-            );
-            Order order = Order.create(command);
-
-            //when
-            CoreException result = assertThrows(CoreException.class, () -> {
-                order.applyCoupon(1L, null);
-            });
-
-            // then
-            assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
-        }
-
-        @DisplayName("정액 할인 정책이 적용되면, 쿠폰 할인 금액이 계산된다.")
+        @DisplayName("할인 금액이 적용되면, 주문의 최종 금액이 할인된 금액으로 계산된다.")
         @Test
         void discount_whenFixedDiscountPolicy() {
             //given
@@ -237,36 +215,13 @@ class OrderTest {
                     )
             );
             Order order = Order.create(command);
-            DiscountPolicy discountPolicy = new FixedAmountDiscountPolicy(new BigDecimal(1000L)); // 정액 할인 2000원
 
 
             //when
-            order.applyCoupon(1L, discountPolicy);
+            order.applyCoupon(1L, new BigDecimal(1000L));
 
             // then
             assertThat(order.getFinalAmount().longValue()).isEqualTo(5000L);
-        }
-
-        @DisplayName("정률 할인 정책이 적용되면, 쿠폰 할인 금액이 계산된다.")
-        @Test
-        void discount_whenPercentDiscountPolicy() {
-            //given
-            OrderCommand.Order command = OrderCommand.Order.of(
-                    1L,
-                    List.of(
-                            OrderCommand.OrderItem.of(1L, "상품1", 1000L, 1),
-                            OrderCommand.OrderItem.of(2L, "상품2", 1000L, 5)
-                    )
-            );
-            Order order = Order.create(command);
-            DiscountPolicy discountPolicy = new PercentDiscountPolicy(new BigDecimal(10)); // 정액 할인 2000원
-
-
-            //when
-            order.applyCoupon(1L, discountPolicy);
-
-            // then
-            assertThat(order.getFinalAmount().longValue()).isEqualTo(5400L);
         }
     }
 
