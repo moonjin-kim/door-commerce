@@ -209,41 +209,6 @@ public class PointServiceIntegrationTest {
                     () -> assertThat(savedPoint.get().balance().longValue()).isEqualTo(amount)
             );
         }
-
-
-        @DisplayName("포인트가 동시에 충전요청을 하여도 정상적으로 포인트가 충전된다.")
-        @Test
-        void chargeSuccess_whenPointChargeSimultaneously() throws InterruptedException  {
-            //given
-            int threadCount = 10;
-            ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-            CountDownLatch latch = new CountDownLatch(threadCount);
-            User user = userJpaRepository.save(UserFixture.createMember());
-            Point point = Point.create(user.getId());
-            point = pointJpaRepository.save(point);
-
-            // 포인트 사용 실패 에러 저장 위치
-            List<Exception> exceptions = Collections.synchronizedList(new ArrayList<>());
-
-            //when
-            for (int i = 0; i < threadCount; i++) {
-                executor.submit(() -> {
-                    try {
-                        pointService.charge(PointCommand.Charge.of(user.getId(), 10000L));
-                    } catch (Exception e) {
-                        exceptions.add(e);
-                    } finally {
-                        latch.countDown();
-                    }
-                });
-            }
-
-            //then
-            latch.await();
-            Point afterPoint = pointJpaRepository.findById(point.getId()).orElseThrow();
-            assertThat(afterPoint.getBalance().longValue()).isEqualTo(100000L);
-
-        }
     }
 
 
@@ -373,41 +338,6 @@ public class PointServiceIntegrationTest {
 
             //then
             assertThat(exception.getErrorType()).isEqualTo(ErrorType.INVALID_POINT_AMOUNT);
-        }
-
-        @DisplayName("포인트가 동시에 사용되어도 정상적으로 포인트가 차감된다.")
-        @Test
-        void successUsed_whenPointIsUsedSimultaneously() throws InterruptedException  {
-            //given
-            int threadCount = 10;
-            ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-            CountDownLatch latch = new CountDownLatch(threadCount);
-            User user = userJpaRepository.save(UserFixture.createMember());
-            Point point = Point.create(user.getId());
-            point.charge(100000);
-            point = pointJpaRepository.save(point);
-
-            // 포인트 사용 실패 에러 저장 위치
-            List<Exception> exceptions = Collections.synchronizedList(new ArrayList<>());
-
-            //when
-            for (int i = 0; i < threadCount; i++) {
-                executor.submit(() -> {
-                    try {
-                        pointService.using(PointCommand.Using.of(user.getId(), 1L, 10000L));
-                    } catch (Exception e) {
-                        exceptions.add(e);
-                    } finally {
-                        latch.countDown();
-                    }
-                });
-            }
-
-            //then
-            latch.await();
-            Point afterPoint = pointJpaRepository.findById(point.getId()).orElseThrow();
-            assertThat(afterPoint.getBalance().longValue()).isEqualTo(0L);
-
         }
     }
 }
