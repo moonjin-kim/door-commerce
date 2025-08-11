@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -65,11 +66,16 @@ public class OrderFacade {
 
         // 쿠폰 적용
         if(criteria.couponId() != null) {
-            order = couponApplier.applyCoupon(
-                    criteria.userId(),
-                    criteria.couponId(),
-                    order
+            CouponApplierInfo.ApplyCoupon discountInfo = couponApplier.applyCoupon(
+                    new CouponApplierCommand.ApplyCoupon(
+                        criteria.userId(),
+                        criteria.couponId(),
+                        order.getId(),
+                        order.getTotalAmount().value()
+                    )
             );
+
+            order.applyCoupon(discountInfo.userCouponId(), discountInfo.discountAmount());
         }
 
         // 결제

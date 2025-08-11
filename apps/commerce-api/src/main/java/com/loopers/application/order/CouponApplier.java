@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Component
@@ -18,17 +19,17 @@ public class CouponApplier {
     private final CouponPolicyAdapter couponPolicyAdapter;
 
     @Transactional
-    public Order applyCoupon(Long userId, Long couponId, Order order) {
+    public CouponApplierInfo.ApplyCoupon applyCoupon(CouponApplierCommand.ApplyCoupon command) {
         UserCoupon userCoupon = couponService.getUserCoupon(
-                CouponCommand.Get.of(userId, couponId)
+                CouponCommand.Get.of(command.userId(), command.couponId())
         );
         DiscountPolicy discountPolicy = couponPolicyAdapter.getPolicy(userCoupon);
-        order.applyCoupon(userCoupon.getId(), discountPolicy);
+        BigDecimal discountAtAmount = discountPolicy.calculateDiscount(command.totalAmount());
 
         // 쿠폰 사용 기록 추가
-        userCoupon.use(order.getId(), LocalDateTime.now());
+        userCoupon.use(command.orderId(), LocalDateTime.now());
         couponService.saveUserCoupon(userCoupon);
 
-        return order;
+        return CouponApplierInfo.ApplyCoupon.of(userCoupon.getId(), discountAtAmount);
     }
 }

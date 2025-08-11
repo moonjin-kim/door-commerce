@@ -86,22 +86,37 @@ public class Order extends BaseEntity {
         }
     }
 
-    public void applyCoupon(Long userCouponId, DiscountPolicy discountPolicy) {
+    public void applyCoupon(Long userCouponId, BigDecimal discountAmount) {
         if (userCouponId == null) {
             throw new CoreException(ErrorType.BAD_REQUEST, "쿠폰 정보가 제공되지 않았습니다.");
         }
-        if(discountPolicy == null) {
+        if(discountAmount == null) {
             throw new CoreException(ErrorType.BAD_REQUEST, "할인 정책이 제공되지 않았습니다.");
         }
 
-        BigDecimal discount = discountPolicy.calculateDiscount(calculateTotalPrice());
-
         // 쿠폰 적용 로직
-        this.couponDiscountAmount = new Money(discount);
+        this.couponDiscountAmount = new Money(discountAmount);
         this.userCouponId = userCouponId;
 
         calculateFinalAmount();
     }
+
+//    public void applyCoupon(Long userCouponId, DiscountPolicy discountPolicy) {
+//        if (userCouponId == null) {
+//            throw new CoreException(ErrorType.BAD_REQUEST, "쿠폰 정보가 제공되지 않았습니다.");
+//        }
+//        if(discountPolicy == null) {
+//            throw new CoreException(ErrorType.BAD_REQUEST, "할인 정책이 제공되지 않았습니다.");
+//        }
+//
+//        BigDecimal discount = discountPolicy.calculateDiscount(calculateTotalPrice());
+//
+//        // 쿠폰 적용 로직
+//        this.couponDiscountAmount = new Money(discount);
+//        this.userCouponId = userCouponId;
+//
+//        calculateFinalAmount();
+//    }
 
     public void calculateFinalAmount() {
         if (this.couponDiscountAmount == null) {
