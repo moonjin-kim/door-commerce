@@ -4,6 +4,7 @@ import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
 import com.loopers.infrastructure.like.LikeJpaRepository;
 import com.loopers.utils.DatabaseCleanUp;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+@Slf4j
 @SpringBootTest
 public class LikeConcurrencyServiceTest {
 
@@ -63,6 +65,7 @@ public class LikeConcurrencyServiceTest {
                     try {
                         likeService.like(command);
                     } catch (Exception e) {
+                        log.warn("좋아요 테스트 실패. command: {}", command, e);
                         exceptions.add(e);
                     } finally {
                         latch.countDown();
@@ -77,7 +80,7 @@ public class LikeConcurrencyServiceTest {
                     () -> assertThat(foundLike).hasSize(1),
                     () -> assertThat(foundLike.get(0).getUserId()).isEqualTo(userId),
                     () -> assertThat(foundLike.get(0).getProductId()).isEqualTo(productId),
-                    () -> assertThat(exceptions).hasSize(9)
+                    () -> assertThat(exceptions).hasSize(0)
             );
 
         }
@@ -105,6 +108,7 @@ public class LikeConcurrencyServiceTest {
                         var command = LikeCommand.Like.of(id, productId);
                         likeService.like(command);
                     } catch (Exception e) {
+                        System.out.println(e.getMessage());
                         exceptions.add(e);
                     } finally {
                         latch.countDown();
