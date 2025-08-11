@@ -7,10 +7,11 @@ import java.util.List;
 public class OrderCriteria {
     public record Order(
             Long userId,
-            List<OrderItem> items
+            List<OrderItem> items,
+            Long couponId
     ) {
-        public static OrderCriteria.Order of(Long userId, List<OrderCriteria.OrderItem> items) {
-            return new OrderCriteria.Order(userId, items);
+        public static OrderCriteria.Order of(Long userId, List<OrderCriteria.OrderItem> items, Long couponId) {
+            return new OrderCriteria.Order(userId, items, couponId);
         }
     }
 

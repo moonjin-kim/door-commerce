@@ -8,6 +8,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "product")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,21 +28,17 @@ public class Product extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
-    protected Product(String name, Long brandId, String description, String imageUrl, Long price, ProductStatus status, Long likeCount) {
+    protected Product(String name, Long brandId, String description, String imageUrl, Long price, ProductStatus status) {
         ProductValidator.validateName(name);
-        this.name = name;
-
         ProductValidator.validateBrandId(brandId);
-        this.brandId = brandId;
-
         ProductValidator.validateDescription(description);
-        this.description = description;
-
         ProductValidator.validateImageUrl(imageUrl);
+
+        this.name = name;
+        this.brandId = brandId;
+        this.description = description;
         this.imageUrl = imageUrl;
-
-
-        this.price = new Money(price);
+        this.price = new Money(new BigDecimal(price));
 
         this.status = status;
     }
@@ -52,8 +50,7 @@ public class Product extends BaseEntity {
                 command.description(),
                 command.imageUrl(),
                 command.price(),
-                ProductStatus.SALE,
-                0L
+                ProductStatus.SALE
         );
     }
 

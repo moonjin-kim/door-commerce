@@ -19,7 +19,7 @@ public class UserService {
         checkDuplicateAccount(request.account());
 
         return userRepository.save(
-                User.register(request.toCommand())
+                User.create(request.toCommand())
         );
     }
 

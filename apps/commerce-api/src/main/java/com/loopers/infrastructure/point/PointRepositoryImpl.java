@@ -22,4 +22,9 @@ public class PointRepositoryImpl implements PointRepository {
     public Optional<Point> findBy(Long userId) {
         return pointJpaRepository.findByUserId(userId);
     }
+
+    @Override
+    public Optional<Point> findByForUpdate(Long userId) {
+        return pointJpaRepository.findByUserIdWithPessimisticWriteLock(userId);
+    }
 }

@@ -2,6 +2,7 @@ package com.loopers.domain.order;
 
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.Money;
+import com.loopers.domain.coupon.policy.DiscountPolicy;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import jakarta.persistence.*;
@@ -9,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,17 +20,23 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order extends BaseEntity {
-    @Column
+    @Column(nullable = false)
     private Long userId;
     @AttributeOverrides({
             @AttributeOverride(name="value", column = @Column(name="total_amount"))
     })
     private Money totalAmount;
-    @AttributeOverrides({
-            @AttributeOverride(name="value", column = @Column(name="point_used"))
-    })
-    private Money pointUsed;
     @Column
+    private Long userCouponId;
+    @AttributeOverrides({
+            @AttributeOverride(name="value", column = @Column(name="coupont_discounted"))
+    })
+    private Money couponDiscountAmount;
+    @AttributeOverrides({
+            @AttributeOverride(name="value", column = @Column(name="final_amount"))
+    })
+    private Money finalAmount;
+    @Column(nullable = false)
     LocalDateTime orderDate;
     @Enumerated(EnumType.STRING)
     @Column
@@ -49,25 +57,23 @@ public class Order extends BaseEntity {
         this.orderItems = items;
         this.status = status;
         this.totalAmount = new Money(calculateTotalPrice());
+        this.couponDiscountAmount = new Money(BigDecimal.ZERO);
+        this.finalAmount = this.totalAmount;
         this.orderDate = LocalDateTime.now();
-
-        // todo: 지금은 포인트로 전액을 사용하는 구조이지만 결제가 생기면 분리할 예정
-        this.pointUsed = this.totalAmount;
     }
 
-    public static Order order(OrderCommand.Order command) {
+    public static Order create(OrderCommand.Order command) {
         List<OrderItem> orderItems = command.orderItems().stream()
                 .map(OrderItem::create)
                 .toList();
 
-
-        return new Order(command.userId(), orderItems,OrderStatus.CONFIRMED);
+        return new Order(command.userId(), orderItems, OrderStatus.CONFIRMED);
     }
 
-    private Long calculateTotalPrice() {
+    private BigDecimal calculateTotalPrice() {
         return orderItems.stream()
-                .mapToLong(OrderItem::getTotalAmount)
-                .sum();
+                .map(OrderItem::getTotalAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public void checkPermission(Long userId) {
@@ -77,6 +83,31 @@ public class Order extends BaseEntity {
 
         if(!this.userId.equals(userId)) {
             throw new CoreException(ErrorType.FORBIDDEN, "해당 주문에 대한 권한이 없습니다.");
+        }
+    }
+
+    public void applyCoupon(Long userCouponId, DiscountPolicy discountPolicy) {
+        if (userCouponId == null) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "쿠폰 정보가 제공되지 않았습니다.");
+        }
+        if(discountPolicy == null) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "할인 정책이 제공되지 않았습니다.");
+        }
+
+        BigDecimal discount = discountPolicy.calculateDiscount(calculateTotalPrice());
+
+        // 쿠폰 적용 로직
+        this.couponDiscountAmount = new Money(discount);
+        this.userCouponId = userCouponId;
+
+        calculateFinalAmount();
+    }
+
+    public void calculateFinalAmount() {
+        if (this.couponDiscountAmount == null) {
+            this.finalAmount = this.totalAmount;
+        } else {
+            this.finalAmount = this.totalAmount.minus(this.couponDiscountAmount.value());
         }
     }
 }

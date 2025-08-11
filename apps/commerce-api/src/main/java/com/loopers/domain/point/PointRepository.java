@@ -7,4 +7,5 @@ import java.util.Optional;
 public interface PointRepository {
     Point save(Point point);
     Optional<Point> findBy(Long userId);
+    Optional<Point> findByForUpdate(Long userId);
 }

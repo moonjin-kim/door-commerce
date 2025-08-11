@@ -40,6 +40,8 @@ public class QPoint extends EntityPathBase<Point> {
 
     public final NumberPath<Long> userId = createNumber("userId", Long.class);
 
+    public final NumberPath<Long> version = createNumber("version", Long.class);
+
     public QPoint(String variable) {
         this(Point.class, forVariable(variable), INITS);
     }

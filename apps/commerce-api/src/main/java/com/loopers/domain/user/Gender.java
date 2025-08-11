@@ -10,7 +10,7 @@ public enum Gender {
 
     public static Gender from(UserV1Request.GenderRequest gender) {
         if (gender == null) {
-            return null;
+            throw new CoreException(ErrorType.BAD_REQUEST, "성별은 비어있을 수 없습니다.");
         }
         switch (gender) {
             case UserV1Request.GenderRequest.MALE:
@@ -18,7 +18,7 @@ public enum Gender {
             case UserV1Request.GenderRequest.FEMALE:
                 return Gender.FEMALE;
             default:
-                throw new CoreException(ErrorType.BAD_REQUEST, "생년월일은 비어있을 수 없습니다.");
+                throw new CoreException(ErrorType.BAD_REQUEST, "성별은 비어있을 수 없습니다.");
         }
     }
 }
