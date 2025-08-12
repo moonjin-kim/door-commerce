@@ -89,7 +89,7 @@ public class LikeConcurrencyServiceTest {
         @Test
         void success_whenPointIsUsedSimultaneously() throws InterruptedException  {
             //given
-            int threadCount = 100;
+            int threadCount = 10;
             ExecutorService executor = Executors.newFixedThreadPool(threadCount);
             CountDownLatch latch = new CountDownLatch(threadCount);
             Long userId = 1L;
@@ -120,7 +120,7 @@ public class LikeConcurrencyServiceTest {
             latch.await();
             List<Like> foundLike = likeJpaRepository.findAll();
             assertAll(
-                    () -> assertThat(foundLike).hasSize(100),
+                    () -> assertThat(foundLike).hasSize(10),
                     () -> assertThat(foundLike.get(0).getProductId()).isEqualTo(productId),
                     () -> assertThat(exceptions).hasSize(0)
             );

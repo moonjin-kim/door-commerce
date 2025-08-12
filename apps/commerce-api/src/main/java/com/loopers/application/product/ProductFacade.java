@@ -27,7 +27,7 @@ public class ProductFacade {
             throw new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 상품입니다.");
         });
 
-        Brand brand = brandService.getBy(product.getId()).orElseThrow(() -> {
+        Brand brand = brandService.getBy(product.getBrandId()).orElseThrow(() -> {
             throw new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 브랜드입니다.");
         });
 

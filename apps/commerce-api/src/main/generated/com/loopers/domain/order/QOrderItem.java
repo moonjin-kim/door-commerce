@@ -13,8 +13,8 @@ import com.querydsl.core.types.dsl.PathInits;
 /**
  * QOrderItem is a Querydsl query type for OrderItem
  */
-@Generated("com.querydsl.codegen.DefaultEmbeddableSerializer")
-public class QOrderItem extends BeanPath<OrderItem> {
+@Generated("com.querydsl.codegen.DefaultEntitySerializer")
+public class QOrderItem extends EntityPathBase<OrderItem> {
 
     private static final long serialVersionUID = 2013320400L;
 
@@ -22,13 +22,29 @@ public class QOrderItem extends BeanPath<OrderItem> {
 
     public static final QOrderItem orderItem = new QOrderItem("orderItem");
 
+    public final com.loopers.domain.QBaseEntity _super = new com.loopers.domain.QBaseEntity(this);
+
+    //inherited
+    public final DateTimePath<java.time.ZonedDateTime> createdAt = _super.createdAt;
+
+    //inherited
+    public final DateTimePath<java.time.ZonedDateTime> deletedAt = _super.deletedAt;
+
+    //inherited
+    public final NumberPath<Long> id = _super.id;
+
     public final StringPath name = createString("name");
+
+    public final QOrder order;
 
     public final NumberPath<Long> productId = createNumber("productId", Long.class);
 
     public final com.loopers.domain.QMoney productPrice;
 
     public final NumberPath<Integer> quantity = createNumber("quantity", Integer.class);
+
+    //inherited
+    public final DateTimePath<java.time.ZonedDateTime> updatedAt = _super.updatedAt;
 
     public QOrderItem(String variable) {
         this(OrderItem.class, forVariable(variable), INITS);
@@ -48,6 +64,7 @@ public class QOrderItem extends BeanPath<OrderItem> {
 
     public QOrderItem(Class<? extends OrderItem> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.order = inits.isInitialized("order") ? new QOrder(forProperty("order"), inits.get("order")) : null;
         this.productPrice = inits.isInitialized("productPrice") ? new com.loopers.domain.QMoney(forProperty("productPrice")) : null;
     }
 

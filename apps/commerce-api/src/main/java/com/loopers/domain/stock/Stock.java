@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 public class Stock extends BaseEntity {
     @Column(unique = true)
     private Long productId;
-    @Column
+    @Column(unique = false)
     private int quantity;
 
     protected Stock(Long productId, int quantity) {
