@@ -2,21 +2,22 @@ package com.loopers.domain.like;
 
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
-import jakarta.persistence.PersistenceException;
-import jakarta.persistence.RollbackException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.tool.schema.spi.CommandAcceptanceException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Duration;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class LikeService {
     private final LikeRepository likeRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     // 예시: 만약 PersistenceException이 발생했다면
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -53,7 +54,17 @@ public class LikeService {
 
     @Transactional(readOnly = true)
     public LikeInfo.GetLikeCount getLikeCount(Long productId) {
+        Object countObject = redisTemplate.opsForValue().get("likeCount:" + productId);
+
+        if (countObject != null) {
+            // 1. 안전하게 Number 타입으로 캐스팅합니다.
+            // 2. longValue() 메서드를 호출하여 Long 타입으로 변환합니다.
+            long likeCount = ((Number) countObject).longValue();
+            return LikeInfo.GetLikeCount.of(likeCount);
+        }
+
         Long count = likeRepository.countBy(productId);
+        redisTemplate.opsForValue().set("likeCount:" + productId, count, Duration.ofMinutes(1));
         return LikeInfo.GetLikeCount.of(count);
 
     }

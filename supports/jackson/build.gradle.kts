@@ -1,11 +1,10 @@
 plugins {
     `java-library`
+    `java-test-fixtures`
 }
 
 dependencies {
-    // spring
-    implementation("org.springframework:spring-web")
-    // jackson
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    api("org.springframework.boot:spring-boot-starter-data-redis")
+
+    testFixturesImplementation("com.redis:testcontainers-redis")
 }

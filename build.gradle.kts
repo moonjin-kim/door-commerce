@@ -46,6 +46,8 @@ subprojects {
     }
 
     dependencies {
+        // redis
+        implementation("org.springframework.boot:spring-boot-starter-data-redis")
         // Web
         runtimeOnly("org.springframework.boot:spring-boot-starter-validation")
         // Spring

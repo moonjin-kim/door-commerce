@@ -85,6 +85,29 @@ class LikeServiceTest {
         }
     }
 
+    @DisplayName("좋아요 수 조회")
+    @Nested
+    class GetLikeCount {
+        @DisplayName("좋아유 수를 조회할때")
+        @Test
+        void GetLike_whenLikeNotExist() {
+            //given
+            Long userId = 1L;
+            Long productId = 1L;
+            likeJpaRepository.save(Like.create(LikeCommand.Like.of(1L, 1L)));
+            likeJpaRepository.save(Like.create(LikeCommand.Like.of(2L, 1L)));
+            likeJpaRepository.save(Like.create(LikeCommand.Like.of(3L, 1L)));
+            likeJpaRepository.save(Like.create(LikeCommand.Like.of(4L, 1L)));
+            likeService.getLikeCount(1L);
+
+            //when
+            LikeInfo.GetLikeCount result = likeService.getLikeCount(1L);
+
+            //then
+            assertThat(result.count()).isEqualTo(4);
+        }
+    }
+
     @DisplayName("좋아요를 취소할 때")
     @Nested
     class DeleteLike {
@@ -129,6 +152,8 @@ class LikeServiceTest {
             );
         }
     }
+
+
 
     @DisplayName("유저의 좋아요를 검색할 때,")
     @Nested

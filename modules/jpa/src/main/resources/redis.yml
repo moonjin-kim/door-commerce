@@ -1,0 +1,56 @@
+spring:
+  data:
+    redis:
+      host: localhost # Redis 서버 호스트
+      port: 6379     # Redis 서버 포트
+      # password: your-password # 비밀번호가 설정된 경우
+
+---
+spring.config.activate.on-profile: local
+
+spring:
+  data:
+    redis:
+      host: localhost # Redis 서버 호스트
+      port: 6379     # Redis 서버 포트
+      # password: your-password # 비밀번호가 설정된 경우
+
+---
+spring.config.activate.on-profile: test
+
+spring:
+  data:
+    redis:
+      host: localhost # Redis 서버 호스트
+      port: 6379     # Redis 서버 포트
+      # password: your-password # 비밀번호가 설정된 경우
+
+---
+spring.config.activate.on-profile: dev
+
+spring:
+  data:
+    redis:
+      host: localhost # Redis 서버 호스트
+      port: 6379     # Redis 서버 포트
+      # password: your-password # 비밀번호가 설정된 경우
+
+---
+spring.config.activate.on-profile: qa
+
+spring:
+  data:
+    redis:
+      host: localhost # Redis 서버 호스트
+      port: 6379     # Redis 서버 포트
+      # password: your-password # 비밀번호가 설정된 경우
+
+---
+spring.config.activate.on-profile: prd
+
+spring:
+  data:
+    redis:
+      host: localhost # Redis 서버 호스트
+      port: 6379     # Redis 서버 포트
+      # password: your-password # 비밀번호가 설정된 경우
