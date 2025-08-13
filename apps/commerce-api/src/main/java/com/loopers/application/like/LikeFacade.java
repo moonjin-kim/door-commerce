@@ -65,9 +65,13 @@ public class LikeFacade {
         return PageResponse.of(
                 searchResult.getPage(),
                 searchResult.getSize(),
-//                searchResult.getTotalCount(),
                 likeProducts
         );
-//
+    }
+
+    public LikeResult.LikeProductCount searchCount(LikeCriteria.SearchCount query) {
+        Long searchResult = likeService.getUserLikeCount(query.toQuery());
+
+        return LikeResult.LikeProductCount.of(searchResult);
     }
 }

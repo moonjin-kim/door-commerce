@@ -158,4 +158,25 @@ class LikeServiceTest {
             );
         }
     }
+
+    @DisplayName("유저의 좋아요 수를 검색할 때,")
+    @Nested
+    class getUserLikeCount {
+        @DisplayName("유저의 상품 수 검색하면, 좋아요 상품 수 반환한다.")
+        @Test
+        void searchLikes() {
+            //given
+            Long userId = 1L;
+            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, 1L)));
+            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, 2L)));
+            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, 3L)));
+            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, 4L)));
+
+            //when
+            Long result = likeService.getUserLikeCount(LikeQuery.SearchCount.of(userId));
+
+            //then
+            assertThat(result).isEqualTo(4);
+        }
+    }
 }

@@ -14,4 +14,12 @@ public class LikeQuery {
             return LikeParams.Search.of(userId);
         }
     }
+
+    public record SearchCount(
+            long userId
+    ) {
+        public static LikeQuery.SearchCount of(long userId) {
+            return new LikeQuery.SearchCount(userId);
+        }
+    }
 }

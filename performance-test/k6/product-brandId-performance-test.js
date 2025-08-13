@@ -1,4 +1,4 @@
-import http from 'k6/http';
+import http from 'performance-test/k6/http';
 import { check, sleep } from 'k6';
 
 // --- 테스트 환경 설정 ---
@@ -45,10 +45,11 @@ export default function () {
         'X-USER-ID': `${userId}`,
     };
 
-    // 2. 상품 목록 조회 (랜덤 페이지)
-    const page = Math.floor(Math.random() * 100) + 1;
-    const resProducts = http.get(`${BASE_URL}/products?page=${page}&size=30`, { headers });
-    check(resProducts, {
+    // 3. 상품 목록 조회 브랜드 id로 조회
+    const page4 = Math.floor(Math.random() * 100) + 1;
+    const brandId = Math.floor(Math.random() * BRAND_ID_MAX) + 1; // 1~1000 사이의 브랜드 ID
+    const resProducts4 = http.get(`${BASE_URL}/products?page=${page4}&size=30&brandId=${brandId}`, { headers });
+    check(resProducts4, {
         '[Products] Status is 200': (r) => r.status === 200,
     });
 

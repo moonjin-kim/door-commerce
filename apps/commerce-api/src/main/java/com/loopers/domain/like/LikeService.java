@@ -18,12 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class LikeService {
     private final LikeRepository likeRepository;
 
-    public PageResponse<LikeInfo.Like> search(PageRequest<LikeQuery.Search> query) {
-        PageResponse<Like> pageRequest = likeRepository.search(query.map(LikeQuery.Search::toParams));
-
-        return pageRequest.map(LikeInfo.Like::of);
-    }
-
     // 예시: 만약 PersistenceException이 발생했다면
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public LikeInfo.LikeResult like(LikeCommand.Like command) {
@@ -62,5 +56,15 @@ public class LikeService {
         Long count = likeRepository.countBy(productId);
         return LikeInfo.GetLikeCount.of(count);
 
+    }
+
+    public PageResponse<LikeInfo.Like> search(PageRequest<LikeQuery.Search> query) {
+        PageResponse<Like> pageRequest = likeRepository.search(query.map(LikeQuery.Search::toParams));
+
+        return pageRequest.map(LikeInfo.Like::of);
+    }
+
+    public Long getUserLikeCount(LikeQuery.SearchCount query) {
+        return likeRepository.countByUserId(query.userId());
     }
 }

@@ -42,4 +42,16 @@ public class LikeCriteria {
             return LikeQuery.Search.of(userId);
         }
     }
+
+    public record SearchCount(
+            long userId
+    ) {
+        public static SearchCount of(long userId) {
+            return new SearchCount(userId);
+        }
+
+        public LikeQuery.SearchCount toQuery() {
+            return LikeQuery.SearchCount.of(userId);
+        }
+    }
 }
