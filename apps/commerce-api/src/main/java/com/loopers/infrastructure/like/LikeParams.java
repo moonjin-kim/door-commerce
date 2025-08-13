@@ -10,4 +10,12 @@ public class LikeParams {
             return new LikeParams.Search(userId);
         }
     }
+
+    public record SearchCount(
+            long userId
+    ) {
+        public static LikeParams.SearchCount of(long userId) {
+            return new LikeParams.SearchCount(userId);
+        }
+    }
 }

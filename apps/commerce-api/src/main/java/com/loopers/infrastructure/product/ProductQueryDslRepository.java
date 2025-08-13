@@ -32,36 +32,39 @@ public class ProductQueryDslRepository{
                         product.imageUrl,
                         product.price.value, // Amount 객체의 값을 가져옴
                         product.status,
-                        like.id.count()// 좋아요 개수 카운트
+                        like.id.count().coalesce(0L)
                 ))
                 .from(product)
                 .leftJoin(like).on(like.productId.eq(product.id))
                 .limit(param.limit())
                 .offset(param.offset())
-                .where(
-                        product.status.eq(ProductStatus.SALE),
-                        eqBrandId(param.getParams().brandId())
-                )
                 .groupBy(
                         product.id,
                         product.name,
                         product.brandId,
                         product.description,
                         product.imageUrl, product.price, product.status)
+                .where(
+                        product.status.eq(ProductStatus.SALE),
+                        eqBrandId(param.getParams().brandId())
+                )
                 .orderBy(getOrderSpecifier(param.getParams().sort()))
                 .fetch();
+
+        return PageResponse.of(param.getPage(),param.getSize(), items);
+    }
+
+    public Long searchCount(ProductParams.SearchCount param) {
 
         Long totalCount = jpaQueryFactory.select(product.count())
                 .from(product)
                 .where(
                         product.status.eq(ProductStatus.SALE),
-                        eqBrandId(param.getParams().brandId()) // 동일한 where 조건 추가
+                        eqBrandId(param.brandId()) // 동일한 where 조건 추가
                 )
                 .fetchOne();
 
-        long count = totalCount != null ? totalCount : 0L;
-
-        return PageResponse.of(param.getPage(),param.getSize(), count, items);
+        return totalCount != null ? totalCount : 0L;
     }
 
     private BooleanExpression eqBrandId(Long brandId) {
@@ -81,10 +84,13 @@ public class ProductQueryDslRepository{
             return new OrderSpecifier<>(Order.DESC, like.id.count());
 
         }
+//        if(sort.equals(ProductParams.ProductSortOption.LIKE_DESC)) {
+//            return new OrderSpecifier<>(Order.DESC, product.likeCount);
+//
+//        }
 
         if(sort.equals(ProductParams.ProductSortOption.LATEST)) {
             return new OrderSpecifier<>(Order.DESC, product.id);
-
         }
 
         return new OrderSpecifier<>(Order.DESC, product.id);

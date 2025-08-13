@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.tool.schema.spi.CommandAcceptanceException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -17,14 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class LikeService {
     private final LikeRepository likeRepository;
 
-    public PageResponse<LikeInfo.Like> search(PageRequest<LikeQuery.Search> query) {
-        PageResponse<Like> pageRequest = likeRepository.search(query.map(LikeQuery.Search::toParams));
-
-        return pageRequest.map(LikeInfo.Like::of);
-    }
-
     // 예시: 만약 PersistenceException이 발생했다면
-//    @Transactional(noRollbackFor = DataIntegrityViolationException.class)
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public LikeInfo.LikeResult like(LikeCommand.Like command) {
         if (likeRepository.existsBy(command.userId(), command.productId())) {
             return LikeInfo.LikeResult.fail();
@@ -36,7 +31,7 @@ public class LikeService {
         } catch (DataIntegrityViolationException e) {
             // 어떤 예외가 잡혔는지 로그로 확인 (2단계 진단을 위해)
             log.warn("데이터 중복으로 '좋아요' 저장 실패. command: {}", command, e);
-            return LikeInfo.LikeResult.success();
+            return LikeInfo.LikeResult.fail();
         }
     }
 
@@ -61,5 +56,15 @@ public class LikeService {
         Long count = likeRepository.countBy(productId);
         return LikeInfo.GetLikeCount.of(count);
 
+    }
+
+    public PageResponse<LikeInfo.Like> search(PageRequest<LikeQuery.Search> query) {
+        PageResponse<Like> pageRequest = likeRepository.search(query.map(LikeQuery.Search::toParams));
+
+        return pageRequest.map(LikeInfo.Like::of);
+    }
+
+    public Long getUserLikeCount(LikeQuery.SearchCount query) {
+        return likeRepository.countByUserId(query.userId());
     }
 }

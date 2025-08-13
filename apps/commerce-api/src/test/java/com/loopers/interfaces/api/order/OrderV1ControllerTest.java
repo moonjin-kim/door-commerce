@@ -34,6 +34,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -561,59 +562,61 @@ class OrderV1ControllerTest {
         }
     }
 
+
+
+
+    @DisplayName("Get /api/v1/orders/{orderId} - 주문 조회 주문 조회 성공")
+    @Test
+    void returnOrder_whenSuccessGetBy() {
+        //given
+        List<OrderCommand.OrderItem> orderItems = List.of(new OrderCommand.OrderItem(2L, "루퍼스 공식 티셔츠", 10000L, 2));
+        Order order2 = Order.create(
+                OrderCommand.Order.of(
+                        1L,
+                        orderItems
+                )
+        );
+        Order saveOrder = orderJpaRepository.save(order2);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("X-USER-ID", "1");
+
+        //when
+        ParameterizedTypeReference<ApiResponse<OrderV1Response.Order>> responseType = new ParameterizedTypeReference<>() {
+        };
+        ResponseEntity<ApiResponse<OrderV1Response.Order>> response =
+                testRestTemplate.exchange(
+                        "/api/v1/orders/" + saveOrder.getId(),
+                        HttpMethod.GET,
+                        new HttpEntity<>(headers),
+                        responseType
+                );
+
+        //then
+        assertAll(
+                () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
+                () -> assertNotNull(response.getBody()),
+                () -> assertThat(response.getBody().data().id()).isEqualTo(saveOrder.getId()),
+                () -> assertThat(response.getBody().data().userId()).isEqualTo(1L),
+                () -> assertThat(response.getBody().data().items()).hasSize(1),
+                () -> assertThat(response.getBody().data().items().get(0).productId()).isEqualTo(2L),
+                () -> assertThat(response.getBody().data().items().get(0).quantity()).isEqualTo(2),
+                () -> assertThat(response.getBody().data().totalPrice()).isEqualTo(20000L)
+        );
+    }
+
     @DisplayName("Get /api/v1/orders/{orderId} - 주문 조회")
     @Nested
-    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     class GetBy {
-        private static final String URL = "/api/v1/orders/{orderId}";
+        private static final String URL = "/api/v1/orders/";
 
-        @DisplayName("주문 조회 성공")
-        @Test
-        void returnOrder_whenSuccessGetBy() {
-            //given
-            var order = orderJpaRepository.save(Order.create(
-                    OrderCommand.Order.of(
-                            1L,
-                            List.of(
-                                    new OrderCommand.OrderItem(2L, "루퍼스 공식 티셔츠", 10000L, 2)
-                            )
-                    )
-            ));
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("X-USER-ID", "1");
-
-            //when
-            ParameterizedTypeReference<ApiResponse<OrderV1Response.Order>> responseType = new ParameterizedTypeReference<>() {
-            };
-            ResponseEntity<ApiResponse<OrderV1Response.Order>> response =
-                    testRestTemplate.exchange(
-                            URL,
-                            HttpMethod.GET,
-                            new HttpEntity<>(headers),
-                            responseType,
-                            order.getId()
-                    );
-
-            //then
-            assertAll(
-                    () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertNotNull(response.getBody()),
-                    () -> assertThat(response.getBody().data().id()).isEqualTo(order.getId()),
-                    () -> assertThat(response.getBody().data().userId()).isEqualTo(1L),
-                    () -> assertThat(response.getBody().data().items()).hasSize(1),
-                    () -> assertThat(response.getBody().data().items().get(0).productId()).isEqualTo(2L),
-                    () -> assertThat(response.getBody().data().items().get(0).quantity()).isEqualTo(2),
-                    () -> assertThat(response.getBody().data().totalPrice()).isEqualTo(20000L)
-            );
-        }
 
         @DisplayName("주문 조회 시 사용자 ID가 일치하지 않으면, 403 FORBIDDEN 에러를 발생시킨다.")
         @Test
         void throw403_whenNotPermissionByUser() {
             //given
-            var order = orderJpaRepository.save(Order.create(
+            Order order = orderJpaRepository.save(Order.create(
                     OrderCommand.Order.of(
                             1L,
                             List.of(
@@ -631,7 +634,7 @@ class OrderV1ControllerTest {
             };
             ResponseEntity<ApiResponse<OrderV1Response.Order>> response =
                     testRestTemplate.exchange(
-                            URL,
+                            URL + order.getId(),
                             HttpMethod.GET,
                             new HttpEntity<>(headers),
                             responseType,
@@ -647,6 +650,7 @@ class OrderV1ControllerTest {
 
         @DisplayName("주문한 상품이 존재하지 않으면, 404 NOT_FOUND에러를 발상핸다.")
         @Test
+        @Transactional
         void returnNotFound_whenOrderIdIsNotExist(){
             //given
             HttpHeaders headers = new HttpHeaders();
@@ -711,7 +715,6 @@ class OrderV1ControllerTest {
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
                     () -> assertNotNull(response.getBody()),
-                    () -> assertThat(response.getBody().data().getTotalCount()).isEqualTo(1),
                     () -> assertThat(response.getBody().data().getPage()).isEqualTo(1),
                     () -> assertThat(response.getBody().data().getSize()).isEqualTo(10),
                     () -> assertThat(response.getBody().data().getItems()).hasSize(1),

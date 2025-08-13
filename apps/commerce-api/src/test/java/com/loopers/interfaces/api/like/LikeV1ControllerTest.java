@@ -325,7 +325,6 @@ class LikeV1ControllerTest {
             //then
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertEquals(1, response.getBody().data().getTotalCount()),
                     () -> assertEquals(1, response.getBody().data().getItems().size()),
                     () -> assertEquals(product.getId(), response.getBody().data().getItems().get(0).productId())
             );

@@ -29,6 +29,11 @@ public class ProductService {
         return productRepository.search(productParams);
     }
 
+    public Long searchCount(ProductCommand.SearchCount command) {
+
+        return productRepository.searchCount(command.toParams());
+    }
+
     public List<ProductInfo> findAllBy(List<Long> productIds) {
         return productRepository.findAllBy(productIds).stream().map(ProductInfo::of).collect(Collectors.toList());
     }

@@ -57,4 +57,17 @@ public class LikeV1Controller implements LikeV1ApiSpec{
                 likeProducts.map(LikeV1Response.LikeProduct::of)
         );
     }
+
+    @GetMapping("/products/count")
+    @Override
+    public ApiResponse<LikeV1Response.LikeProductCount> countBy(
+            @RequestHeader("X-USER-ID") Long userId
+    ) {
+        LikeResult.LikeProductCount searchCount = likeFacade.searchCount(
+                LikeCriteria.SearchCount.of(userId)
+        );
+
+        return ApiResponse.success(LikeV1Response.LikeProductCount.of(searchCount)
+        );
+    }
 }

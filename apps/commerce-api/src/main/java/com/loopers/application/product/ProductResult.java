@@ -54,4 +54,12 @@ public class ProductResult {
             );
         }
     }
+
+    public record SearchCount(
+            Long totalCount
+    ) {
+        public static SearchCount from(Long totalCount) {
+            return new SearchCount(totalCount);
+        }
+    }
 }

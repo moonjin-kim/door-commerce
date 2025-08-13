@@ -17,10 +17,16 @@ public interface ProductV1ApiSpec {
     )
     ApiResponse<ProductV1Response.ProductDetail> getBy(Long userId, Long productId);
 
-
     @Operation(
             summary = "상품 목록 조회",
             description = "상품 목록을 조회한다. 페이지네이션이 적용되어 있다."
     )
     ApiResponse<PageResponse<ProductV1Response.ProductSummary>> getList(@PageableDefault(size = 10) Pageable pageable, @ModelAttribute ProductV1Request.Search searchDto);
+
+
+    @Operation(
+            summary = "상품 목록 조회",
+            description = "상품 목록을 조회한다. 페이지네이션이 적용되어 있다."
+    )
+    ApiResponse<ProductV1Response.ProductSearchCount> getListCount( @ModelAttribute ProductV1Request.SearchCount searchDto);
 }

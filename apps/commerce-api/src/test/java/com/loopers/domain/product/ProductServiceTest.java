@@ -85,28 +85,31 @@ class ProductServiceTest {
         @Test
         void returnProductPage_whenSearchQueryIsProvided() {
             //given
-            var product1 = productJpaRepository.save(
-                    Product.create(ProductCommand.Create.of(
-                            1L,
-                            "루퍼스 공식 티셔츠",
-                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
-                            "https://loopers.com/product/t-shirt.png",
-                            20000L
-                    ))
+            var product1 = Product.create(ProductCommand.Create.of(
+                    1L,
+                    "루퍼스 공식 티셔츠",
+                    "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
+                    "https://loopers.com/product/t-shirt.png",
+                    20000L
+            ));
+            product1.increaseLikeCount();
+            product1.increaseLikeCount();
+            var savedProduct1 = productJpaRepository.save(
+                    product1
             );
-            var product2 = productJpaRepository.save(
-                    Product.create(ProductCommand.Create.of(
+            var product2 = Product.create(ProductCommand.Create.of(
                             1L,
                             "루퍼스 공식 후드티",
                             "루퍼스의 공식 후드티입니다. 루퍼스는 루퍼스입니다.",
                             "https://loopers.com/product/hoodie.png",
                             30000L
-                    ))
-            );
+                    ));
+            product2.increaseLikeCount();
+            var savedProduct2 = productJpaRepository.save(product2);
             likeJpaRepository.saveAll(List.of(
-                    Like.create(new LikeCommand.Like(1L, product1.getId())),
-                    Like.create(new LikeCommand.Like(2L, product1.getId())),
-                    Like.create(new LikeCommand.Like(1L, product2.getId()))
+                    Like.create(new LikeCommand.Like(1L, savedProduct1.getId())),
+                    Like.create(new LikeCommand.Like(2L, savedProduct1.getId())),
+                    Like.create(new LikeCommand.Like(1L, savedProduct2.getId()))
             ));
 
             PageRequest<ProductCommand.Search> query = PageRequest.of(1, 10, ProductCommand.Search.of("like_desc", null));
@@ -118,11 +121,10 @@ class ProductServiceTest {
             assertAll(
                     () -> assertThat(productPage.getPage()).isEqualTo(1),
                     () -> assertThat(productPage.getSize()).isEqualTo(10),
-                    () -> assertThat(productPage.getTotalCount()).isEqualTo(2),
                     () -> assertThat(productPage.getItems()).hasSize(2),
-                    () -> assertThat(productPage.getItems().get(0).getId()).isEqualTo(product1.getId()),
+                    () -> assertThat(productPage.getItems().get(0).getId()).isEqualTo(savedProduct1.getId()),
                     () -> assertThat(productPage.getItems().get(0).getLikeCount()).isEqualTo(2),
-                    () -> assertThat(productPage.getItems().get(1).getId()).isEqualTo(product2.getId())
+                    () -> assertThat(productPage.getItems().get(1).getId()).isEqualTo(savedProduct2.getId())
             );
         }
 
@@ -159,7 +161,6 @@ class ProductServiceTest {
             assertAll(
                     () -> assertThat(productPage.getPage()).isEqualTo(1),
                     () -> assertThat(productPage.getSize()).isEqualTo(10),
-                    () -> assertThat(productPage.getTotalCount()).isEqualTo(2),
                     () -> assertThat(productPage.getItems()).hasSize(2)
             );
         }
@@ -237,6 +238,72 @@ class ProductServiceTest {
                     () -> assertThat(productPage.getItems().get(0).getId()).isEqualTo(
                             product2.getId())
             );
+        }
+    }
+
+    @DisplayName("상품 수량을 검색할 떄")
+    @Nested
+    class SearchCount {
+
+        @DisplayName("검색 조건이 주어지면 해당 조건에 맞는 상품의 수량을 반환한다.")
+        @Test
+        void returnSortLikeCount_whenSearchQueryIsProvided() {
+            //given
+            var product1 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 티셔츠",
+                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/t-shirt.png",
+                            20000L
+                    ))
+            );
+            var product2 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 후드티",
+                            "루퍼스의 공식 후드티입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/hoodie.png",
+                            30000L
+                    ))
+            );
+
+
+            //when
+            Long totalCount = productService.searchCount(ProductCommand.SearchCount.of(null));
+
+            //then
+            assertThat(totalCount).isEqualTo(2L);
+        }
+
+        @DisplayName("특정 브랜드ID가 주어지면 해당 브랜드의 상품수를 반환한다.")
+        @Test
+        void returnProductPage_when() {
+            //given
+            var product1 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 티셔츠",
+                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/t-shirt.png",
+                            20000L
+                    ))
+            );
+            var product2 = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            2L,
+                            "루퍼스 공식 후드티",
+                            "루퍼스의 공식 후드티입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/hoodie.png",
+                            30000L
+                    ))
+            );
+
+            //when
+            Long totalCount = productService.searchCount(ProductCommand.SearchCount.of(1L));
+
+            //then
+            assertThat(totalCount).isEqualTo(1L);
         }
     }
 

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "orders") // order가 SQL 예약어인 경우가 많아 orders로 지정
+@Table(name = "orders")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order extends BaseEntity {
@@ -42,24 +42,22 @@ public class Order extends BaseEntity {
     @Column
     private OrderStatus status;
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(
-            name = "order_item", // OrderItem 정보를 저장할 별도 테이블의 이름
-            joinColumns = @JoinColumn(name = "order_id") // 이 테이블에서 Order를 참조할 외래 키(FK)
-    )
-    private List<OrderItem> orderItems = new ArrayList<>();
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<OrderItem> orderItems = new ArrayList<>();
 
     private Order(Long userId, List<OrderItem> items, OrderStatus status) {
         if(userId == null || items == null || items.isEmpty()) {
             throw new CoreException(ErrorType.BAD_REQUEST,"주문 정보가 올바르지 않습니다.");
         }
+
+        items.forEach(this::addOrderItem);
         this.userId = userId;
-        this.orderItems = items;
         this.status = status;
         this.totalAmount = new Money(calculateTotalPrice());
         this.couponDiscountAmount = new Money(BigDecimal.ZERO);
         this.finalAmount = this.totalAmount;
         this.orderDate = LocalDateTime.now();
+
     }
 
     public static Order create(OrderCommand.Order command) {
@@ -99,6 +97,11 @@ public class Order extends BaseEntity {
         this.userCouponId = userCouponId;
 
         calculateFinalAmount();
+    }
+
+    public void addOrderItem(final OrderItem item) {
+        orderItems.add(item);
+        item.initOrder(this);
     }
 
 //    public void applyCoupon(Long userCouponId, DiscountPolicy discountPolicy) {
