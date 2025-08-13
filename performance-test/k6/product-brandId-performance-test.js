@@ -1,4 +1,4 @@
-import http from 'performance-test/k6/http';
+import http from 'k6/http';
 import { check, sleep } from 'k6';
 
 // --- 테스트 환경 설정 ---

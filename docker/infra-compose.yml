@@ -13,7 +13,7 @@ services:
       - MYSQL_COLLATE=utf8mb4_general_ci
     volumes:
       - mysql-8-data:/var/lib/mysql
-      -
+
   redis-master:
     image: redis:7.0
     container_name: redis-master
