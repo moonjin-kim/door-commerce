@@ -7,8 +7,9 @@ import java.time.Duration;
 public class CommerceCache {
     public static final class ProductCache extends MyCache {
         private ProductCache() {
-            super("상품 정보", Duration.ofHours(6));
+            super("상품 정보", Duration.ofMinutes(10));
         }
         public static final ProductCache INSTANCE = new ProductCache();
     }
+
 }

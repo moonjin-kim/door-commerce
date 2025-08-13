@@ -40,7 +40,7 @@ class ProductServiceTest {
 
     @DisplayName("상품을 조회할 때")
     @Nested
-    class FindBy {
+    class GetBy {
         @DisplayName("존재하지 않는 상품 아이디가 주어지면 NotFound 예외가 발생한다.")
         @Test
         void returnEmpty_whenProductIsNotFound(){
@@ -48,7 +48,7 @@ class ProductServiceTest {
             Long productId = 1L;
 
             //when
-            Optional<Product> result = productService.findBy(productId);
+            Optional<Product> result = productService.getBy(productId);
 
             //then
             assertThat(result.isPresent()).isFalse();

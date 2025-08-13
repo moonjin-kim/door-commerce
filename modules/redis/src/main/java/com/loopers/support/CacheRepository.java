@@ -1,12 +1,13 @@
 package com.loopers.support;
 
 import java.time.Duration;
+import java.util.Optional;
 
 public interface CacheRepository {
     /**
      * 캐시에서 값을 가져옵니다.
      */
-    <T> T get(MyCache cache, String key, Class<T> clazz);
+    <T> Optional<T> get(MyCache cache, String key, Class<T> clazz);
 
     /**
      * 캐시에 값을 저장합니다.

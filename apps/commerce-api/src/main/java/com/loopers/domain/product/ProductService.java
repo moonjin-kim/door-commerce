@@ -3,6 +3,8 @@ package com.loopers.domain.product;
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
 import com.loopers.infrastructure.product.ProductParams;
+import com.loopers.support.CacheRepository;
+import com.loopers.support.cache.CommerceCache;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +20,19 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class ProductService {
     private final ProductRepository productRepository;
+    private final CacheRepository cacheRepository;
 
     public Optional<Product> getBy(Long id) {
-        return productRepository.findBy(id);
+        Optional<Product> cachedProduct = cacheRepository.get(CommerceCache.ProductCache.INSTANCE, id.toString(), Product.class);
+        if (cachedProduct.isPresent()) {
+            return cachedProduct;
+        }
+
+        Optional<Product> product = productRepository.findBy(id);
+
+        product.ifPresent(value -> cacheRepository.set(CommerceCache.ProductCache.INSTANCE, id.toString(), value));
+
+        return product;
     }
 
     public PageResponse<ProductView> search(PageRequest<ProductCommand.Search> command) {
@@ -36,9 +48,5 @@ public class ProductService {
 
     public List<ProductInfo> findAllBy(List<Long> productIds) {
         return productRepository.findAllBy(productIds).stream().map(ProductInfo::of).collect(Collectors.toList());
-    }
-
-    public Optional<Product> findBy(Long id) {
-        return productRepository.findBy(id);
     }
 }
