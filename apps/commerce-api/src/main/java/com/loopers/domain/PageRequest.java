@@ -41,4 +41,8 @@ public class PageRequest<T> {
     public <U> PageRequest<U> map(Function<T, U> converter) {
         return new PageRequest<>(this.page, this.size, converter.apply(this.params));
     }
+
+    public boolean isCacheablePage() {
+        return page < 3;
+    }
 }

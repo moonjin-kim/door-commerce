@@ -42,8 +42,16 @@ public class ProductService {
     }
 
     public Long searchCount(ProductCommand.SearchCount command) {
+        Optional<Long> cachedProduct = cacheRepository.get(CommerceCache.ProductSearchCache.INSTANCE, command.brandId().toString(), Long.class);
+        if (cachedProduct.isPresent()) {
+            return cachedProduct.get();
+        }
 
-        return productRepository.searchCount(command.toParams());
+        Long count = productRepository.searchCount(command.toParams());
+
+        cacheRepository.set(CommerceCache.ProductSearchCache.INSTANCE, command.toParams().toString(), count);
+
+        return count;
     }
 
     public List<ProductInfo> findAllBy(List<Long> productIds) {

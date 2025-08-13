@@ -12,4 +12,11 @@ public class CommerceCache {
         public static final ProductCache INSTANCE = new ProductCache();
     }
 
+    public static final class ProductSearchCache extends MyCache {
+        private ProductSearchCache() {
+            super("상품 검색 결과", Duration.ofMinutes(1));
+        }
+        public static final ProductSearchCache INSTANCE = new ProductSearchCache();
+    }
+
 }
