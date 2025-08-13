@@ -65,7 +65,7 @@ public class LikeFacade {
         return PageResponse.of(
                 searchResult.getPage(),
                 searchResult.getSize(),
-                searchResult.getTotalCount(),
+//                searchResult.getTotalCount(),
                 likeProducts
         );
 //

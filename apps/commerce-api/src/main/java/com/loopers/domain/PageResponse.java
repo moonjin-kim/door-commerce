@@ -13,20 +13,18 @@ import java.util.stream.Collectors;
 public class PageResponse<T> {
     private int page;
     private int size;
-    private long totalCount;
     private List<T> items;
 
     public PageResponse() {}
 
-    protected PageResponse(int page, int size, long totalCount, List<T> items) {
+    protected PageResponse(int page, int size, List<T> items) {
         this.page = page;
         this.size = size;
-        this.totalCount = totalCount;
         this.items = items;
     }
 
-    public static <T> PageResponse<T> of(int page, int size, long totalCount, List<T> items) {
-        return new PageResponse<>(page, size, totalCount, items);
+    public static <T> PageResponse<T> of(int page, int size, List<T> items) {
+        return new PageResponse<>(page, size, items);
     }
 
     /**
@@ -42,6 +40,6 @@ public class PageResponse<T> {
                 .collect(Collectors.toList());
 
         // 4. 기존 페이지 정보와 변환된 리스트를 사용하여 새로운 PageResponse<U> 객체를 생성하여 반환
-        return new PageResponse<>(this.page, this.size, this.totalCount, convertedItems);
+        return new PageResponse<>(this.page, this.size, convertedItems);
     }
 }

@@ -44,11 +44,10 @@ export default function () {
         'Content-Type': 'application/json',
         'X-USER-ID': `${userId}`,
     };
-
-    // 2. 상품 목록 조회 (랜덤 페이지)
-    const page = Math.floor(Math.random() * 100) + 1;
-    const resProducts = http.get(`${BASE_URL}/products?page=${page}&size=30`, { headers });
-    check(resProducts, {
+    //3. 상품 목록 조회 (가격순으로 조회)
+    const page2 = Math.floor(Math.random() * 100) + 1;
+    const resProducts2 = http.get(`${BASE_URL}/products?page=${page2}&size=30&sort=price_asc`, { headers });
+    check(resProducts2, {
         '[Products] Status is 200': (r) => r.status === 200,
     });
 

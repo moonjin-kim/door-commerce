@@ -152,7 +152,6 @@ class LikeServiceTest {
 
             //then
             assertAll(
-                () -> assertThat(result.getTotalCount()).isEqualTo(4L),
                 () -> assertThat(result.getPage()).isEqualTo(1),
                 () -> assertThat(result.getSize()).isEqualTo(10),
                 () -> assertThat(result.getItems()).hasSize(4)

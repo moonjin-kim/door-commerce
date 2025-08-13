@@ -715,7 +715,6 @@ class OrderV1ControllerTest {
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
                     () -> assertNotNull(response.getBody()),
-                    () -> assertThat(response.getBody().data().getTotalCount()).isEqualTo(1),
                     () -> assertThat(response.getBody().data().getPage()).isEqualTo(1),
                     () -> assertThat(response.getBody().data().getSize()).isEqualTo(10),
                     () -> assertThat(response.getBody().data().getItems()).hasSize(1),

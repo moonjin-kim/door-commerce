@@ -324,7 +324,6 @@ class ProductV1E2ETest {
             assertAll(
                     () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().getTotalCount()).isEqualTo(2),
                     () -> assertThat(response.getBody().data().getPage()).isEqualTo(1),
                     () -> assertThat(response.getBody().data().getSize()).isEqualTo(10),
                     () -> assertThat(response.getBody().data().getItems()).hasSize(2),
@@ -367,7 +366,6 @@ class ProductV1E2ETest {
             //then
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().getTotalCount()).isEqualTo(1),
                     () -> assertThat(response.getBody().data().getPage()).isEqualTo(1),
                     () -> assertThat(response.getBody().data().getSize()).isEqualTo(10),
                     () -> assertThat(response.getBody().data().getItems()).hasSize(1),
@@ -410,7 +408,6 @@ class ProductV1E2ETest {
             //then
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().getTotalCount()).isEqualTo(2),
                     () -> assertThat(response.getBody().data().getPage()).isEqualTo(1),
                     () -> assertThat(response.getBody().data().getSize()).isEqualTo(10),
                     () -> assertThat(response.getBody().data().getItems()).hasSize(2),

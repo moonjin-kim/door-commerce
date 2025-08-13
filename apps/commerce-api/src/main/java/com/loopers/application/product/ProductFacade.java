@@ -50,4 +50,10 @@ public class ProductFacade {
         return productPage.map(ProductResult.ProductDto::from);
     }
 
+    public ProductResult.SearchCount searchCount(ProductCriteria.SearchCount criteria) {
+        Long count = productService.searchCount(criteria.toCommand());
+
+        return new ProductResult.SearchCount(count);
+    }
+
 }

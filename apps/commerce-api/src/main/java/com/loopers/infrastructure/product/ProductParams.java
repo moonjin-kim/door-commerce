@@ -15,6 +15,16 @@ public class ProductParams {
         }
     }
 
+    public record SearchCount(
+            Long brandId
+    ) {
+        public static SearchCount of(Long brandId) {
+            return new SearchCount(
+                    brandId
+            );
+        }
+    }
+
     public enum ProductSortOption {
         PRICE_ASC("price_asc"),
         LATEST("latest"),

@@ -1,6 +1,5 @@
 package com.loopers.support.data;
 
-import com.loopers.domain.BaseEntity;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandCommand;
 import com.loopers.domain.point.Point;
@@ -17,19 +16,14 @@ import com.loopers.infrastructure.product.ProductJpaRepository;
 import com.loopers.infrastructure.stock.StockJpaRepository;
 import com.loopers.infrastructure.user.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
-import org.instancio.Instancio;
-import org.instancio.Model;
-import org.instancio.Select;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 @Component
 @Profile("new")
@@ -64,14 +58,22 @@ public class TestDataInitializer implements ApplicationRunner {
             for (int j = 1; j <= productCount; j++) {
                 // 고유한 상품명을 위해 브랜드 ID와 상품 인덱스 조합
                 long uniqueProductIdSuffix = (i * 1000) + j;
-                ProductCommand.Create productCommand = new ProductCommand.Create(
+                Product product = Product.create(new ProductCommand.Create(
                         savedBrand.getId(),
                         "브랜드 " + i + "의 상품 " + j,
                         "상품 설명 브랜드 " + i + " 상품 " + uniqueProductIdSuffix,
                         "https://test.com/band - " + i + " product-" + uniqueProductIdSuffix + ".png",
                         ThreadLocalRandom.current().nextLong(10000, 200001) // 1만원 ~ 20만원
-                );
-                productsForBrand.add(Product.create(productCommand));
+                ));
+                try {
+                    java.lang.reflect.Field likeCountField = Product.class.getDeclaredField("likeCount");
+                    likeCountField.setAccessible(true); // private 필드에 접근 가능하도록 설정
+                    likeCountField.set(product, ThreadLocalRandom.current().nextLong(0, 100001)); // 0부터 1000 사이의 랜덤 값 주입
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    // 테스트 데이터 생성 중 예외 발생 시 처리
+                    e.printStackTrace();
+                }
+                productsForBrand.add(product);
             }
             totalProducts.addAll(productsForBrand);
         }
