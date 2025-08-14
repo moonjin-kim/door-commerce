@@ -1,5 +1,6 @@
 package com.loopers.support.cache;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.loopers.support.CacheRepository;
 import com.loopers.support.MyCache;
 import lombok.RequiredArgsConstructor;
@@ -21,15 +22,15 @@ public class CacheRedisRepository implements CacheRepository {
     public <T> Optional<T> get(MyCache cache, String key, Class<T> clazz) {
         String valueFromCache = redisTemplate.opsForValue().get(cache.getKey(key));
 
-        // 2. 캐시된 값이 없으면 null을 반환합니다.
+        // 2. 캐시된 값이 없으면 empty를 반환한다.
         if (valueFromCache == null || valueFromCache.isEmpty()) {
             return Optional.empty();
         }
 
         try {
-            // 3. ObjectMapper를 사용해 JSON 문자열을 지정된 클래스(clazz)의 객체로 변환합니다.
             return Optional.of(objectMapper.readValue(valueFromCache, clazz));
         } catch (Exception e) {
+            log.error("캐시 데이터 매핑 실패 {}", e.getMessage());
             return Optional.empty();
         }
     }
@@ -37,7 +38,12 @@ public class CacheRedisRepository implements CacheRepository {
 
     @Override
     public void set(MyCache cache, String key, Object value) {
-        redisTemplate.opsForValue().set(cache.getKey(key), value.toString(), cache.getTtl());
+        try {
+            String jsonValue = objectMapper.writeValueAsString(value);
+            redisTemplate.opsForValue().set(cache.getKey(key), jsonValue, cache.getTtl());
+        } catch (JsonProcessingException e) {
+            log.error("Failed to serialize object for cache. key: {}, value: {}", key, value, e);
+        }
     }
 
     @Override
