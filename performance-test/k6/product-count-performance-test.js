@@ -46,7 +46,7 @@ export default function () {
     };
     //3. 상품 목록 조회 (가격순으로 조회)
     const page2 = Math.floor(Math.random() * 100) + 1;
-    const resProducts2 = http.get(`${BASE_URL}/products/count?page=${page2}&size=30&brandId=${1}`, { headers });
+    const resProducts2 = http.get(`${BASE_URL}/products/count?page=${page2}&size=30`, { headers });
     check(resProducts2, {
         '[Products] Status is 200': (r) => r.status === 200,
     });

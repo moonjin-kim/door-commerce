@@ -1,12 +1,13 @@
-package com.loopers.support;
+package com.loopers.support.cache;
 
+import com.loopers.support.CacheRepository;
+import com.loopers.support.MyCache;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.time.Duration;
 import java.util.Optional;
 
 @Slf4j

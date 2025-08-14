@@ -8,6 +8,7 @@ import com.loopers.support.cache.CommerceCache;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -42,14 +44,18 @@ public class ProductService {
     }
 
     public Long searchCount(ProductCommand.SearchCount command) {
-        Optional<Long> cachedProduct = cacheRepository.get(CommerceCache.ProductSearchCache.INSTANCE, command.brandId().toString(), Long.class);
+        Optional<Long> cachedProduct = cacheRepository.get(CommerceCache.ProductSearchCache.INSTANCE, command.toString(), Long.class);
         if (cachedProduct.isPresent()) {
             return cachedProduct.get();
         }
 
         Long count = productRepository.searchCount(command.toParams());
 
-        cacheRepository.set(CommerceCache.ProductSearchCache.INSTANCE, command.toParams().toString(), count);
+        cacheRepository.set(
+                CommerceCache.ProductSearchCache.INSTANCE,
+                command.toParams().toString(),
+                count
+        );
 
         return count;
     }
