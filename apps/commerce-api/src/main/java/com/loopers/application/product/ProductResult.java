@@ -1,9 +1,7 @@
 package com.loopers.application.product;
 
 import com.loopers.domain.brand.Brand;
-import com.loopers.domain.brand.BrandInfo;
 import com.loopers.domain.product.Product;
-import com.loopers.domain.product.ProductInfo;
 import com.loopers.domain.product.ProductView;
 
 public class ProductResult {
@@ -40,7 +38,7 @@ public class ProductResult {
             Long likeCount,
             Boolean isLiked
     ) {
-        public static ProductDetail from(Product product, Brand brand, Boolean isLiked, Long likeCount) {
+        public static ProductDetail of(Product product, Brand brand, Boolean isLiked, Long likeCount) {
             return new ProductDetail(
                     product.getId(),
                     product.getBrandId(),

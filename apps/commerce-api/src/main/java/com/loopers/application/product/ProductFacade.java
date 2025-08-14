@@ -7,13 +7,18 @@ import com.loopers.domain.brand.BrandService;
 import com.loopers.domain.like.LikeCommand;
 import com.loopers.domain.like.LikeInfo;
 import com.loopers.domain.like.LikeService;
-import com.loopers.domain.product.*;
+import com.loopers.domain.product.Product;
+import com.loopers.domain.product.ProductCommand;
+import com.loopers.domain.product.ProductService;
+import com.loopers.domain.product.ProductView;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 @Transactional
@@ -38,7 +43,14 @@ public class ProductFacade {
 
         LikeInfo.GetLikeCount likeCount = likeService.getLikeCount(productId);
 
-        return ProductResult.ProductDetail.from(product, brand, likeInfo.isLiked(), likeCount.count());
+        ProductResult.ProductDetail productDetail = ProductResult.ProductDetail.of(
+                product,
+                brand,
+                likeInfo.isLiked(),
+                likeCount.count()
+        );
+
+        return productDetail;
     }
 
 
