@@ -7,21 +7,21 @@ import java.time.Duration;
 public class CommerceCache {
     public static final class ProductCache extends MyCache {
         private ProductCache() {
-            super("상품 정보", Duration.ofMinutes(10));
+            super("상품 정보", Duration.ofMinutes(10), "v1");
         }
         public static final ProductCache INSTANCE = new ProductCache();
     }
 
-    public static final class ProductSearchCache extends MyCache {
-        private ProductSearchCache() {
-            super("상품 검색 결과", Duration.ofMinutes(10));
+    public static final class ProductSearchCountCache extends MyCache {
+        private ProductSearchCountCache() {
+            super("상품 검색 결과", Duration.ofMinutes(10), "v1");
         }
-        public static final ProductSearchCache INSTANCE = new ProductSearchCache();
+        public static final ProductSearchCountCache INSTANCE = new ProductSearchCountCache();
     }
 
     public static final class BrandCache extends MyCache {
         private BrandCache() {
-            super("브랜드 조회", Duration.ofMinutes(30));
+            super("브랜드 조회", Duration.ofMinutes(10), "v1");
         }
         public static final BrandCache INSTANCE = new BrandCache();
     }

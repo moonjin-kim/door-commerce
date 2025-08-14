@@ -24,7 +24,6 @@ public class BrandService {
                 id.toString(),
                 Brand.class
         );
-        log.info("get brand from cache: {}", cachedBrand);
         if (cachedBrand.isPresent()) {
             return cachedBrand;
         }

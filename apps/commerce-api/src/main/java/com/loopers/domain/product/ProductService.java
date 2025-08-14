@@ -5,8 +5,6 @@ import com.loopers.domain.PageResponse;
 import com.loopers.infrastructure.product.ProductParams;
 import com.loopers.support.CacheRepository;
 import com.loopers.support.cache.CommerceCache;
-import com.loopers.support.error.CoreException;
-import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,7 +42,8 @@ public class ProductService {
     }
 
     public Long searchCount(ProductCommand.SearchCount command) {
-        Optional<Long> cachedProduct = cacheRepository.get(CommerceCache.ProductSearchCache.INSTANCE, command.toString(), Long.class);
+        // 조회 캐시 조회
+        Optional<Long> cachedProduct = cacheRepository.get(CommerceCache.ProductSearchCountCache.INSTANCE, command.toString(), Long.class);
         if (cachedProduct.isPresent()) {
             return cachedProduct.get();
         }
@@ -52,7 +51,7 @@ public class ProductService {
         Long count = productRepository.searchCount(command.toParams());
 
         cacheRepository.set(
-                CommerceCache.ProductSearchCache.INSTANCE,
+                CommerceCache.ProductSearchCountCache.INSTANCE,
                 command.toParams().toString(),
                 count
         );
