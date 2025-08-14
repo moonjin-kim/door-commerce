@@ -32,18 +32,11 @@ public class ProductQueryDslRepository{
                         product.imageUrl,
                         product.price.value, // Amount 객체의 값을 가져옴
                         product.status,
-                        like.id.count().coalesce(0L)
+                        product.likeCount
                 ))
                 .from(product)
-                .leftJoin(like).on(like.productId.eq(product.id))
                 .limit(param.limit())
                 .offset(param.offset())
-                .groupBy(
-                        product.id,
-                        product.name,
-                        product.brandId,
-                        product.description,
-                        product.imageUrl, product.price, product.status)
                 .where(
                         product.status.eq(ProductStatus.SALE),
                         eqBrandId(param.getParams().brandId())
@@ -81,7 +74,7 @@ public class ProductQueryDslRepository{
         }
 
         if(sort.equals(ProductParams.ProductSortOption.LIKE_DESC)) {
-            return new OrderSpecifier<>(Order.DESC, like.id.count());
+            return new OrderSpecifier<>(Order.DESC, product.likeCount);
 
         }
 //        if(sort.equals(ProductParams.ProductSortOption.LIKE_DESC)) {
