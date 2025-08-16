@@ -23,7 +23,11 @@ public class ProductService {
     private final CacheRepository cacheRepository;
 
     public Optional<Product> getBy(Long id) {
-        Optional<Product> cachedProduct = cacheRepository.get(CommerceCache.ProductCache.INSTANCE, id.toString(), Product.class);
+        Optional<Product> cachedProduct = cacheRepository.get(
+                CommerceCache.ProductCache.INSTANCE,
+                id.toString(),
+                Product.class
+        );
         if (cachedProduct.isPresent()) {
             return cachedProduct;
         }

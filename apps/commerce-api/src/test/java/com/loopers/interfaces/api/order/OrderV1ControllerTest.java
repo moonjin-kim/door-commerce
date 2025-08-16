@@ -24,6 +24,7 @@ import com.loopers.infrastructure.stock.StockJpaRepository;
 import com.loopers.infrastructure.user.UserJpaRepository;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.utils.DatabaseCleanUp;
+import com.loopers.utils.RedisCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -62,6 +63,8 @@ class OrderV1ControllerTest {
     private final TestRestTemplate testRestTemplate;
     @Autowired
     private final DatabaseCleanUp databaseCleanUp;
+    @Autowired
+    private RedisCleanUp redisCleanUp;
 
     @Autowired
     public OrderV1ControllerTest(
@@ -89,6 +92,7 @@ class OrderV1ControllerTest {
     @AfterEach
     void tearDown() {
         databaseCleanUp.truncateAllTables();
+        redisCleanUp.truncateAll();
     }
 
     @DisplayName("Post /api/v1/orders - 주문 생성")

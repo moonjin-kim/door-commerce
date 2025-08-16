@@ -11,7 +11,9 @@ import com.loopers.infrastructure.brand.BrandJpaRepository;
 import com.loopers.infrastructure.like.LikeJpaRepository;
 import com.loopers.infrastructure.product.ProductJpaRepository;
 import com.loopers.interfaces.api.ApiResponse;
+import com.loopers.support.cache.CommerceCache;
 import com.loopers.utils.DatabaseCleanUp;
+import com.loopers.utils.RedisCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -44,7 +46,9 @@ class ProductV1E2ETest {
     @Autowired
     private final DatabaseCleanUp databaseCleanUp;
     @Autowired
-    private RedisTemplate<String, Object> cacheRedisTemplate;
+    private RedisTemplate<String, String> cacheRedisTemplate;
+    @Autowired
+    private RedisCleanUp redisCleanUp;
 
     @Autowired
     public ProductV1E2ETest(ProductJpaRepository productJpaRepository,LikeJpaRepository likeJpaRepository, BrandJpaRepository brandJpaRepository, TestRestTemplate testRestTemplate, DatabaseCleanUp databaseCleanUp) {
@@ -58,6 +62,7 @@ class ProductV1E2ETest {
     @AfterEach
     void tearDown() {
         databaseCleanUp.truncateAllTables();
+        redisCleanUp.truncateAll();
     }
 
     @DisplayName("Get /api/v1/products/{productId}")
@@ -328,7 +333,7 @@ class ProductV1E2ETest {
                     () -> assertThat(response.getBody().data().description()).isEqualTo("루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다."),
                     () -> assertThat(response.getBody().data().imageUrl()).isEqualTo("https://loopers.com/product/t-shirt.png"),
                     () -> assertThat(response.getBody().data().price()).isEqualTo(20000L),
-                    () -> assertThat(cacheRedisTemplate.opsForValue().get("product::1")).isNotNull()
+                    () -> assertThat(cacheRedisTemplate.opsForValue().get(CommerceCache.ProductCache.INSTANCE.getKey("1"))).isNotNull()
             );
         }
 
