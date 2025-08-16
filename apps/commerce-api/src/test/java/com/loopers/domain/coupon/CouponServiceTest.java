@@ -66,7 +66,7 @@ class CouponServiceTest {
             // then
             assertAll(
                     () -> assertThat(result).isNotNull(),
-                    () -> assertThat(result).isEqualTo(coupon)
+                    () -> assertThat(result).isEqualTo(userCoupon)
             );
         }
 

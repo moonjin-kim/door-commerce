@@ -28,4 +28,12 @@ public class LikeResult {
             );
         }
     }
+
+    public record LikeProductCount(
+            Long totalCount
+    ) {
+        public static LikeProductCount of(Long totalCount) {
+            return new LikeProductCount(totalCount);
+        }
+    }
 }

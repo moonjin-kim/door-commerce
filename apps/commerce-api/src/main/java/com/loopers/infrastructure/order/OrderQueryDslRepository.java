@@ -25,15 +25,15 @@ public class OrderQueryDslRepository {
                 )
                 .fetch();
 
-        Long totalCount = jpaQueryFactory.select(order.count())
-                .from(order)
-                .where(
-                        order.userId.eq(param.getParams().userId())
-                )
-                .fetchOne();
+//        Long totalCount = jpaQueryFactory.select(order.count())
+//                .from(order)
+//                .where(
+//                        order.userId.eq(param.getParams().userId())
+//                )
+//                .fetchOne();
+//
+//        long count = totalCount != null ? totalCount : 0L;
 
-        long count = totalCount != null ? totalCount : 0L;
-
-        return PageResponse.of(param.getPage(),param.getSize(), count, items);
+        return PageResponse.of(param.getPage(),param.getSize(), items);
     }
 }

@@ -11,7 +11,12 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "product")
+@Table(name = "product"
+//        , indexes = {
+//        @Index(name = "idx_product_price", columnList = "price"),
+//        @Index(name = "idx_product_brand_id", columnList = "brandId")
+//}
+)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Product extends BaseEntity {
@@ -19,16 +24,23 @@ public class Product extends BaseEntity {
     private String name;
     @Column()
     private Long brandId;
-    @Column(unique = true)
+    @Column()
     private String description;
     @Column(unique = true)
     private String imageUrl;
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "value", column = @Column(name = "price"))
+    })
     private Money price;
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
+    private Long likeCount;
 
-    protected Product(String name, Long brandId, String description, String imageUrl, Long price, ProductStatus status) {
+    protected Product(
+            String name,
+            Long brandId,
+            String description, String imageUrl, Long price, ProductStatus status) {
         ProductValidator.validateName(name);
         ProductValidator.validateBrandId(brandId);
         ProductValidator.validateDescription(description);
@@ -39,7 +51,7 @@ public class Product extends BaseEntity {
         this.description = description;
         this.imageUrl = imageUrl;
         this.price = new Money(new BigDecimal(price));
-
+        this.likeCount = 0L;
         this.status = status;
     }
 
@@ -52,6 +64,16 @@ public class Product extends BaseEntity {
                 command.price(),
                 ProductStatus.SALE
         );
+    }
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        if (this.likeCount > 0) {
+            this.likeCount--;
+        }
     }
 
 }

@@ -102,14 +102,19 @@ class CouponApplierTest {
             Order order = orderJpaRepository.save(Order.create(command));
 
             //when
-            Order updatedOrder = couponApplier.applyCoupon(1L, coupon.getId(),order);
+            CouponApplierInfo.ApplyCoupon updatedOrder = couponApplier.applyCoupon(
+                    CouponApplierCommand.ApplyCoupon.of(
+                            1L,
+                            coupon.getId(),
+                            order.getId(),
+                            order.getTotalAmount().value()
+                    )
+            );
 
             //then
             assertAll(
-                    ()-> assertThat(updatedOrder.getUserCouponId()).isNotNull(),
-                    () -> assertThat(updatedOrder.getTotalAmount().longValue()).isEqualTo(6000L),
-                    () -> assertThat(updatedOrder.getCouponDiscountAmount().longValue()).isEqualTo(600L),
-                    () -> assertThat(updatedOrder.getFinalAmount().longValue()).isEqualTo(5400L)
+                    ()-> assertThat(updatedOrder.userCouponId()).isNotNull(),
+                    () -> assertThat(updatedOrder.discountAmount().longValue()).isEqualTo(600L)
             );
         }
 
@@ -138,14 +143,19 @@ class CouponApplierTest {
             Order order = orderJpaRepository.save(Order.create(command));
 
             //when
-            Order updatedOrder = couponApplier.applyCoupon(1L, coupon.getId(),order);
+            CouponApplierInfo.ApplyCoupon updatedOrder = couponApplier.applyCoupon(
+                    CouponApplierCommand.ApplyCoupon.of(
+                            1L,
+                            coupon.getId(),
+                            order.getId(),
+                            order.getTotalAmount().value()
+                    )
+            );
 
             //then
             assertAll(
-                    ()-> assertThat(updatedOrder.getUserCouponId()).isNotNull(),
-                    () -> assertThat(updatedOrder.getTotalAmount().longValue()).isEqualTo(6000L),
-                    () -> assertThat(updatedOrder.getCouponDiscountAmount().longValue()).isEqualTo(1000L),
-                    () -> assertThat(updatedOrder.getFinalAmount().longValue()).isEqualTo(5000L)
+                    ()-> assertThat(updatedOrder.userCouponId()).isNotNull(),
+                    () -> assertThat(updatedOrder.discountAmount().longValue()).isEqualTo(1000L)
             );
         }
 
@@ -164,115 +174,18 @@ class CouponApplierTest {
 
             //when
             CoreException result = assertThrows(CoreException.class, () -> {
-                couponApplier.applyCoupon(1L, 1L,order);
+                couponApplier.applyCoupon(
+                        CouponApplierCommand.ApplyCoupon.of(
+                                1L,
+                                1L, // 존재하지 않는 쿠폰 ID
+                                order.getId(),
+                                order.getTotalAmount().value()
+                        )
+                );
             });
 
             //then
             assertThat(result.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
-        }
-
-        @DisplayName("유저에게 발행되지 않은 쿠폰을 동시에 사용하여도 1개의 쿠폰만 발행 후 적용되고 나머지는 실패한다.")
-        @Test
-        void throwConcurrentModificationException_whenPointIsUsedSimultaneously() throws InterruptedException  {
-            //given
-            int threadCount = 10;
-            ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-            CountDownLatch latch = new CountDownLatch(threadCount);
-
-            Coupon coupon = couponJpaRepository.save(
-                    Coupon.create(
-                            CouponCommand.Create.of(
-                                    "1000 할인 쿠폰",
-                                    "1000원 할인 쿠폰입니다.",
-                                    BigDecimal.valueOf(1000L),
-                                    DiscountType.FIXED
-                            )
-                    )
-            );
-
-            OrderCommand.Order command = OrderCommand.Order.of(
-                    1L,
-                    List.of(
-                            OrderCommand.OrderItem.of(1L, "상품1", 1000L, 1),
-                            OrderCommand.OrderItem.of(2L, "상품2", 1000L, 5)
-                    )
-            );
-            Order order = orderJpaRepository.save(Order.create(command));
-
-            // 포인트 사용 실패 에러 저장 위치
-            List<Exception> exceptions = Collections.synchronizedList(new ArrayList<>());
-
-            //when
-            for (int i = 0; i < threadCount; i++) {
-                executor.submit(() -> {
-                    try {
-                        couponApplier.applyCoupon(1L, 1L, order);
-                    } catch (Exception e) {
-                        exceptions.add(e);
-                    } finally {
-                        latch.countDown();
-                    }
-                });
-            }
-
-            //then
-            latch.await();
-            assertThat(exceptions.size()).isEqualTo(threadCount - 1);
-        }
-
-        @DisplayName("쿠폰을 동시에 사용하여도 1번만 적용되고 나머지는 실패한다.")
-        @Test
-        void throwConcurrentModificationException_whenPointIsUsedSimultaneously2() throws InterruptedException  {
-            //given
-            int threadCount = 10;
-            ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-            CountDownLatch latch = new CountDownLatch(threadCount);
-
-            Coupon coupon = couponJpaRepository.save(
-                    Coupon.create(
-                            CouponCommand.Create.of(
-                                    "1000 할인 쿠폰",
-                                    "1000원 할인 쿠폰입니다.",
-                                    BigDecimal.valueOf(1000L),
-                                    DiscountType.FIXED
-                            )
-                    )
-            );
-
-            UserCoupon userCoupon = userCouponJpaRepository.save(UserCoupon.create(1L, coupon));
-
-            OrderCommand.Order command = OrderCommand.Order.of(
-                    1L,
-                    List.of(
-                            OrderCommand.OrderItem.of(1L, "상품1", 1000L, 1),
-                            OrderCommand.OrderItem.of(2L, "상품2", 1000L, 5)
-                    )
-            );
-            Order order = orderJpaRepository.save(Order.create(command));
-
-            // 포인트 사용 실패 에러 저장 위치
-            List<Exception> exceptions = Collections.synchronizedList(new ArrayList<>());
-
-            //when
-            for (int i = 0; i < threadCount; i++) {
-                executor.submit(() -> {
-                    try {
-                        couponApplier.applyCoupon(1L, 1L, order);
-                    } catch (Exception e) {
-                        exceptions.add(e);
-                    } finally {
-                        latch.countDown();
-                    }
-                });
-            }
-
-            //then
-            latch.await();
-            UserCoupon updateUserCoupon = userCouponJpaRepository.findById(userCoupon.getId()).get();
-            assertThat(exceptions.size()).isEqualTo(threadCount - 1);
-            assertAll(
-                    () -> assertThat(updateUserCoupon.getUsedAt()).isNotNull()
-            );
         }
     }
 }

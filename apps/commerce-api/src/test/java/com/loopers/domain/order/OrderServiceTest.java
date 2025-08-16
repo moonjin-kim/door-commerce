@@ -6,6 +6,7 @@ import com.loopers.infrastructure.order.OrderJpaRepository;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -30,10 +31,10 @@ class OrderServiceTest {
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
 
-//    @AfterEach
-//    void tearDown() {
-//        databaseCleanUp.truncateAllTables();
-//    }
+    @AfterEach
+    void tearDown() {
+        databaseCleanUp.truncateAllTables();
+    }
 
     @DisplayName("주문을 생성할 때")
     @Nested

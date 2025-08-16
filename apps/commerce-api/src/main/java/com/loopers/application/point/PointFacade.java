@@ -1,5 +1,6 @@
 package com.loopers.application.point;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointService;
 import com.loopers.domain.user.User;

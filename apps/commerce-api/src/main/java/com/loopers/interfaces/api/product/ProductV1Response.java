@@ -47,4 +47,14 @@ public class ProductV1Response {
         }
     }
 
+    public record ProductSearchCount(
+            Long totalCount
+    ) {
+        public static ProductSearchCount from(ProductResult.SearchCount searchCount) {
+            return new ProductSearchCount(
+                    searchCount.totalCount()
+            );
+        }
+    }
+
 }

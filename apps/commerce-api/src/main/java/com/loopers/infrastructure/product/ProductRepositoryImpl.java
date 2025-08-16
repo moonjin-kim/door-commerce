@@ -36,4 +36,9 @@ public class ProductRepositoryImpl implements ProductRepository {
     public PageResponse<ProductView> search(PageRequest<ProductParams.Search> productSearch) {
         return productQueryDslRepository.search(productSearch);
     }
+
+    @Override
+    public Long searchCount(ProductParams.SearchCount productSearch) {
+        return productQueryDslRepository.searchCount(productSearch);
+    }
 }

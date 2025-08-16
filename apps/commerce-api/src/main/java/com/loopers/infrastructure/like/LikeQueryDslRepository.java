@@ -32,7 +32,7 @@ public class LikeQueryDslRepository implements LikeCustomRepository {
         long count = totalCount != null ? totalCount : 0L;
 
 
-        return PageResponse.of(searchParams.getPage(), searchParams.getSize(), count, items);
+        return PageResponse.of(searchParams.getPage(), searchParams.getSize(), items);
 
     }
 }

@@ -28,11 +28,11 @@ public class ProductValidator {
 
     static void validateImageUrl(String imageUrl) {
         if(imageUrl == null || imageUrl.isBlank()) {
-            throw new CoreException(ErrorType.BAD_REQUEST, "로고 이미지는 비어있을 수 없습니다..");
+            throw new CoreException(ErrorType.BAD_REQUEST, "아이템 이미지는 비어있을 수 없습니다..");
         }
 
         if(!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
-            throw new CoreException(ErrorType.BAD_REQUEST, "로고 이미지 url 형식이 잘못되었습니다.");
+            throw new CoreException(ErrorType.BAD_REQUEST, "아이템 이미지 url 형식이 잘못되었습니다.");
         }
     }
 }

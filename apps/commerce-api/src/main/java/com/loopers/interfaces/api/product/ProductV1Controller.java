@@ -41,6 +41,21 @@ public class ProductV1Controller implements ProductV1ApiSpec{
         );
     }
 
+    @GetMapping("/count")
+    @Override
+    public ApiResponse<ProductV1Response.ProductSearchCount> getListCount(
+            @ModelAttribute ProductV1Request.SearchCount searchDto
+    ) {
+
+        ProductResult.SearchCount searchCount = productFacade.searchCount(
+                searchDto.toCriteria()
+        );
+
+        return ApiResponse.success(
+                ProductV1Response.ProductSearchCount.from(searchCount)
+        );
+    }
+
     @GetMapping("/{productId}")
     @Override
     public ApiResponse<ProductV1Response.ProductDetail> getBy(

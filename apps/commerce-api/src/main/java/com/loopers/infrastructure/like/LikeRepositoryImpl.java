@@ -30,6 +30,11 @@ public class LikeRepositoryImpl implements LikeRepository {
     }
 
     @Override
+    public Long countByUserId(Long userId) {
+        return likeJpaRepository.countByUserId(userId);
+    }
+
+    @Override
     public boolean existsBy(Long userId, Long productId) {
         return likeJpaRepository.existsByUserIdAndProductId(userId, productId);
     }

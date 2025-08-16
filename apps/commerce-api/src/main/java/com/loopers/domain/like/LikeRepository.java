@@ -15,5 +15,7 @@ public interface LikeRepository {
 
     Long countBy(Long productId);
 
+    Long countByUserId(Long userId);
+
     void delete(Long userId, Long productId);
 }

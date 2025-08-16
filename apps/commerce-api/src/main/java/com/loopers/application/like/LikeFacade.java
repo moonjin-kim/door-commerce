@@ -28,21 +28,26 @@ public class LikeFacade {
     private final LikeService likeService;
     private final ProductService productService;
 
+    @Transactional
     public String like(LikeCriteria.Like like) {
-        productService.getBy(like.productId()).orElseThrow(() -> {
-            throw new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 상품입니다.");
-        });
+        Product product = productService.getBy(like.productId()).orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 상품입니다."));
 
-        likeService.like(like.toCommand());
+        LikeInfo.LikeResult likeResult = likeService.like(like.toCommand());
+        if (likeResult.isSuccess()) {
+            product.increaseLikeCount();
+        }
         return "좋아요에 성공했습니다";
     }
 
-    public String unLike(LikeCriteria.UnLike like) {
-        productService.getBy(like.productId()).orElseThrow(() -> {
-            throw new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 상품입니다.");
-        });
 
-        likeService.unlike(like.toCommand());
+    @Transactional
+    public String unLike(LikeCriteria.UnLike like) {
+        Product product = productService.getBy(like.productId()).orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 상품입니다."));
+
+        LikeInfo.UnLikeResult unLikeResult = likeService.unlike(like.toCommand());
+        if (unLikeResult.isSuccess()) {
+            product.increaseLikeCount();
+        }
         return "좋아요에 성공했습니다";
     }
 
@@ -51,7 +56,7 @@ public class LikeFacade {
 
         List<LikeResult.LikeProduct> likeProducts = searchResult.getItems().stream()
                 .map(like -> {
-                    Product product = productService.findBy(like.productId())
+                    Product product = productService.getBy(like.productId())
                             .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 상품입니다."));
                     return LikeResult.LikeProduct.of(product);
                 })
@@ -60,9 +65,13 @@ public class LikeFacade {
         return PageResponse.of(
                 searchResult.getPage(),
                 searchResult.getSize(),
-                searchResult.getTotalCount(),
                 likeProducts
         );
-//
+    }
+
+    public LikeResult.LikeProductCount searchCount(LikeCriteria.SearchCount query) {
+        Long searchResult = likeService.getUserLikeCount(query.toQuery());
+
+        return LikeResult.LikeProductCount.of(searchResult);
     }
 }

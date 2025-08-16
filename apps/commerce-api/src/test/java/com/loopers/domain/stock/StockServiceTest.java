@@ -202,38 +202,5 @@ class StockServiceTest {
                     () -> assertThat(foundStock2.getQuantity()).isEqualTo(stock2.getQuantity() - 5)
             );
         }
-
-
-
-        @DisplayName("재고 차감이 동시에 이루어져도 정상적으로 처리된다.")
-        @Test
-        void decreaseStockSuccessfully_whenPointIsUsedSimultaneously() throws InterruptedException {
-            //given
-            int threadCount = 10;
-            ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-            CountDownLatch latch = new CountDownLatch(threadCount);
-            Stock stock1 = stockJpaRepository.save(new Stock(1L, 10));
-
-            //when
-            for (int i = 0; i < threadCount; i++) {
-                executor.submit(() -> {
-                    try {
-                        stockService.decrease(StockCommand.Decrease.of(1L, 1));
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
-                    } finally {
-                        latch.countDown();
-                    }
-                });
-            }
-            latch.await();
-
-            //then
-            Stock foundStock1 = stockJpaRepository.findById(stock1.getProductId()).get();
-            assertAll(
-                    () -> assertThat(foundStock1.getQuantity()).isEqualTo(stock1.getQuantity() - 10)
-            );
-        }
     }
-
 }

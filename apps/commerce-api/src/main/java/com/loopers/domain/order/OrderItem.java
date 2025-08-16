@@ -1,5 +1,6 @@
 package com.loopers.domain.order;
 
+import com.loopers.domain.BaseEntity;
 import com.loopers.domain.Money;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
@@ -10,10 +11,14 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-@Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class OrderItem {
+@Entity
+@Table(name = "order_item")
+public class OrderItem extends BaseEntity {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ref_order_id")
+    private Order order;
     @Column()
     private Long productId;
     @Column()
@@ -25,7 +30,7 @@ public class OrderItem {
     @Column()
     private int quantity;
 
-    private OrderItem(Long productId, String name, Long productPrice, int quantity) {
+    protected OrderItem(Long productId, String name, Long productPrice, int quantity) {
         if (productId == null) {
             throw new CoreException(ErrorType.INVALID_INPUT, "상품 ID는 null일 수 없습니다.");
         }
@@ -50,5 +55,11 @@ public class OrderItem {
 
     public BigDecimal getTotalAmount() {
         return productPrice.multiply(quantity).value();
+    }
+
+    void initOrder(final Order order) {
+        if (this.order == null) {
+            this.order = order;
+        }
     }
 }

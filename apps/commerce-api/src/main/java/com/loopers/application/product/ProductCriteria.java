@@ -25,6 +25,24 @@ public class ProductCriteria {
         }
     }
 
+    public record SearchCount(
+            Long brandId
+    ) {
+        public static SearchCount of(
+                Long brandId
+        ) {
+            return new SearchCount(
+                    brandId
+            );
+        }
+
+        public ProductCommand.SearchCount toCommand() {
+            return ProductCommand.SearchCount.of(
+                    brandId
+            );
+        }
+    }
+
     public enum ProductSortOption {
         PRICE_ASC("price_asc"),
         LATEST("latest"),
