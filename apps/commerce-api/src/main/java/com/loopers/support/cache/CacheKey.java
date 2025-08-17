@@ -1,4 +1,4 @@
-package com.loopers.support;
+package com.loopers.support.cache;
 
 import java.time.Duration;
 
@@ -6,12 +6,12 @@ import java.time.Duration;
  * 모든 캐시 정의의 기본이 되는 추상 클래스입니다.
  * 상속받는 클래스는 캐시의 속성을 정의합니다.
  */
-public abstract class MyCache {
+public abstract class CacheKey {
     private final String description;
     private final Duration ttl;
     private final String version;
 
-    protected MyCache(String description, Duration ttl, String version) {
+    protected CacheKey(String description, Duration ttl, String version) {
         this.description = description;
         this.ttl = ttl;
         this.version = version;
