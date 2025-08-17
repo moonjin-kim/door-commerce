@@ -1,5 +1,7 @@
 package com.loopers.application.order;
 
+import com.loopers.application.payment.PaymentMethodType;
+import com.loopers.application.payment.pg.CardType;
 import com.loopers.domain.order.OrderCommand;
 
 import java.util.List;
@@ -8,10 +10,20 @@ public class OrderCriteria {
     public record Order(
             Long userId,
             List<OrderItem> items,
-            Long couponId
+            Long couponId,
+            PaymentMethodType paymentMethodType,
+            CardType cardType,
+            String cardNumber
     ) {
-        public static OrderCriteria.Order of(Long userId, List<OrderCriteria.OrderItem> items, Long couponId) {
-            return new OrderCriteria.Order(userId, items, couponId);
+        public static OrderCriteria.Order of(
+                Long userId,
+                List<OrderCriteria.OrderItem> items,
+                Long couponId,
+                PaymentMethodType paymentMethodType,
+                CardType cardType,
+                String cardNumber
+        ) {
+            return new OrderCriteria.Order(userId, items, couponId, paymentMethodType, cardType, cardNumber);
         }
     }
 
@@ -30,5 +42,10 @@ public class OrderCriteria {
         public OrderCommand.GetOrdersBy toCommand() {
             return OrderCommand.GetOrdersBy.of(userId);
         }
+    }
+
+    public enum PaymentMethod {
+        POINT,
+        CARD
     }
 }

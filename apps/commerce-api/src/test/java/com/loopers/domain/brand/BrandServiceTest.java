@@ -1,7 +1,7 @@
 package com.loopers.domain.brand;
 
 import com.loopers.infrastructure.brand.BrandJpaRepository;
-import com.loopers.support.CacheRepository;
+import com.loopers.support.cache.CacheRepository;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;

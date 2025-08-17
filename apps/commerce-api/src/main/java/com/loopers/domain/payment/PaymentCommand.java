@@ -7,11 +7,16 @@ public class PaymentCommand {
             Long orderId,
             Long userId,
             Long amount,
-            String method
+            String method,
+            CardType cardType,
+            String cardNumber
     ) {
+        static public Pay of(Long orderId, Long userId, Long amount, String method, String cardType, String cardNumber) {
+            return new Pay(orderId, userId, amount, method, CardType.valueOf(cardType),cardNumber);
+        }
+
         static public Pay of(Long orderId, Long userId, Long amount, String method) {
-            return new Pay(orderId, userId, amount, method);
+            return new Pay(orderId, userId, amount, method, null,null);
         }
     }
-
 }

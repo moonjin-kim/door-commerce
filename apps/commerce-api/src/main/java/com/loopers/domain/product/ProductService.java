@@ -3,7 +3,7 @@ package com.loopers.domain.product;
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
 import com.loopers.infrastructure.product.ProductParams;
-import com.loopers.support.CacheRepository;
+import com.loopers.support.cache.CacheRepository;
 import com.loopers.support.cache.CommerceCache;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

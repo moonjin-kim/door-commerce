@@ -1,28 +1,28 @@
 package com.loopers.application.payment;
 
+import com.loopers.application.payment.pg.PgCommand;
+import com.loopers.application.payment.pg.PgProcess;
 import com.loopers.domain.payment.PaymentCommand;
 import com.loopers.domain.payment.PaymentInfo;
 import com.loopers.domain.payment.PaymentService;
-import com.loopers.domain.point.Point;
-import com.loopers.domain.point.PointCommand;
-import com.loopers.domain.point.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-@Component("POINT")
+@Component("CARD")
 @RequiredArgsConstructor
-public class PointPaymentAdapter implements PaymentMethod {
-    private final PointService pointService;
+public class CardPaymentAdapter implements PaymentMethod {
+    private final PgProcess pgProcess;
     private final PaymentService paymentService;
+    private final String callbackUrl = "http://localhost:8080/payment/callback";
 
     @Override
     public PaymentInfo.Pay pay(PaymentCommand.Pay command) {
-        PointCommand.Using pointUsingCommand = PointCommand.Using.of(
-                command.userId(),
-                command.orderId(),
-                command.amount()
+        pgProcess.payment(
+                PgCommand.Pay.from(
+                        command,
+                        callbackUrl
+                )
         );
-        Point point = pointService.using(pointUsingCommand);
 
         return paymentService.pay(command);
     }
