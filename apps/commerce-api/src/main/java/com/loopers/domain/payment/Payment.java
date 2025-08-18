@@ -2,6 +2,7 @@ package com.loopers.domain.payment;
 
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.Money;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -16,15 +17,21 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Payment extends BaseEntity {
-    private Long orderId;
+    @Column(nullable = false)
+    private String orderId;
+    @Column(nullable = false)
     private Long userId;
+    @Column(nullable = false)
     private Money paymentAmount;
+    @Column(nullable = false)
     private PaymentStatus status;
+    @Column(nullable = false)
     private PaymentType paymentType;
+    @Column(nullable = false)
     private LocalDateTime paymentDate;
 
     protected Payment(
-            Long orderId,
+            String orderId,
             Long userId,
             Long paymentAmount,
             PaymentStatus status,
@@ -56,9 +63,16 @@ public class Payment extends BaseEntity {
                 command.orderId(),
                 command.userId(),
                 command.amount(),
-                PaymentStatus.COMPLETED,
+                PaymentStatus.PENDING,
                 PaymentType.of(command.method()),
                 LocalDateTime.now()
         );
+    }
+
+    public void complete() {
+        if (this.status != PaymentStatus.PENDING) {
+            throw new IllegalStateException("결제 상태가 PENDING이 아닙니다.");
+        }
+        this.status = PaymentStatus.COMPLETED;
     }
 }

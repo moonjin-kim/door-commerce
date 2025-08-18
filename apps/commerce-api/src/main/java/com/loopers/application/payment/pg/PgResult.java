@@ -1,14 +1,14 @@
 package com.loopers.application.payment.pg;
 
 public class PgResult {
-    record Pay(
+    public record Pay(
             String transactionKey,
             String status
     ) {
 
     }
 
-    record Find(){
+    public record Find(){
 
     }
 }

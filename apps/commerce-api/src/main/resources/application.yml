@@ -29,6 +29,10 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
+pg:
+  api:
+    url: localhost:8082
+
 ---
 spring:
   config:

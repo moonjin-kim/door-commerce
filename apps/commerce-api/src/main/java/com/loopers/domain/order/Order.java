@@ -1,5 +1,6 @@
 package com.loopers.domain.order;
 
+import com.github.f4b6a3.uuid.UuidCreator;
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.Money;
 import com.loopers.domain.coupon.policy.DiscountPolicy;
@@ -20,6 +21,8 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order extends BaseEntity {
+    @Column(unique = true, nullable = false, length = 36)
+    private String orderId;
     @Column(nullable = false)
     private Long userId;
     @AttributeOverrides({
@@ -57,7 +60,7 @@ public class Order extends BaseEntity {
         this.couponDiscountAmount = new Money(BigDecimal.ZERO);
         this.finalAmount = this.totalAmount;
         this.orderDate = LocalDateTime.now();
-
+        this.orderId = generateOrderCode();
     }
 
     public static Order create(OrderCommand.Order command) {
@@ -102,6 +105,10 @@ public class Order extends BaseEntity {
     public void addOrderItem(final OrderItem item) {
         orderItems.add(item);
         item.initOrder(this);
+    }
+
+    private String generateOrderCode() {
+        return UuidCreator.getTimeOrdered().toString();
     }
 
 //    public void applyCoupon(Long userCouponId, DiscountPolicy discountPolicy) {

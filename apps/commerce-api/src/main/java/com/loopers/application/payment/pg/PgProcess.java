@@ -7,7 +7,7 @@ public interface PgProcess {
      * @param command 결제 요청 정보
      * @return 결제 결과
      */
-    PgResult.Pay payment(PgCommand.Pay command);
+    PgResult.Pay payment(PgCommand.Pay command, Long userId);
 
     /**
      * 결제 취소를 처리합니다.

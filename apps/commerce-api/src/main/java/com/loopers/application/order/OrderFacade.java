@@ -54,6 +54,7 @@ public class OrderFacade {
                     Product product = productService.getBy(item.productId()).orElseThrow(
                             () -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 상품 : " + item.productId()
                     ));
+                    System.out.println("상품 정보: " + product.getBrandId() + ", 가격: " + product.getPrice().value());
                     return OrderCommand.OrderItem.from(
                             product,
                             item.quantity()
@@ -81,10 +82,12 @@ public class OrderFacade {
         // 결제
         paymentProcess.processPayment(
             PaymentCommand.Pay.of(
-                order.getId(),
+                order.getOrderId(),
                 order.getUserId(),
                 order.getTotalAmount().longValue(),
-                "pointPayment"
+                criteria.paymentMethodType().name(),
+                criteria.cardType(),
+                criteria.cardNumber()
             )
         );
 

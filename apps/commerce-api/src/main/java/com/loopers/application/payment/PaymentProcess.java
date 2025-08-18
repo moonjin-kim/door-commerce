@@ -17,6 +17,7 @@ public class PaymentProcess {
     private final Map<String, PaymentMethod> paymentStrategyMap;
 
     public PaymentInfo.Pay processPayment(PaymentCommand.Pay command) {
+
         PaymentMethod paymentMethod = paymentStrategyMap.get(command.method());
         if (paymentMethod == null) {
             throw new CoreException(ErrorType.UNSUPPORTED_PAYMENT_METHOD);

@@ -24,6 +24,7 @@ public class PointPaymentAdapter implements PaymentMethod {
         );
         Point point = pointService.using(pointUsingCommand);
 
-        return paymentService.pay(command);
+        paymentService.pay(command);
+        return paymentService.paymentComplete(command);
     }
 }

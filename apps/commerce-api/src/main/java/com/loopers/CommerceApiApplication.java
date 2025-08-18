@@ -9,8 +9,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import java.util.TimeZone;
 
 @ConfigurationPropertiesScan
-@SpringBootApplication
 @EnableFeignClients
+@SpringBootApplication
 public class CommerceApiApplication {
 
     @PostConstruct

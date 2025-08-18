@@ -1,7 +1,7 @@
 package com.loopers.infrastructure.payment;
 
 import com.loopers.domain.payment.Payment;
-import com.loopers.domain.payment.PaymentRepository;
+import com.loopers.domain.payment.CommercePaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class PaymentRepositoryImpl implements PaymentRepository {
+public class PaymentRepositoryImpl implements CommercePaymentRepository {
     private final PaymentJpaRepository paymentJpaRepository;
     @Override
     public Payment save(Payment payment) {

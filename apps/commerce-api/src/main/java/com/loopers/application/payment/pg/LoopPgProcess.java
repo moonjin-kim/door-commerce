@@ -9,8 +9,8 @@ public class LoopPgProcess implements PgProcess {
     private final PgFeignClient pgFeignClient;
 
     @Override
-    public PgResult.Pay payment(PgCommand.Pay request) {
-        return pgFeignClient.payment(request);
+    public PgResult.Pay payment(PgCommand.Pay request, Long userId) {
+        return pgFeignClient.payment(request, userId).getData();
     }
 
     @Override

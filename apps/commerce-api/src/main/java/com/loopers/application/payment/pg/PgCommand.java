@@ -6,7 +6,7 @@ public class PgCommand {
     public record Pay(
             String orderId,
             CardType cardType,
-            String cardNumber,
+            String cardNo,
             Long amount,
             String callbackUrl
     ) {
