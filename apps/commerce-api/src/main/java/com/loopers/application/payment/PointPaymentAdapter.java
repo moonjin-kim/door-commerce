@@ -16,15 +16,20 @@ public class PointPaymentAdapter implements PaymentMethod {
     private final PaymentService paymentService;
 
     @Override
-    public PaymentInfo.Pay pay(PaymentCommand.Pay command) {
+    public PaymentInfo.Pay pay(PaymentCriteria.Pay criteria) {
         PointCommand.Using pointUsingCommand = PointCommand.Using.of(
-                command.userId(),
-                command.orderId(),
-                command.amount()
+                criteria.userId(),
+                criteria.orderId(),
+                criteria.amount()
         );
         Point point = pointService.using(pointUsingCommand);
 
-        paymentService.pay(command);
-        return paymentService.paymentComplete(command);
+        paymentService.pay(PaymentCommand.Pay.of(
+                criteria.orderId(),
+                criteria.userId(),
+                criteria.amount(),
+                PaymentMethodType.POINT.name()
+        ));
+        return paymentService.paymentComplete(criteria.orderId());
     }
 }

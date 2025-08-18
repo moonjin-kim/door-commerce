@@ -23,6 +23,8 @@ public class Payment extends BaseEntity {
     private Long userId;
     @Column(nullable = false)
     private Money paymentAmount;
+    @Column(nullable = true)
+    private String transactionKey;
     @Column(nullable = false)
     private PaymentStatus status;
     @Column(nullable = false)
@@ -36,6 +38,7 @@ public class Payment extends BaseEntity {
             Long paymentAmount,
             PaymentStatus status,
             PaymentType paymentType,
+            String transactionKey,
             LocalDateTime paymentDate
     ) {
         if(orderId == null) {
@@ -54,6 +57,7 @@ public class Payment extends BaseEntity {
         this.status = status;
         this.paymentType = paymentType;
         this.paymentDate = paymentDate;
+        this.transactionKey = transactionKey;
     }
 
     public static Payment create(
@@ -65,6 +69,7 @@ public class Payment extends BaseEntity {
                 command.amount(),
                 PaymentStatus.PENDING,
                 PaymentType.of(command.method()),
+                command.transactionKey(),
                 LocalDateTime.now()
         );
     }

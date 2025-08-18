@@ -21,8 +21,8 @@ public class PaymentService {
         );
     }
 
-    public PaymentInfo.Pay paymentComplete(PaymentCommand.Pay command) {
-        Payment payment = paymentRepository.findByOrderId(command.orderId())
+    public PaymentInfo.Pay paymentComplete(String orderId) {
+        Payment payment = paymentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("결제 내역 없음"));
         payment.complete();
         return PaymentInfo.Pay.from(paymentRepository.save(payment));

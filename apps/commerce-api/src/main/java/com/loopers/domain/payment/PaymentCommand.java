@@ -7,14 +7,23 @@ public class PaymentCommand {
             Long amount,
             String method,
             com.loopers.application.payment.pg.CardType cardType,
-            String cardNumber
+            String cardNumber,
+            String transactionKey
     ) {
-        static public Pay of(String orderId, Long userId, Long amount, String method, com.loopers.application.payment.pg.CardType cardType, String cardNumber) {
-            return new Pay(orderId, userId, amount, method, cardType, cardNumber);
+        static public Pay of(String orderId, Long userId, Long amount, String method) {
+            return new Pay(orderId, userId, amount, method, null,null, null);
         }
 
-        static public Pay of(String orderId, Long userId, Long amount, String method) {
-            return new Pay(orderId, userId, amount, method, null,null);
+        static public Pay of(
+                String orderId,
+                Long userId,
+                Long amount,
+                String method,
+                com.loopers.application.payment.pg.CardType cardType,
+                String cardNumber,
+                String transactionKey
+        ) {
+            return new Pay(orderId, userId, amount, method, cardType, cardNumber, transactionKey);
         }
     }
 }

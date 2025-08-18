@@ -16,17 +16,25 @@ public class CardPaymentAdapter implements PaymentMethod {
     private final PaymentService paymentService;
 
     @Override
-    public PaymentInfo.Pay pay(PaymentCommand.Pay command) {
+    public PaymentInfo.Pay pay(PaymentCriteria.Pay criteria) {
         String callbackUrl = "http://localhost:8080/payment/callback";
+
         PgResult.Pay pgResult = pgProcess.payment(
                 PgCommand.Pay.from(
-                        command,
+                        criteria,
                         callbackUrl
                 ),
-                command.userId()
+                criteria.userId()
         );
-        System.out.println(pgResult);
 
-        return paymentService.pay(command);
+        return paymentService.pay(PaymentCommand.Pay.of(
+                criteria.orderId(),
+                criteria.userId(),
+                criteria.amount(),
+                criteria.method(),
+                criteria.cardType(),
+                criteria.cardNumber(),
+                pgResult.transactionKey()
+        ));
     }
 }

@@ -4,5 +4,5 @@ import com.loopers.domain.payment.PaymentCommand;
 import com.loopers.domain.payment.PaymentInfo;
 
 public interface PaymentMethod {
-    PaymentInfo.Pay pay(PaymentCommand.Pay command);
+    PaymentInfo.Pay pay(PaymentCriteria.Pay command);
 }

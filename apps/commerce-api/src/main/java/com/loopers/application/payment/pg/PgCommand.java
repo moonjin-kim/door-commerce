@@ -1,5 +1,6 @@
 package com.loopers.application.payment.pg;
 
+import com.loopers.application.payment.PaymentCriteria;
 import com.loopers.domain.payment.PaymentCommand;
 
 public class PgCommand {
@@ -27,7 +28,7 @@ public class PgCommand {
             );
         }
 
-        public static Pay from(PaymentCommand.Pay command, String callbackUrl) {
+        public static Pay from(PaymentCriteria.Pay command, String callbackUrl) {
             return new Pay(
                     String.valueOf(command.orderId()),
                     CardType.valueOf(command.cardType().name()),
