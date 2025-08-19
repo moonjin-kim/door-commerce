@@ -46,7 +46,7 @@ public class StockConcurrencyServiceTest {
             for (int i = 0; i < threadCount; i++) {
                 executor.submit(() -> {
                     try {
-                        stockService.decrease(StockCommand.Decrease.of(1L, 1));
+                        stockService.decrease(StockCommand.Increase.of(1L, 1));
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
                     } finally {

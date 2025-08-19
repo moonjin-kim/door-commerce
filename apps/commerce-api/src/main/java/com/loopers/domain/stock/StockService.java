@@ -1,11 +1,9 @@
 package com.loopers.domain.stock;
 
-import com.loopers.domain.product.ProductInfo;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -28,9 +26,20 @@ public class StockService {
     }
 
     @Transactional
-    public void decreaseAll(List<StockCommand.Decrease> command) {
+    public void increase(StockCommand.Increase command) {
+        Stock stock = stockRepository.findByIdWithPessimisticWriteLock(command.productId())
+                .orElseThrow(() ->
+                        new CoreException(ErrorType.BAD_REQUEST, "[productId = " + command.productId() + "] 존재하지 않는 재고입니다.")
+                );
+
+        stock.increase(command.quantity());
+    }
+
+
+    @Transactional
+    public void decreaseAll(List<StockCommand.Increase> command) {
         List<Long> productIds = command.stream()
-                .map(StockCommand.Decrease::productId)
+                .map(StockCommand.Increase::productId)
                 .toList();
 
         List<Stock> stocks = stockRepository.findAllByWithPessimisticWriteLock(productIds);

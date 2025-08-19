@@ -17,7 +17,7 @@ public class CardPaymentAdapter implements PaymentMethod {
 
     @Override
     public PaymentInfo.Pay pay(PaymentCriteria.Pay criteria) {
-        String callbackUrl = "http://localhost:8080/payment/callback";
+        String callbackUrl = "http://localhost:8080/api/v1/orders/callback";
 
         PgResult.Pay pgResult = pgProcess.payment(
                 PgCommand.Pay.from(

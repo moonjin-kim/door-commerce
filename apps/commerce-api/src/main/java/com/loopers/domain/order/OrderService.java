@@ -28,15 +28,43 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<Order> getByOrderId(String orderId) {
+        // 주문 조회
+        return orderRepository.findByOrderId(orderId);
+    }
+
+
+    @Transactional
+    public Order complete(String orderId) {
+        // 주문 조회
+        Order order = orderRepository.findByOrderId(orderId).orElseThrow(
+                () -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 주문: " + orderId )
+        );
+
+        order.complete();
+
+        return order;
+    }
+
+    @Transactional
+    public Order cancel(String orderId) {
+        // 주문 조회
+        Order order = orderRepository.findByOrderId(orderId).orElseThrow(
+                () -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 주문: " + orderId )
+        );
+
+        order.cancel();
+
+        return order;
+    }
+
+    @Transactional(readOnly = true)
     public PageResponse<Order> getOrders(
             PageRequest<OrderCommand.GetOrdersBy> command
     ) {
-        // 주문 조회
-        PageResponse<Order> orders = orderRepository.findAllBy(
+        // 주문 정보 반환
+        return orderRepository.findAllBy(
                 command.map(OrderCommand.GetOrdersBy::toParams)
         );
-
-        // 주문 정보 반환
-        return orders;
     }
 }

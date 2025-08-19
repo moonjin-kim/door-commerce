@@ -9,8 +9,8 @@ public interface PgFeignClient {
     PaymentResponse<PgResult.Pay> payment(@RequestBody PgCommand.Pay command, @RequestHeader("X-USER-ID") Long userId) ;
 
     @GetMapping("/api/v1/payments/{paymentId}")
-    PgResult.Find findByPaymentId(@PathVariable("paymentId") String paymentId) ;
+    PaymentResponse<PgResult.Find> findByPaymentId(@PathVariable("paymentId") String paymentId, @RequestHeader("X-USER-ID") Long userId) ;
 
     @GetMapping("/api/v1/payments")
-    PgResult.Find findByOrderId(@RequestParam("orderId") String orderId) ;
+    PaymentResponse<PgResult.Find> findByOrderId(@RequestParam("orderId") String orderId, @RequestHeader("X-USER-ID") Long userId) ;
 }

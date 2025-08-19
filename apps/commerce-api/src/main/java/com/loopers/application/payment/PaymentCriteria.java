@@ -13,7 +13,7 @@ public class PaymentCriteria {
             com.loopers.application.payment.pg.CardType cardType,
             String cardNumber
     ) {
-        static public PaymentCommand.Pay of(
+        static public PaymentCriteria.Pay of(
                 String orderId,
                 Long userId,
                 Long amount,
@@ -21,11 +21,11 @@ public class PaymentCriteria {
                 com.loopers.application.payment.pg.CardType cardType,
                 String cardNumber
         ) {
-            return new PaymentCommand.Pay(orderId, userId, amount, method, cardType, cardNumber);
+            return new PaymentCriteria.Pay(orderId, userId, amount, method, cardType, cardNumber);
         }
 
-        static public PaymentCommand.Pay of(String orderId, Long userId, Long amount, String method) {
-            return new PaymentCommand.Pay(orderId, userId, amount, method, null,null);
+        static public PaymentCriteria.Pay of(String orderId, Long userId, Long amount, String method) {
+            return new PaymentCriteria.Pay(orderId, userId, amount, method, null,null);
         }
     }
 }

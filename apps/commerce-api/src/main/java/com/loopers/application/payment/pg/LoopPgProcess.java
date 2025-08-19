@@ -14,12 +14,13 @@ public class LoopPgProcess implements PgProcess {
     }
 
     @Override
-    public PgResult.Find findByOrderId(String orderId) {
-        return pgFeignClient.findByOrderId(orderId);
+    public PgResult.Find findByOrderId(String orderId, Long userId) {
+        PaymentResponse<PgResult.Find> result = pgFeignClient.findByOrderId(orderId, userId);
+        return result.getData();
     }
 
     @Override
-    public PgResult.Find findByPGId(String paymentId) {
-        return pgFeignClient.findByPaymentId(paymentId);
+    public PgResult.Find findByPGId(String paymentId, Long userId) {
+        return pgFeignClient.findByPaymentId(paymentId, userId).getData();
     }
 }

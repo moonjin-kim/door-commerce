@@ -26,6 +26,11 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
+    public Optional<Order> findByOrderId(String orderId) {
+        return orderJpaRepository.findByOrderId(orderId);
+    }
+
+    @Override
     public PageResponse<Order> findAllBy(PageRequest<OrderParams.GetOrdersBy> params) {
         return orderQueryDslRepository.findAllBy(params);
     }

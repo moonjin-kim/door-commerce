@@ -42,7 +42,7 @@ public class Order extends BaseEntity {
     @Column(nullable = false)
     LocalDateTime orderDate;
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(length = 20)
     private OrderStatus status;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -69,12 +69,6 @@ public class Order extends BaseEntity {
                 .toList();
 
         return new Order(command.userId(), orderItems, OrderStatus.PENDING);
-    }
-
-    private BigDecimal calculateTotalPrice() {
-        return orderItems.stream()
-                .map(OrderItem::getTotalAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public void checkPermission(Long userId) {
@@ -107,32 +101,39 @@ public class Order extends BaseEntity {
         item.initOrder(this);
     }
 
-    private String generateOrderCode() {
-        return UuidCreator.getTimeOrdered().toString();
-    }
-
-//    public void applyCoupon(Long userCouponId, DiscountPolicy discountPolicy) {
-//        if (userCouponId == null) {
-//            throw new CoreException(ErrorType.BAD_REQUEST, "쿠폰 정보가 제공되지 않았습니다.");
-//        }
-//        if(discountPolicy == null) {
-//            throw new CoreException(ErrorType.BAD_REQUEST, "할인 정책이 제공되지 않았습니다.");
-//        }
-//
-//        BigDecimal discount = discountPolicy.calculateDiscount(calculateTotalPrice());
-//
-//        // 쿠폰 적용 로직
-//        this.couponDiscountAmount = new Money(discount);
-//        this.userCouponId = userCouponId;
-//
-//        calculateFinalAmount();
-//    }
-
     public void calculateFinalAmount() {
         if (this.couponDiscountAmount == null) {
             this.finalAmount = this.totalAmount;
         } else {
             this.finalAmount = this.totalAmount.minus(this.couponDiscountAmount.value());
         }
+    }
+
+
+    private String generateOrderCode() {
+        return UuidCreator.getTimeOrdered().toString();
+    }
+
+
+    private BigDecimal calculateTotalPrice() {
+        return orderItems.stream()
+                .map(OrderItem::getTotalAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public void complete() {
+        if (this.status != OrderStatus.PENDING) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "주문 상태가 PENDING이 아닙니다. 현재 상태: " + this.status);
+        }
+
+        this.status = OrderStatus.COMPLETED;
+    }
+
+    public void cancel() {
+        if (this.status != OrderStatus.PENDING) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "주문 상태가 PENDING이 아닙니다. 현재 상태: " + this.status);
+        }
+
+        this.status = OrderStatus.CANCELLED;
     }
 }

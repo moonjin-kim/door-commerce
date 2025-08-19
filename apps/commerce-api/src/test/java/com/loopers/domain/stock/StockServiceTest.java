@@ -1,9 +1,5 @@
 package com.loopers.domain.stock;
 
-import com.loopers.domain.point.Point;
-import com.loopers.domain.point.PointCommand;
-import com.loopers.domain.user.User;
-import com.loopers.fixture.UserFixture;
 import com.loopers.infrastructure.stock.StockJpaRepository;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
@@ -14,15 +10,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.OptimisticLockingFailureException;
-import org.testcontainers.shaded.org.checkerframework.checker.units.qual.A;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -53,7 +42,7 @@ class StockServiceTest {
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                stockService.decrease(new StockCommand.Decrease(productId, quantity));
+                stockService.decrease(new StockCommand.Increase(productId, quantity));
             });
 
             //then
@@ -70,7 +59,7 @@ class StockServiceTest {
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                stockService.decrease(new StockCommand.Decrease(productId, 11));
+                stockService.decrease(new StockCommand.Increase(productId, 11));
             });
 
             //then
@@ -87,7 +76,7 @@ class StockServiceTest {
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                stockService.decrease(new StockCommand.Decrease(productId, -1));
+                stockService.decrease(new StockCommand.Increase(productId, -1));
             });
 
             //then
@@ -103,7 +92,7 @@ class StockServiceTest {
             Stock stock = stockJpaRepository.save(new Stock(productId, initialQuantity));
 
             //when
-            stockService.decrease(new StockCommand.Decrease(productId, 10));
+            stockService.decrease(new StockCommand.Increase(productId, 10));
 
             //then
             Stock foundStock = stockJpaRepository.findById(productId).get();
@@ -127,8 +116,8 @@ class StockServiceTest {
             CoreException exception = assertThrows(CoreException.class, () -> {
                 stockService.decreaseAll(
                         List.of(
-                                new StockCommand.Decrease(productId, 1),
-                                new StockCommand.Decrease(2L, 1)
+                                new StockCommand.Increase(productId, 1),
+                                new StockCommand.Increase(2L, 1)
                         )
                 );
             });
@@ -148,8 +137,8 @@ class StockServiceTest {
             CoreException exception = assertThrows(CoreException.class, () -> {
                 stockService.decreaseAll(
                         List.of(
-                                new StockCommand.Decrease(1L, 10),
-                                new StockCommand.Decrease(2L, 6)
+                                new StockCommand.Increase(1L, 10),
+                                new StockCommand.Increase(2L, 6)
                         )
                 );
             });
@@ -169,8 +158,8 @@ class StockServiceTest {
             CoreException exception = assertThrows(CoreException.class, () -> {
                 stockService.decreaseAll(
                         List.of(
-                                new StockCommand.Decrease(1L, 10),
-                                new StockCommand.Decrease(2L, -1)
+                                new StockCommand.Increase(1L, 10),
+                                new StockCommand.Increase(2L, -1)
                         )
                 );
             });
@@ -189,8 +178,8 @@ class StockServiceTest {
             //when
             stockService.decreaseAll(
                     List.of(
-                            new StockCommand.Decrease(1L, 10),
-                            new StockCommand.Decrease(2L, 5)
+                            new StockCommand.Increase(1L, 10),
+                            new StockCommand.Increase(2L, 5)
                     )
             );
 

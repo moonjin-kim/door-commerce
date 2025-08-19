@@ -27,4 +27,11 @@ public class PaymentService {
         payment.complete();
         return PaymentInfo.Pay.from(paymentRepository.save(payment));
     }
+
+    public PaymentInfo.Pay paymentFail(String orderId, String reason) {
+        Payment payment = paymentRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("결제 내역 없음"));
+        payment.fail(reason);
+        return PaymentInfo.Pay.from(paymentRepository.save(payment));
+    }
 }

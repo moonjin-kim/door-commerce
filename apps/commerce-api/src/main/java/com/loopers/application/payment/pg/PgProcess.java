@@ -14,7 +14,7 @@ public interface PgProcess {
      *
      * @return 결제 취소 결과
      */
-    PgResult.Find findByOrderId(String orderId);
+    PgResult.Find findByOrderId(String orderId, Long userId);
 
-    PgResult.Find findByPGId(String paymentId);
+    PgResult.Find findByPGId(String paymentId, Long userId);
 }

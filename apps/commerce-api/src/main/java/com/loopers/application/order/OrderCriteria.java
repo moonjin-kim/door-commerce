@@ -27,6 +27,28 @@ public class OrderCriteria {
         }
     }
 
+    public record Callback(
+            String transactionKey,
+            String orderId,
+            CardType cardType,
+            String cardNo,
+            String amount,
+            String transactionStatus,
+            String reason
+    ) {
+        public static OrderCriteria.Callback of(
+                String transactionKey,
+                String orderId,
+                CardType cardType,
+                String cardNo,
+                String amount,
+                String transactionStatus,
+                String reason
+        ) {
+            return new OrderCriteria.Callback(transactionKey, orderId, cardType, cardNo, amount, transactionStatus, reason);
+        }
+    }
+
     public record OrderItem(
             Long productId,
             int quantity

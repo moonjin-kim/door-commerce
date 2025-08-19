@@ -16,7 +16,7 @@ import java.util.Map;
 public class PaymentProcess {
     private final Map<String, PaymentMethod> paymentStrategyMap;
 
-    public PaymentInfo.Pay processPayment(PaymentCommand.Pay command) {
+    public PaymentInfo.Pay processPayment(PaymentCriteria.Pay command) {
 
         PaymentMethod paymentMethod = paymentStrategyMap.get(command.method());
         if (paymentMethod == null) {

@@ -9,5 +9,6 @@ import java.util.Optional;
 public interface OrderRepository {
     Order save(Order order);
     Optional<Order> findById(Long id);
+    Optional<Order> findByOrderId(String orderId);
     PageResponse<Order> findAllBy(PageRequest<OrderParams.GetOrdersBy> pageRequest);
 }
