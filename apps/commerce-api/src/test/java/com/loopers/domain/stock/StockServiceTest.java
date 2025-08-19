@@ -42,7 +42,7 @@ class StockServiceTest {
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                stockService.decrease(new StockCommand.Increase(productId, quantity));
+                stockService.decrease(new StockCommand.Decrease(productId, quantity));
             });
 
             //then
@@ -59,7 +59,7 @@ class StockServiceTest {
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                stockService.decrease(new StockCommand.Increase(productId, 11));
+                stockService.decrease(new StockCommand.Decrease(productId, 11));
             });
 
             //then
@@ -76,7 +76,7 @@ class StockServiceTest {
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                stockService.decrease(new StockCommand.Increase(productId, -1));
+                stockService.decrease(new StockCommand.Decrease(productId, -1));
             });
 
             //then
@@ -92,7 +92,7 @@ class StockServiceTest {
             Stock stock = stockJpaRepository.save(new Stock(productId, initialQuantity));
 
             //when
-            stockService.decrease(new StockCommand.Increase(productId, 10));
+            stockService.decrease(new StockCommand.Decrease(productId, 10));
 
             //then
             Stock foundStock = stockJpaRepository.findById(productId).get();

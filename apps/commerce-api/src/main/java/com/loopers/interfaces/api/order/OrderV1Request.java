@@ -1,8 +1,8 @@
 package com.loopers.interfaces.api.order;
 
 import com.loopers.application.order.OrderCriteria;
-import com.loopers.application.payment.PaymentMethodType;
-import com.loopers.application.payment.pg.CardType;
+import com.loopers.application.order.payment.PaymentMethodType;
+import com.loopers.domain.pg.CardType;
 
 import java.util.List;
 import java.util.stream.Collectors;

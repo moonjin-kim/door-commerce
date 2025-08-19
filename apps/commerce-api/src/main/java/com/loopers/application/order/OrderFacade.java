@@ -1,9 +1,14 @@
 package com.loopers.application.order;
 
-import com.loopers.application.payment.PaymentCriteria;
-import com.loopers.application.payment.PaymentProcess;
-import com.loopers.application.payment.pg.PgProcess;
-import com.loopers.application.payment.pg.PgResult;
+import com.loopers.application.order.coupon.CouponApplier;
+import com.loopers.application.order.coupon.CouponApplierCommand;
+import com.loopers.application.order.coupon.CouponApplierInfo;
+import com.loopers.application.order.payment.PaymentCriteria;
+import com.loopers.application.order.payment.PaymentProcess;
+import com.loopers.domain.payment.PaymentInfo;
+import com.loopers.domain.payment.PaymentStatus;
+import com.loopers.domain.pg.PgProcess;
+import com.loopers.infrastructure.payment.PgResult;
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
 import com.loopers.domain.order.Order;
@@ -72,11 +77,19 @@ public class OrderFacade {
                     )
             );
 
-            order.applyCoupon(discountInfo.userCouponId(), discountInfo.discountAmount());
+            order.applyCoupon(
+                    discountInfo.userCouponId(),
+                    discountInfo.discountAmount()
+            );
         }
 
+        // 재고 차감
+        orderItems.forEach(orderItem -> {
+            stockService.decrease(StockCommand.Decrease.from(orderItem));
+        });
+
         // 결제
-        paymentProcess.processPayment(
+        PaymentInfo.Pay paymentInfo = paymentProcess.processPayment(
             PaymentCriteria.Pay.of(
                 order.getOrderId(),
                 order.getUserId(),
@@ -86,11 +99,16 @@ public class OrderFacade {
                 criteria.cardNumber()
             )
         );
-
-        // 재고 차감
-        orderItems.forEach(orderItem -> {
-            stockService.decrease(StockCommand.Decrease.from(orderItem));
-        });
+        if(paymentInfo.status() == PaymentStatus.FAILED) {
+            // 결제 실패 시 주문 취소
+            order.getOrderItems().forEach(orderItem -> {
+                stockService.increase(StockCommand.Increase.of(orderItem.getProductId(), orderItem.getQuantity()));
+            });
+            order = orderService.cancel(order.getOrderId());
+        } else if(paymentInfo.status() == PaymentStatus.COMPLETED) {
+            // 포인트로 결제한 경우
+            order = orderService.complete(order.getOrderId());
+        }
 
         return OrderResult.Order.from(order);
     }
@@ -116,6 +134,7 @@ public class OrderFacade {
         if(!Objects.equals(pgResult.status(), "SUCCESS")) {
             orderService.cancel(criteria.orderId());
             paymentService.paymentFail(order.getOrderId(), pgResult.reason());
+
             order.getOrderItems().forEach(orderItem -> {
                 stockService.increase(StockCommand.Increase.of(orderItem.getProductId(), orderItem.getQuantity()));
             });
@@ -125,8 +144,8 @@ public class OrderFacade {
 
 
         // 결제 완료 저장
-        orderService.complete(criteria.orderId());
-        paymentService.paymentComplete(order.getOrderId());
+        order = orderService.complete(criteria.orderId());
+        paymentService.paymentComplete(order.getOrderId(), pgResult.transactionKey());
 
         return OrderResult.Order.from(order);
     }

@@ -1,10 +1,10 @@
-package com.loopers.application.payment.pg;
+package com.loopers.infrastructure.payment;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 @FeignClient(name = "pg", url = "${pg.api.url}")
-public interface PgFeignClient {
+public interface LoopFeignClient {
     @PostMapping("/api/v1/payments")
     PaymentResponse<PgResponse.Pay> payment(@RequestBody PgCommand.Pay command, @RequestHeader("X-USER-ID") Long userId) ;
 

@@ -1,10 +1,9 @@
-package com.loopers.application.order;
+package com.loopers.application.order.coupon;
 
 import com.loopers.domain.coupon.CouponCommand;
 import com.loopers.domain.coupon.CouponService;
 import com.loopers.domain.coupon.UserCoupon;
 import com.loopers.domain.coupon.policy.DiscountPolicy;
-import com.loopers.domain.order.Order;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

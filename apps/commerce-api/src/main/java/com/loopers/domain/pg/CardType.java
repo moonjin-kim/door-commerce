@@ -1,4 +1,4 @@
-package com.loopers.application.payment.pg;
+package com.loopers.domain.pg;
 
 public enum CardType {
     SAMSUNG,

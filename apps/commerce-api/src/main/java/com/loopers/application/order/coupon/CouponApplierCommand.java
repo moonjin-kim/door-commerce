@@ -1,9 +1,9 @@
-package com.loopers.application.order;
+package com.loopers.application.order.coupon;
 
 import java.math.BigDecimal;
 
 public class CouponApplierCommand {
-    record ApplyCoupon(
+    public record ApplyCoupon(
             Long userId,
             Long couponId,
             Long orderId,

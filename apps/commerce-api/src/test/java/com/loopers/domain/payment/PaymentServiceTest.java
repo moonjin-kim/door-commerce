@@ -34,7 +34,7 @@ class PaymentServiceTest {
         @Test
         void returnPaymentInfo_whenPaymentIsSuccessful() {
             // given
-            PaymentCommand.Pay command = new PaymentCommand.Pay(1L, 1000L, 10000L, "pointPayment");
+            PaymentCommand.Pay command = PaymentCommand.Pay.of("123456", 1000L, 10000L, PaymentType.POINT);
 
             // when
             PaymentInfo.Pay paymentInfo = paymentService.pay(command);
@@ -51,7 +51,7 @@ class PaymentServiceTest {
         @Test
         void savedPaymentInfo_whenPaymentIsSuccessful() {
             // given
-            PaymentCommand.Pay command = new PaymentCommand.Pay(1L, 1000L, 10000L, "pointPayment");
+            PaymentCommand.Pay command = PaymentCommand.Pay.of("123456", 1000L, 10000L, PaymentType.POINT);
 
             // when
             PaymentInfo.Pay paymentInfo = paymentService.pay(command);
@@ -60,7 +60,7 @@ class PaymentServiceTest {
             Payment payment = paymentJpaRepository.findById(paymentInfo.paymentId()).orElseThrow();
             assertAll(
                     () -> assertThat(payment).isNotNull(),
-                    () -> assertThat(payment.getOrderId()).isEqualTo(1L),
+                    () -> assertThat(payment.getOrderId()).isEqualTo("123456"),
                     () -> assertThat(payment.getUserId()).isEqualTo(1000L),
                     () -> assertThat(payment.getPaymentAmount().longValue()).isEqualTo(10000L),
                     () -> assertThat(payment.getPaymentType()).isEqualTo(PaymentType.POINT),
@@ -72,7 +72,7 @@ class PaymentServiceTest {
         @Test
         void throwException_whenPaymentAmountIsNegative() {
             // given
-            PaymentCommand.Pay command = new PaymentCommand.Pay(1L, 1000L, -1L, "pointPayment");
+            PaymentCommand.Pay command = PaymentCommand.Pay.of("123456", 1000L, -1L, PaymentType.POINT);
 
             // when & then
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -88,7 +88,7 @@ class PaymentServiceTest {
         @Test
         void throwIllegalArgumentException_whenNotProviderOrderId() {
             // given
-            PaymentCommand.Pay command = new PaymentCommand.Pay(null, 1000L, -1L, "pointPayment");
+            PaymentCommand.Pay command = PaymentCommand.Pay.of(null, 1000L, 10000L, PaymentType.POINT);
 
             // when & then
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -103,7 +103,7 @@ class PaymentServiceTest {
         @Test
         void throwIllegalArgumentException_whenNotProviderUserId() {
             // given
-            PaymentCommand.Pay command = new PaymentCommand.Pay(1L, null, -1L, "pointPayment");
+            PaymentCommand.Pay command = PaymentCommand.Pay.of("123456", null, 10000L, PaymentType.POINT);
 
             // when & then
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {

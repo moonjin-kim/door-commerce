@@ -1,4 +1,6 @@
-package com.loopers.application.payment.pg;
+package com.loopers.infrastructure.payment;
+
+import com.loopers.domain.pg.CardType;
 
 public class PgResponse {
     public record Pay(

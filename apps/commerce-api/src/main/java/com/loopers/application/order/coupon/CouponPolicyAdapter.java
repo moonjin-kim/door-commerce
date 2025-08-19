@@ -1,4 +1,4 @@
-package com.loopers.application.order;
+package com.loopers.application.order.coupon;
 
 import com.loopers.domain.coupon.UserCoupon;
 import com.loopers.domain.coupon.policy.DiscountPolicy;

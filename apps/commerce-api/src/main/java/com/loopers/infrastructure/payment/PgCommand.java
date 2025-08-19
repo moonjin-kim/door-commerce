@@ -1,7 +1,7 @@
-package com.loopers.application.payment.pg;
+package com.loopers.infrastructure.payment;
 
-import com.loopers.application.payment.PaymentCriteria;
-import com.loopers.domain.payment.PaymentCommand;
+import com.loopers.application.order.payment.PaymentCriteria;
+import com.loopers.domain.pg.CardType;
 
 public class PgCommand {
     public record Pay(

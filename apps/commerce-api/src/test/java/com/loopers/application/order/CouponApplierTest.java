@@ -1,23 +1,13 @@
 package com.loopers.application.order;
 
+import com.loopers.application.order.coupon.CouponApplier;
+import com.loopers.application.order.coupon.CouponApplierCommand;
+import com.loopers.application.order.coupon.CouponApplierInfo;
 import com.loopers.domain.coupon.*;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderCommand;
-import com.loopers.domain.point.Point;
-import com.loopers.domain.point.PointCommand;
-import com.loopers.domain.product.Product;
-import com.loopers.domain.product.ProductCommand;
-import com.loopers.domain.stock.Stock;
-import com.loopers.domain.stock.StockCommand;
-import com.loopers.domain.user.User;
-import com.loopers.fixture.UserFixture;
 import com.loopers.infrastructure.coupon.UserCouponJpaRepository;
 import com.loopers.infrastructure.order.OrderJpaRepository;
-import com.loopers.infrastructure.point.PointHistoryJpaRepository;
-import com.loopers.infrastructure.point.PointJpaRepository;
-import com.loopers.infrastructure.product.ProductJpaRepository;
-import com.loopers.infrastructure.stock.StockJpaRepository;
-import com.loopers.infrastructure.user.UserJpaRepository;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
@@ -27,15 +17,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;

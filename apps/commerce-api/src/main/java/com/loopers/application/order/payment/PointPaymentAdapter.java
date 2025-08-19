@@ -1,8 +1,9 @@
-package com.loopers.application.payment;
+package com.loopers.application.order.payment;
 
 import com.loopers.domain.payment.PaymentCommand;
 import com.loopers.domain.payment.PaymentInfo;
 import com.loopers.domain.payment.PaymentService;
+import com.loopers.domain.payment.PaymentType;
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointCommand;
 import com.loopers.domain.point.PointService;
@@ -24,12 +25,11 @@ public class PointPaymentAdapter implements PaymentMethod {
         );
         Point point = pointService.using(pointUsingCommand);
 
-        paymentService.pay(PaymentCommand.Pay.of(
+        return paymentService.pay(PaymentCommand.Pay.of(
                 criteria.orderId(),
                 criteria.userId(),
                 criteria.amount(),
-                PaymentMethodType.POINT.name()
+                PaymentType.POINT
         ));
-        return paymentService.paymentComplete(criteria.orderId());
     }
 }

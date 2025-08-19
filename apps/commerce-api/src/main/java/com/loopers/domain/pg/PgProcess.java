@@ -1,4 +1,7 @@
-package com.loopers.application.payment.pg;
+package com.loopers.domain.pg;
+
+import com.loopers.infrastructure.payment.PgCommand;
+import com.loopers.infrastructure.payment.PgResult;
 
 public interface PgProcess {
     PgResult.Pay payment(PgCommand.Pay command, Long userId);

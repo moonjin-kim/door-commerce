@@ -48,7 +48,6 @@ public class Payment extends BaseEntity {
             Long paymentAmount,
             PaymentStatus status,
             PaymentType paymentType,
-            String transactionKey,
             LocalDateTime paymentDate
     ) {
         if(orderId == null) {
@@ -67,27 +66,35 @@ public class Payment extends BaseEntity {
         this.status = status;
         this.paymentType = paymentType;
         this.paymentDate = paymentDate;
-        this.transactionKey = transactionKey;
+        this.transactionKey = null;
     }
 
     public static Payment create(
             PaymentCommand.Pay command
     ) {
+        PaymentStatus status = PaymentStatus.PENDING;
+        if(command.method() == PaymentType.POINT) {
+            status = PaymentStatus.COMPLETED; // 포인트 결제는 즉시 완료로 처리
+        }
+
         return new Payment(
                 command.orderId(),
                 command.userId(),
                 command.amount(),
-                PaymentStatus.PENDING,
-                PaymentType.of(command.method()),
-                command.transactionKey(),
+                status,
+                PaymentType.of(command.method().name()),
                 LocalDateTime.now()
         );
     }
 
-    public void complete() {
+    public void complete(String transactionKey) {
         if (this.status != PaymentStatus.PENDING) {
             throw new IllegalStateException("결제 상태가 PENDING이 아닙니다.");
         }
+        if (transactionKey == null || transactionKey.isBlank()) {
+            throw new IllegalArgumentException("트랜잭션 키는 null이거나 빈 문자열일 수 없습니다.");
+        }
+        this.transactionKey = transactionKey;
         this.status = PaymentStatus.COMPLETED;
     }
 

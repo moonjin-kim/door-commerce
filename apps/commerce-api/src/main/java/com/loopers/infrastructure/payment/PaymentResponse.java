@@ -1,4 +1,4 @@
-package com.loopers.application.payment.pg;
+package com.loopers.infrastructure.payment;
 
 public class PaymentResponse<T> {
     private Meta meta;

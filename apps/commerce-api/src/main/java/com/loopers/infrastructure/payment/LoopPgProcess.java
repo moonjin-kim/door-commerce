@@ -1,12 +1,13 @@
-package com.loopers.application.payment.pg;
+package com.loopers.infrastructure.payment;
 
+import com.loopers.domain.pg.PgProcess;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class LoopPgProcess implements PgProcess {
-    private final PgFeignClient pgFeignClient;
+    private final LoopFeignClient pgFeignClient;
 
     @Override
     public PgResult.Pay payment(PgCommand.Pay request, Long userId) {
