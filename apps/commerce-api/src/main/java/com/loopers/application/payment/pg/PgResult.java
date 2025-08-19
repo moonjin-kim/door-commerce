@@ -1,13 +1,13 @@
 package com.loopers.application.payment.pg;
 
-import com.loopers.application.order.OrderCriteria;
-
 public class PgResult {
     public record Pay(
             String transactionKey,
             String status
     ) {
-
+        static PgResult.Pay from(PgResponse.Pay response) {
+            return new PgResult.Pay(response.transactionKey(), response.status());
+        }
     }
 
     public record Find(
@@ -19,5 +19,16 @@ public class PgResult {
             String status,
             String reason
     ) {
+        static PgResult.Find from(PgResponse.Find response) {
+            return new PgResult.Find(
+                    response.transactionKey(),
+                    response.orderId(),
+                    response.cardType(),
+                    response.cardNo(),
+                    response.amount(),
+                    response.status(),
+                    response.reason()
+            );
+        }
     }
 }
