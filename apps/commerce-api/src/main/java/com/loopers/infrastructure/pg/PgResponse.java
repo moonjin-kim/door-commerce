@@ -1,4 +1,4 @@
-package com.loopers.infrastructure.payment;
+package com.loopers.infrastructure.pg;
 
 import com.loopers.domain.pg.CardType;
 

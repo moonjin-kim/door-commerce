@@ -45,6 +45,8 @@ public class Order extends BaseEntity {
     @Column(length = 20)
     private OrderStatus status;
 
+    private final int PENDING_LIMIT_SECONDS = 5;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     List<OrderItem> orderItems = new ArrayList<>();
 
@@ -135,5 +137,13 @@ public class Order extends BaseEntity {
         }
 
         this.status = OrderStatus.CANCELLED;
+    }
+
+    public boolean isExpire(LocalDateTime currentTime) {
+        if (this.status != OrderStatus.PENDING) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "주문 상태가 PENDING이 아닙니다. 현재 상태: " + this.status);
+        }
+
+        return currentTime.isAfter(this.orderDate.plusSeconds(PENDING_LIMIT_SECONDS));
     }
 }

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -66,5 +67,10 @@ public class OrderService {
         return orderRepository.findAllBy(
                 command.map(OrderCommand.GetOrdersBy::toParams)
         );
+    }
+
+    public List<Order> getPendingOrders() {
+        // 주문 목록 조회
+        return orderRepository.findAllBy(OrderStatus.PENDING);
     }
 }

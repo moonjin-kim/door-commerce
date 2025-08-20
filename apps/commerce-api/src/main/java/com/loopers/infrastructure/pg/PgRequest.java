@@ -1,9 +1,9 @@
-package com.loopers.infrastructure.payment;
+package com.loopers.infrastructure.pg;
 
 import com.loopers.application.order.payment.PaymentCriteria;
 import com.loopers.domain.pg.CardType;
 
-public class PgCommand {
+public class PgRequest {
     public record Pay(
             String orderId,
             CardType cardType,

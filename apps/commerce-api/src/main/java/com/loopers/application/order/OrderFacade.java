@@ -7,8 +7,8 @@ import com.loopers.application.order.payment.PaymentCriteria;
 import com.loopers.application.order.payment.PaymentProcess;
 import com.loopers.domain.payment.PaymentInfo;
 import com.loopers.domain.payment.PaymentStatus;
-import com.loopers.domain.pg.PgProcess;
-import com.loopers.infrastructure.payment.PgResult;
+import com.loopers.domain.pg.PgService;
+import com.loopers.infrastructure.pg.PgResult;
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
 import com.loopers.domain.order.Order;
@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -33,60 +34,16 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class OrderFacade {
     private final OrderService orderService;
-    private final ProductService productService;
     private final PaymentService paymentService;
     private final StockService stockService;
-    private final UserService userService;
     private final PaymentProcess paymentProcess;
-    private final CouponApplier couponApplier;
-    private final PgProcess pgProcess;
+    private final OrderTransactionService orderTransactionService;
+    private final PgService pgService;
 
     @Transactional
     public OrderResult.Order order(OrderCriteria.Order criteria) {
         // Validate user
-        var user = userService.getUser(criteria.userId());
-        if (user.isEmpty()) {
-            throw new CoreException(ErrorType.NOT_FOUND, "User not found: " + criteria.userId());
-        }
-
-        //주문 상품 조회
-        List<OrderCommand.OrderItem> orderItems = criteria.items().stream()
-                .map(item -> {
-                    Product product = productService.getBy(item.productId()).orElseThrow(
-                            () -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 상품 : " + item.productId()
-                    ));
-                    System.out.println("상품 정보: " + product.getBrandId() + ", 가격: " + product.getPrice().value());
-                    return OrderCommand.OrderItem.from(
-                            product,
-                            item.quantity()
-                    );
-                })
-                .toList();
-
-        //주문서 생성
-        Order order = orderService.order(OrderCommand.Order.of(criteria.userId(), orderItems));
-
-        // 쿠폰 적용
-        if(criteria.couponId() != null) {
-            CouponApplierInfo.ApplyCoupon discountInfo = couponApplier.applyCoupon(
-                    new CouponApplierCommand.ApplyCoupon(
-                        criteria.userId(),
-                        criteria.couponId(),
-                        order.getId(),
-                        order.getTotalAmount().value()
-                    )
-            );
-
-            order.applyCoupon(
-                    discountInfo.userCouponId(),
-                    discountInfo.discountAmount()
-            );
-        }
-
-        // 재고 차감
-        orderItems.forEach(orderItem -> {
-            stockService.decrease(StockCommand.Decrease.from(orderItem));
-        });
+        Order order = orderTransactionService.prepareOrder(criteria);
 
         // 결제
         PaymentInfo.Pay paymentInfo = paymentProcess.processPayment(
@@ -99,6 +56,7 @@ public class OrderFacade {
                 criteria.cardNumber()
             )
         );
+
         if(paymentInfo.status() == PaymentStatus.FAILED) {
             // 결제 실패 시 주문 취소
             order.getOrderItems().forEach(orderItem -> {
@@ -113,14 +71,13 @@ public class OrderFacade {
         return OrderResult.Order.from(order);
     }
 
-    @Transactional()
     public OrderResult.Order callback(OrderCriteria.Callback criteria) {
         // 주문 조회
         Order order = orderService.getByOrderId(criteria.orderId()).orElseThrow(
                 () -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 주문: " + criteria.orderId() )
         );
 
-        PgResult.Find pgResult = pgProcess.findByPGId(criteria.transactionKey(), order.getUserId());
+        PgResult.Find pgResult = pgService.findByTransactionKey(criteria.transactionKey(), order.getUserId());
         if(pgResult == null) {
             orderService.cancel(criteria.orderId());
             paymentService.paymentFail(order.getOrderId(), "결제 조회 실패");
@@ -148,6 +105,43 @@ public class OrderFacade {
         paymentService.paymentComplete(order.getOrderId(), pgResult.transactionKey());
 
         return OrderResult.Order.from(order);
+    }
+
+    public void syncPayment(LocalDateTime currentTime) {
+        // 주문 정보 조회
+        List<Order> orders = orderService.getPendingOrders();
+
+        for(Order order : orders) {
+            if (!order.isExpire(currentTime)) {
+                continue;
+            }
+            List<PgResult.Find> pgResults = pgService.findByOrderId(order.getOrderId(), order.getUserId());
+
+            boolean isNotPaid = pgResults.isEmpty();
+            String reason = "주문 정보가 없습니다.";
+            for(PgResult.Find pgResult : pgResults) {
+                isNotPaid = true;
+                if(pgResult.status().equals("SUCCESS")) {
+                    // 결제 정보가 있는 경우 주문 만료 처리
+                    orderService.complete(order.getOrderId());
+                    paymentService.paymentComplete(order.getOrderId(), "AUTO_CANCEL");
+                    isNotPaid = false;
+                    break;
+                }
+            }
+
+            if(isNotPaid) {
+                // 결제 정보가 없거나 실패한 경우 주문 취소
+                orderService.cancel(order.getOrderId());
+
+                // 재고 복구
+                order.getOrderItems().forEach(orderItem -> {
+                    stockService.increase(StockCommand.Increase.of(orderItem.getProductId(), orderItem.getQuantity()));
+                });
+
+                paymentService.paymentFail(order.getOrderId(), reason);
+            }
+        }
     }
 
     @Transactional(readOnly = true)

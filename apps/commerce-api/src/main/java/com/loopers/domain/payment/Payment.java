@@ -72,16 +72,12 @@ public class Payment extends BaseEntity {
     public static Payment create(
             PaymentCommand.Pay command
     ) {
-        PaymentStatus status = PaymentStatus.PENDING;
-        if(command.method() == PaymentType.POINT) {
-            status = PaymentStatus.COMPLETED; // 포인트 결제는 즉시 완료로 처리
-        }
 
         return new Payment(
                 command.orderId(),
                 command.userId(),
                 command.amount(),
-                status,
+                PaymentStatus.PENDING,
                 PaymentType.of(command.method().name()),
                 LocalDateTime.now()
         );

@@ -4,13 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 @RequiredArgsConstructor
 public class OrderSchedules {
+    private final OrderFacade orderFacade;
 
-
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 60000)
     public void processPendingOrders() {
-        System.out.println("Processing pending orders...");
+        orderFacade.syncPayment(LocalDateTime.now());
     }
 }

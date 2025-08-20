@@ -1,6 +1,6 @@
 package com.loopers.application.order.payment;
 
-import com.loopers.infrastructure.payment.PgCommand;
+import com.loopers.infrastructure.pg.PgRequest;
 import com.loopers.domain.pg.PgProcess;
 import com.loopers.domain.payment.PaymentCommand;
 import com.loopers.domain.payment.PaymentInfo;
@@ -31,7 +31,7 @@ public class CardPaymentAdapter implements PaymentMethod {
 
         try {
             pgProcess.payment(
-                    PgCommand.Pay.from(
+                    PgRequest.Pay.from(
                             criteria,
                             callbackUrl
                     ),
@@ -39,10 +39,6 @@ public class CardPaymentAdapter implements PaymentMethod {
             );
         } catch (Exception e) {
             log.error("Payment failed for orderId: {}", criteria.orderId(), e);
-            paymentResult = paymentService.paymentFail(
-                    criteria.orderId(),
-                    "PG 결제 실패: " + e.getMessage()
-            );
         }
 
         return paymentResult;
