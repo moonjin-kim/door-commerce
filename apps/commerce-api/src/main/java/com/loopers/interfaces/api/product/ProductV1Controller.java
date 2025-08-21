@@ -6,6 +6,7 @@ import com.loopers.application.product.ProductResult;
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
 import com.loopers.interfaces.api.ApiResponse;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
