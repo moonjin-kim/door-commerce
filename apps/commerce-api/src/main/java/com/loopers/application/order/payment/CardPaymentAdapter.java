@@ -39,6 +39,7 @@ public class CardPaymentAdapter implements PaymentMethod {
             );
         } catch (Exception e) {
             log.error("Payment failed for orderId: {}", criteria.orderId(), e);
+            paymentResult = paymentService.paymentFail(criteria.orderId(), e.getMessage());
         }
 
         return paymentResult;

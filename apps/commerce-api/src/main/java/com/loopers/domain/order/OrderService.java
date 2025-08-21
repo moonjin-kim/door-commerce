@@ -49,6 +49,7 @@ public class OrderService {
 
     @Transactional
     public Order cancel(String orderId) {
+        System.out.println("OrderService.cancel: " + orderId);
         // 주문 조회
         Order order = orderRepository.findByOrderId(orderId).orElseThrow(
                 () -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 주문: " + orderId )

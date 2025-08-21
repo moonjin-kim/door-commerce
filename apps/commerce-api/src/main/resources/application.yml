@@ -24,6 +24,33 @@ spring:
       - logging.yml
       - monitoring.yml
 
+resilience4j:
+  circuitbreaker:
+    instances:
+      pgCircuit:
+        sliding-window-size: 10
+        failure-rate-threshold: 50       # 실패율이 50% 넘으면 Open
+        slow-call-rate-threshold: 50
+        minimum-number-of-calls: 4
+        wait-duration-in-open-state: 2s # Open 상태 유지 시간
+        permitted-number-of-calls-in-half-open-state: 2
+        slow-call-duration-threshold: 1s
+        record-exceptions:
+          - feign.FeignException.InternalServerError
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+  retry:
+    instances:
+      pgRetry:
+        max-attempts: 2
+        wait-duration: 600ms
+        retry-exceptions:
+          - feign.FeignException.InternalServerError
+          - feign.RetryableException
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+        fail-after-max-attempts: false
+
 springdoc:
   use-fqn: true
   swagger-ui:

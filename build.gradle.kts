@@ -68,9 +68,12 @@ subprojects {
         testImplementation("org.testcontainers:testcontainers")
         testImplementation("org.testcontainers:junit-jupiter")
 
+        // feignClient
         implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
         implementation("io.github.openfeign:feign-httpclient:11.0")
         implementation("com.github.f4b6a3:uuid-creator:5.3.2")
+
+        implementation("io.github.resilience4j:resilience4j-spring-boot3")
     }
 
     tasks.withType(Jar::class) { enabled = true }

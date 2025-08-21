@@ -71,6 +71,7 @@ public class OrderFacade {
         return OrderResult.Order.from(order);
     }
 
+    @Transactional
     public OrderResult.Order callback(OrderCriteria.Callback criteria) {
         // 주문 조회
         Order order = orderService.getByOrderId(criteria.orderId()).orElseThrow(
@@ -107,6 +108,7 @@ public class OrderFacade {
         return OrderResult.Order.from(order);
     }
 
+    @Transactional
     public void syncPayment(LocalDateTime currentTime) {
         // 주문 정보 조회
         List<Order> orders = orderService.getPendingOrders();
