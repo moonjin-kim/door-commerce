@@ -49,18 +49,6 @@ public class ProductService {
         return productRepository.search(productParams);
     }
 
-    private PageResponse<ProductView> getProductsFallback(PageRequest<ProductCommand.Search> command, Throwable t) {
-        log.error("Fallback for getProducts executed. Command: {}, Error: {}",
-                command, t.getMessage());
-
-        // 그 외의 경우, 가장 안전한 빈 페이지를 반환
-        return PageResponse.of(
-                command.getPage(),
-                command.getSize(),
-                Collections.emptyList()
-        );
-    }
-
     public Long searchCount(ProductCommand.SearchCount command) {
         // 조회 캐시 조회
         Optional<Long> cachedProduct = cacheRepository.get(CommerceCache.ProductSearchCountCache.INSTANCE, command.toString(), Long.class);
@@ -81,5 +69,17 @@ public class ProductService {
 
     public List<ProductInfo> findAllBy(List<Long> productIds) {
         return productRepository.findAllBy(productIds).stream().map(ProductInfo::of).collect(Collectors.toList());
+    }
+
+    private PageResponse<ProductView> getProductsFallback(PageRequest<ProductCommand.Search> command, Throwable t) {
+        log.error("Fallback for getProducts executed. Command: {}, Error: {}",
+                command, t.getMessage());
+
+        // 그 외의 경우, 가장 안전한 빈 페이지를 반환
+        return PageResponse.of(
+                command.getPage(),
+                command.getSize(),
+                Collections.emptyList()
+        );
     }
 }
