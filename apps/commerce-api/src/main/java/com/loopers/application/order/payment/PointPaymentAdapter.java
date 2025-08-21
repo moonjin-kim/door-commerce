@@ -1,5 +1,6 @@
 package com.loopers.application.order.payment;
 
+import com.github.f4b6a3.uuid.UuidCreator;
 import com.loopers.domain.payment.PaymentCommand;
 import com.loopers.domain.payment.PaymentInfo;
 import com.loopers.domain.payment.PaymentService;
@@ -24,15 +25,17 @@ public class PointPaymentAdapter implements PaymentMethod {
                 criteria.orderId(),
                 criteria.userId(),
                 criteria.amount(),
-                PaymentType.POINT
+                criteria.method()
         ));
+        
         try {
             Point point = pointService.using(PointCommand.Using.of(
                     criteria.userId(),
                     criteria.orderId(),
                     criteria.amount()
             ));
-            payInfo = paymentService.paymentComplete(criteria.orderId(), "transactionKey");
+            String transactionKey = UuidCreator.getTimeOrdered().toString();
+            payInfo = paymentService.paymentComplete(criteria.orderId(), transactionKey);
         } catch (Exception e) {
             payInfo = paymentService.paymentFail(criteria.orderId(), e.getMessage());
         }

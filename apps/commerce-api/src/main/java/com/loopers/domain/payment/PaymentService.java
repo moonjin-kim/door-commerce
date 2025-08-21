@@ -24,8 +24,8 @@ public class PaymentService {
     public PaymentInfo.Pay paymentComplete(String orderId, String transactionKey) {
         Payment payment = paymentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("결제 내역 없음"));
-
         payment.complete(transactionKey);
+        
         return PaymentInfo.Pay.from(paymentRepository.save(payment));
     }
 
@@ -33,6 +33,7 @@ public class PaymentService {
         Payment payment = paymentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("결제 내역 없음"));
         payment.fail(reason);
+
         return PaymentInfo.Pay.from(paymentRepository.save(payment));
     }
 }

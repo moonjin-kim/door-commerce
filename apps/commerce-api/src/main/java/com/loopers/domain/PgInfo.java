@@ -1,14 +1,15 @@
-package com.loopers.infrastructure.pg;
+package com.loopers.domain;
 
 import com.loopers.domain.pg.CardType;
+import com.loopers.infrastructure.pg.PgResponse;
 
-public class PgResult {
+public class PgInfo {
     public record Pay(
             String transactionKey,
             String status
     ) {
-        static PgResult.Pay from(PgResponse.Pay response) {
-            return new PgResult.Pay(response.transactionKey(), response.status());
+        static public PgInfo.Pay from(PgResponse.Pay response) {
+            return new PgInfo.Pay(response.transactionKey(), response.status());
         }
     }
 
@@ -21,8 +22,8 @@ public class PgResult {
             String status,
             String reason
     ) {
-        static PgResult.Find from(PgResponse.Find response) {
-            return new PgResult.Find(
+        static public PgInfo.Find from(PgResponse.Find response) {
+            return new PgInfo.Find(
                     response.transactionKey(),
                     response.orderId(),
                     response.cardType(),

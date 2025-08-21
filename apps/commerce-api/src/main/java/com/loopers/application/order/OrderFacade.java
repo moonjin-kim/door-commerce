@@ -1,25 +1,19 @@
 package com.loopers.application.order;
 
-import com.loopers.application.order.coupon.CouponApplier;
-import com.loopers.application.order.coupon.CouponApplierCommand;
-import com.loopers.application.order.coupon.CouponApplierInfo;
 import com.loopers.application.order.payment.PaymentCriteria;
 import com.loopers.application.order.payment.PaymentProcess;
 import com.loopers.domain.payment.PaymentInfo;
 import com.loopers.domain.payment.PaymentStatus;
 import com.loopers.domain.pg.PgService;
-import com.loopers.infrastructure.pg.PgResult;
+import com.loopers.domain.PgInfo;
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderCommand;
 import com.loopers.domain.order.OrderService;
 import com.loopers.domain.payment.PaymentService;
-import com.loopers.domain.product.Product;
-import com.loopers.domain.product.ProductService;
 import com.loopers.domain.stock.StockCommand;
 import com.loopers.domain.stock.StockService;
-import com.loopers.domain.user.UserService;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +52,7 @@ public class OrderFacade {
         );
 
         if(paymentInfo.status() == PaymentStatus.FAILED) {
-            // 결제 실패 시 주문 취소
+            // 결제 실패 시 주문 취소(카드 정보 에러, 포인트 부족과 같은 결제 실패 사유)
             order.getOrderItems().forEach(orderItem -> {
                 stockService.increase(StockCommand.Increase.of(orderItem.getProductId(), orderItem.getQuantity()));
             });
@@ -78,7 +72,7 @@ public class OrderFacade {
                 () -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 주문: " + criteria.orderId() )
         );
 
-        PgResult.Find pgResult = pgService.findByTransactionKey(criteria.transactionKey(), order.getUserId());
+        PgInfo.Find pgResult = pgService.findByTransactionKey(criteria.transactionKey(), order.getUserId());
         if(pgResult == null) {
             orderService.cancel(criteria.orderId());
             paymentService.paymentFail(order.getOrderId(), "결제 조회 실패");
@@ -108,7 +102,6 @@ public class OrderFacade {
         return OrderResult.Order.from(order);
     }
 
-    @Transactional
     public void syncPayment(LocalDateTime currentTime) {
         // 주문 정보 조회
         List<Order> orders = orderService.getPendingOrders();
@@ -117,11 +110,11 @@ public class OrderFacade {
             if (!order.isExpire(currentTime)) {
                 continue;
             }
-            List<PgResult.Find> pgResults = pgService.findByOrderId(order.getOrderId(), order.getUserId());
+            List<PgInfo.Find> pgResults = pgService.findByOrderId(order.getOrderId(), order.getUserId());
 
             boolean isNotPaid = pgResults.isEmpty();
             String reason = "주문 정보가 없습니다.";
-            for(PgResult.Find pgResult : pgResults) {
+            for(PgInfo.Find pgResult : pgResults) {
                 isNotPaid = true;
                 if(pgResult.status().equals("SUCCESS")) {
                     // 결제 정보가 있는 경우 주문 만료 처리

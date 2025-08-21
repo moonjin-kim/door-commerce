@@ -19,29 +19,23 @@ public class LoopPgProcess implements PgProcess {
     @CircuitBreaker(name = "pgCircuit")
     @Retry(name = "pgRetry")
     @Override
-    public PgResult.Pay payment(PgRequest.Pay request, Long userId) {
-        log.info("Payment request: {}", request.orderId());
-        return PgResult.Pay.from(
-                pgFeignClient.payment(request, userId).getData()
-        );
+    public PgResponse.Pay payment(PgRequest.Pay request, Long userId) {
+        return pgFeignClient.payment(request, userId).getData();
     }
-
 
     @CircuitBreaker(name = "pgCircuit")
     @Retry(name = "pgRetry")
     @Override
-    public List<PgResult.Find> findByOrderId(String orderId, Long userId) {
+    public List<PgResponse.Find> findByOrderId(String orderId, Long userId) {
         PaymentResponse<List<PgResponse.Find>> result = pgFeignClient.findByOrderId(orderId, userId);
-        return result.getData().stream().map(
-                PgResult.Find::from
-        ).toList();
+        return result.getData();
     }
 
     @CircuitBreaker(name = "pgCircuit")
     @Retry(name = "pgRetry")
     @Override
-    public PgResult.Find findByPGId(String paymentId, Long userId) {
+    public PgResponse.Find findByPGId(String paymentId, Long userId) {
         PaymentResponse<PgResponse.Find> result = pgFeignClient.findByPaymentId(paymentId, userId);
-        return PgResult.Find.from(result.getData());
+        return result.getData();
     }
 }

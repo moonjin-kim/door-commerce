@@ -20,14 +20,9 @@ public class CardPaymentAdapter implements PaymentMethod {
     public PaymentInfo.Pay pay(PaymentCriteria.Pay criteria) {
         String callbackUrl = "http://localhost:8080/api/v1/orders/callback";
 
-        PaymentInfo.Pay paymentResult = paymentService.pay(PaymentCommand.Pay.of(
-                criteria.orderId(),
-                criteria.userId(),
-                criteria.amount(),
-                criteria.method(),
-                criteria.cardType(),
-                criteria.cardNumber()
-        ));
+        PaymentInfo.Pay paymentResult = paymentService.pay(
+            criteria.toCommand()
+        );
 
         try {
             pgProcess.payment(
@@ -38,7 +33,7 @@ public class CardPaymentAdapter implements PaymentMethod {
                     criteria.userId()
             );
         } catch (Exception e) {
-            log.error("Payment failed for orderId: {}", criteria.orderId(), e);
+            log.error("PG 결제가 실패하였습니다. orderId: {}", criteria.orderId(), e);
             paymentResult = paymentService.paymentFail(criteria.orderId(), e.getMessage());
         }
 

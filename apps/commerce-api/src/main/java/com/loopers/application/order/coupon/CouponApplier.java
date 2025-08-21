@@ -18,7 +18,7 @@ public class CouponApplier {
     private final CouponPolicyAdapter couponPolicyAdapter;
 
     @Transactional
-    public CouponApplierInfo.ApplyCoupon applyCoupon(CouponApplierCommand.ApplyCoupon command) {
+    public CouponApplierInfo.ApplyCoupon applyCoupon(CouponApplierCommand.Apply command) {
         UserCoupon userCoupon = couponService.getUserCoupon(
                 CouponCommand.Get.of(command.userId(), command.couponId())
         );

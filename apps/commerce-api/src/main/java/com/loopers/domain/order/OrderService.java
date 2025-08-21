@@ -17,7 +17,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
 
     @Transactional
-    public Order order(OrderCommand.Order order) {
+    public Order create(OrderCommand.Order order) {
         // 주문 저장
         return orderRepository.save(Order.create(order));
     }

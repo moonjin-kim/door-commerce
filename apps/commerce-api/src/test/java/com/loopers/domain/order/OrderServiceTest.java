@@ -49,7 +49,7 @@ class OrderServiceTest {
             );
 
             // when
-            Order orderDto = orderService.order(orderCommand);
+            Order orderDto = orderService.create(orderCommand);
 
             // then
             assertAll(
@@ -75,7 +75,7 @@ class OrderServiceTest {
 
             //when
             CoreException result = assertThrows(CoreException.class, () -> {
-                orderService.order(orderCommand);
+                orderService.create(orderCommand);
             });
 
             //then
@@ -93,7 +93,7 @@ class OrderServiceTest {
 
             //when
             CoreException result = assertThrows(CoreException.class, () -> {
-                orderService.order(orderCommand);
+                orderService.create(orderCommand);
             });
 
             //then
@@ -112,7 +112,7 @@ class OrderServiceTest {
                     2L,
                     of(new OrderCommand.OrderItem(1L, "Product A", 1000L, 2))
             );
-            Order createdOrder1 = orderService.order(orderCommand);
+            Order createdOrder1 = orderService.create(orderCommand);
 
             // when
             Optional<Order> orderDto = orderService.getBy(new OrderCommand.GetBy(createdOrder1.getId(), 2L));
@@ -151,8 +151,8 @@ class OrderServiceTest {
                     1L,
                     of(new OrderCommand.OrderItem(2L, "Product B", 2000L, 1))
             );
-            orderService.order(orderCommand1);
-            orderService.order(orderCommand2);
+            orderService.create(orderCommand1);
+            orderService.create(orderCommand2);
             PageRequest<OrderCommand.GetOrdersBy> command = new PageRequest<>(1, 10, OrderCommand.GetOrdersBy.of(1L));
 
             // when

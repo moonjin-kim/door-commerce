@@ -3,15 +3,9 @@ package com.loopers.application.order;
 import com.loopers.application.order.coupon.CouponApplier;
 import com.loopers.application.order.coupon.CouponApplierCommand;
 import com.loopers.application.order.coupon.CouponApplierInfo;
-import com.loopers.application.order.payment.PaymentCriteria;
-import com.loopers.application.order.payment.PaymentProcess;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderCommand;
 import com.loopers.domain.order.OrderService;
-import com.loopers.domain.payment.PaymentInfo;
-import com.loopers.domain.payment.PaymentService;
-import com.loopers.domain.payment.PaymentStatus;
-import com.loopers.domain.pg.PgService;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductService;
 import com.loopers.domain.stock.StockCommand;
@@ -48,7 +42,6 @@ public class OrderTransactionService {
                     Product product = productService.getBy(item.productId()).orElseThrow(
                             () -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 상품 : " + item.productId()
                             ));
-                    System.out.println("상품 정보: " + product.getBrandId() + ", 가격: " + product.getPrice().value());
                     return OrderCommand.OrderItem.from(
                             product,
                             item.quantity()
@@ -57,12 +50,12 @@ public class OrderTransactionService {
                 .toList();
 
         //주문서 생성
-        Order order = orderService.order(OrderCommand.Order.of(criteria.userId(), orderItems));
+        Order order = orderService.create(OrderCommand.Order.of(criteria.userId(), orderItems));
 
         // 쿠폰 적용
         if(criteria.couponId() != null) {
             CouponApplierInfo.ApplyCoupon discountInfo = couponApplier.applyCoupon(
-                    new CouponApplierCommand.ApplyCoupon(
+                    new CouponApplierCommand.Apply(
                             criteria.userId(),
                             criteria.couponId(),
                             order.getId(),

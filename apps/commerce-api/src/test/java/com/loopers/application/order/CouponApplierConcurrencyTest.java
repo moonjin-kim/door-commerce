@@ -100,7 +100,7 @@ public class CouponApplierConcurrencyTest {
                 executor.submit(() -> {
                     try {
                         couponApplier.applyCoupon(
-                                CouponApplierCommand.ApplyCoupon.of(
+                                CouponApplierCommand.Apply.of(
                                         1L,
                                         coupon.getId(),
                                         order.getId(),
@@ -158,7 +158,7 @@ public class CouponApplierConcurrencyTest {
                 executor.submit(() -> {
                     try {
                         couponApplier.applyCoupon(
-                                CouponApplierCommand.ApplyCoupon.of(
+                                CouponApplierCommand.Apply.of(
                                         1L,
                                         coupon.getId(),
                                         order.getId(),

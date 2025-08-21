@@ -87,7 +87,7 @@ class CouponApplierTest {
 
             //when
             CouponApplierInfo.ApplyCoupon updatedOrder = couponApplier.applyCoupon(
-                    CouponApplierCommand.ApplyCoupon.of(
+                    CouponApplierCommand.Apply.of(
                             1L,
                             coupon.getId(),
                             order.getId(),
@@ -128,7 +128,7 @@ class CouponApplierTest {
 
             //when
             CouponApplierInfo.ApplyCoupon updatedOrder = couponApplier.applyCoupon(
-                    CouponApplierCommand.ApplyCoupon.of(
+                    CouponApplierCommand.Apply.of(
                             1L,
                             coupon.getId(),
                             order.getId(),
@@ -159,7 +159,7 @@ class CouponApplierTest {
             //when
             CoreException result = assertThrows(CoreException.class, () -> {
                 couponApplier.applyCoupon(
-                        CouponApplierCommand.ApplyCoupon.of(
+                        CouponApplierCommand.Apply.of(
                                 1L,
                                 1L, // 존재하지 않는 쿠폰 ID
                                 order.getId(),

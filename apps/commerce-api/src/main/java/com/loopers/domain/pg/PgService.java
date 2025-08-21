@@ -1,7 +1,8 @@
 package com.loopers.domain.pg;
 
 import com.loopers.infrastructure.pg.PgRequest;
-import com.loopers.infrastructure.pg.PgResult;
+import com.loopers.domain.PgInfo;
+import com.loopers.infrastructure.pg.PgResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,15 +13,23 @@ import java.util.List;
 public class PgService {
     private final PgProcess pgProcess;
 
-    public PgResult.Pay payment(PgRequest.Pay command, Long userId) {
-        return pgProcess.payment(command, userId);
+    public PgInfo.Pay payment(PgRequest.Pay command, Long userId) {
+        PgResponse.Pay response = pgProcess.payment(command, userId);
+
+        return PgInfo.Pay.from(response);
     }
 
-    public PgResult.Find findByTransactionKey(String transactionKey, Long userId) {
-        return pgProcess.findByPGId(transactionKey, userId);
+    public PgInfo.Find findByTransactionKey(String transactionKey, Long userId) {
+        PgResponse.Find response = pgProcess.findByPGId(transactionKey, userId);
+
+        return PgInfo.Find.from(response);
     }
 
-    public List<PgResult.Find> findByOrderId(String orderId, Long userId) {
-        return pgProcess.findByOrderId(orderId, userId);
+    public List<PgInfo.Find> findByOrderId(String orderId, Long userId) {
+        List<PgResponse.Find> responses = pgProcess.findByOrderId(orderId, userId);
+
+        return responses.stream()
+                .map(PgInfo.Find::from)
+                .toList();
     }
 }
