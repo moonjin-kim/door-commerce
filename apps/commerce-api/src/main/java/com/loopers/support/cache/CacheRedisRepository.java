@@ -1,8 +1,6 @@
 package com.loopers.support.cache;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.loopers.support.CacheRepository;
-import com.loopers.support.MyCache;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,7 +17,7 @@ public class CacheRedisRepository implements CacheRepository {
     private final ObjectMapper objectMapper;
 
     @Override
-    public <T> Optional<T> get(MyCache cache, String key, Class<T> clazz) {
+    public <T> Optional<T> get(CacheKey cache, String key, Class<T> clazz) {
         String valueFromCache = redisTemplate.opsForValue().get(cache.getKey(key));
 
         // 2. 캐시된 값이 없으면 empty를 반환한다.
@@ -37,7 +35,7 @@ public class CacheRedisRepository implements CacheRepository {
 
 
     @Override
-    public void set(MyCache cache, String key, Object value) {
+    public void set(CacheKey cache, String key, Object value) {
         try {
             String jsonValue = objectMapper.writeValueAsString(value);
             redisTemplate.opsForValue().set(cache.getKey(key), jsonValue, cache.getTtl());
@@ -47,7 +45,7 @@ public class CacheRedisRepository implements CacheRepository {
     }
 
     @Override
-    public void delete(MyCache cache, String key) {
+    public void delete(CacheKey cache, String key) {
         redisTemplate.delete(cache.getKey(key));
     }
 }

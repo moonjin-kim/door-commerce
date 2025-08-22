@@ -1,10 +1,9 @@
-package com.loopers.application.order;
+package com.loopers.application.order.coupon;
 
 import com.loopers.domain.coupon.CouponCommand;
 import com.loopers.domain.coupon.CouponService;
 import com.loopers.domain.coupon.UserCoupon;
 import com.loopers.domain.coupon.policy.DiscountPolicy;
-import com.loopers.domain.order.Order;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +18,7 @@ public class CouponApplier {
     private final CouponPolicyAdapter couponPolicyAdapter;
 
     @Transactional
-    public CouponApplierInfo.ApplyCoupon applyCoupon(CouponApplierCommand.ApplyCoupon command) {
+    public CouponApplierInfo.ApplyCoupon applyCoupon(CouponApplierCommand.Apply command) {
         UserCoupon userCoupon = couponService.getUserCoupon(
                 CouponCommand.Get.of(command.userId(), command.couponId())
         );

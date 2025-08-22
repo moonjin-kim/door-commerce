@@ -3,13 +3,15 @@ package com.loopers.domain.product;
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
 import com.loopers.infrastructure.product.ProductParams;
-import com.loopers.support.CacheRepository;
+import com.loopers.support.cache.CacheRepository;
 import com.loopers.support.cache.CommerceCache;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,7 +41,9 @@ public class ProductService {
         return product;
     }
 
+    @CircuitBreaker(name = "productCircuit", fallbackMethod = "getProductsFallback")
     public PageResponse<ProductView> search(PageRequest<ProductCommand.Search> command) {
+
         PageRequest<ProductParams.Search> productParams = command.map(ProductCommand.Search::toParams);
 
         return productRepository.search(productParams);
@@ -65,5 +69,17 @@ public class ProductService {
 
     public List<ProductInfo> findAllBy(List<Long> productIds) {
         return productRepository.findAllBy(productIds).stream().map(ProductInfo::of).collect(Collectors.toList());
+    }
+
+    private PageResponse<ProductView> getProductsFallback(PageRequest<ProductCommand.Search> command, Throwable t) {
+        log.error("Fallback for getProducts executed. Command: {}, Error: {}",
+                command, t.getMessage());
+
+        // 그 외의 경우, 가장 안전한 빈 페이지를 반환
+        return PageResponse.of(
+                command.getPage(),
+                command.getSize(),
+                Collections.emptyList()
+        );
     }
 }

@@ -11,12 +11,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "product"
-//        , indexes = {
-//        @Index(name = "idx_product_price", columnList = "price"),
-//        @Index(name = "idx_product_brand_id", columnList = "brandId")
-//}
-)
+@Table(name = "product")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Product extends BaseEntity {
@@ -29,9 +24,7 @@ public class Product extends BaseEntity {
     @Column(unique = true)
     private String imageUrl;
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "value", column = @Column(name = "price"))
-    })
+    @AttributeOverride(name = "value", column = @Column(name = "price", nullable = false, precision = 10, scale = 2))
     private Money price;
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
@@ -40,7 +33,11 @@ public class Product extends BaseEntity {
     protected Product(
             String name,
             Long brandId,
-            String description, String imageUrl, Long price, ProductStatus status) {
+            String description,
+            String imageUrl,
+            Long price,
+            ProductStatus status
+    ) {
         ProductValidator.validateName(name);
         ProductValidator.validateBrandId(brandId);
         ProductValidator.validateDescription(description);

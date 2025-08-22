@@ -264,7 +264,7 @@ public class PointServiceIntegrationTest {
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                pointService.using(PointCommand.Using.of(user.getId(), 1L,2000L));
+                pointService.using(PointCommand.Using.of(user.getId(), "123456",2000L));
             });
 
             //then
@@ -279,7 +279,7 @@ public class PointServiceIntegrationTest {
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                pointService.using(PointCommand.Using.of(user.getId(), 1L,2000L));
+                pointService.using(PointCommand.Using.of(user.getId(), "123456",2000L));
             });
 
             //then
@@ -296,7 +296,7 @@ public class PointServiceIntegrationTest {
             pointJpaRepository.save(point);
 
             //when
-            Point result = pointService.using(PointCommand.Using.of(user.getId(), 1L,500L));
+            Point result = pointService.using(PointCommand.Using.of(user.getId(), "123456",500L));
 
             //then
             assertThat(result.balance().longValue()).isEqualTo(500L);
@@ -312,10 +312,10 @@ public class PointServiceIntegrationTest {
             pointJpaRepository.save(point);
 
             //when
-            Point result = pointService.using(PointCommand.Using.of(user.getId(), 1L,500L));
+            Point result = pointService.using(PointCommand.Using.of(user.getId(), "123456",500L));
 
             //then
-            Optional<PointHistory> savedPoint = pointHistoryJpaRepository.findByOrderId(1L);
+            Optional<PointHistory> savedPoint = pointHistoryJpaRepository.findByOrderId("123456");
             assertThat(savedPoint).isPresent();
             assertThat(savedPoint.get().getStatus()).isEqualTo(PointStatus.USE);
             assertThat(savedPoint.get().getAmount().longValue()).isEqualTo(-500L);
@@ -333,7 +333,7 @@ public class PointServiceIntegrationTest {
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                pointService.using(PointCommand.Using.of(user.getId(), 1L,0L));
+                pointService.using(PointCommand.Using.of(user.getId(), "123456",0L));
             });
 
             //then

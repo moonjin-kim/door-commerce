@@ -1,12 +1,12 @@
 package com.loopers.application.order;
 
+import com.loopers.application.order.coupon.CouponApplier;
+import com.loopers.application.order.coupon.CouponApplierCommand;
 import com.loopers.domain.coupon.*;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderCommand;
 import com.loopers.infrastructure.coupon.UserCouponJpaRepository;
 import com.loopers.infrastructure.order.OrderJpaRepository;
-import com.loopers.support.error.CoreException;
-import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -100,7 +100,7 @@ public class CouponApplierConcurrencyTest {
                 executor.submit(() -> {
                     try {
                         couponApplier.applyCoupon(
-                                CouponApplierCommand.ApplyCoupon.of(
+                                CouponApplierCommand.Apply.of(
                                         1L,
                                         coupon.getId(),
                                         order.getId(),
@@ -158,7 +158,7 @@ public class CouponApplierConcurrencyTest {
                 executor.submit(() -> {
                     try {
                         couponApplier.applyCoupon(
-                                CouponApplierCommand.ApplyCoupon.of(
+                                CouponApplierCommand.Apply.of(
                                         1L,
                                         coupon.getId(),
                                         order.getId(),

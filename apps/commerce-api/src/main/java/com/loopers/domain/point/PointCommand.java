@@ -12,10 +12,10 @@ public class PointCommand {
 
     public record Using(
             Long userId,
-            Long orderId,
+            String orderId,
             Long amount
     ) {
-        public static Using of(Long userId, Long orderId,Long amount) {
+        public static Using of(Long userId, String orderId,Long amount) {
             return new Using(userId, orderId, amount);
         }
     }
