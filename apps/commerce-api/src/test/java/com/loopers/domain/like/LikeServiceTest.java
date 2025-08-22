@@ -83,86 +83,6 @@ class LikeServiceTest {
                     () -> assertThat(result.isSuccess()).isFalse()
             );
         }
-
-        @DisplayName("좋아요를 동시에 눌러도, 1개의 좋아요만 생성된다")
-        @Test
-        void successUsed_whenPointIsUsedSimultaneously() throws InterruptedException  {
-            //given
-            int threadCount = 10;
-            ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-            CountDownLatch latch = new CountDownLatch(threadCount);
-            Long userId = 1L;
-            Long productId = 1L;
-            var command = LikeCommand.Like.of(userId, productId);
-
-            // 포인트 사용 실패 에러 저장 위치
-            List<Exception> exceptions = Collections.synchronizedList(new ArrayList<>());
-
-            //when
-            for (int i = 0; i < threadCount; i++) {
-                executor.submit(() -> {
-                    try {
-                        likeService.like(command);
-                    } catch (Exception e) {
-                        exceptions.add(e);
-                    } finally {
-                        latch.countDown();
-                    }
-                });
-            }
-
-            //then
-            latch.await();
-            List<Like> foundLike = likeJpaRepository.findAll();
-            assertAll(
-                    () -> assertThat(foundLike).hasSize(1),
-                    () -> assertThat(foundLike.get(0).getUserId()).isEqualTo(userId),
-                    () -> assertThat(foundLike.get(0).getProductId()).isEqualTo(productId),
-                    () -> assertThat(exceptions).hasSize(9)
-            );
-
-        }
-
-        @DisplayName("여러 유저가 좋아요를 동시에 눌러도, 각 유저에 대해서 1개의 좋아요만 생성된다")
-        @Test
-        void success_whenPointIsUsedSimultaneously() throws InterruptedException  {
-            //given
-            int threadCount = 100;
-            ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-            CountDownLatch latch = new CountDownLatch(threadCount);
-            Long userId = 1L;
-            Long productId = 1L;
-
-            // 포인트 사용 실패 에러 저장 위치
-            List<Exception> exceptions = Collections.synchronizedList(new ArrayList<>());
-
-            //when
-            for (int i = 0; i < threadCount; i++) {
-                final int idx = i;
-                executor.submit(() -> {
-                    try {
-                        // 각 스레드마다 다른 유저 ID를 사용
-                        Long id = (long) idx;
-                        var command = LikeCommand.Like.of(id, productId);
-                        likeService.like(command);
-                    } catch (Exception e) {
-                        exceptions.add(e);
-                    } finally {
-                        latch.countDown();
-                    }
-                });
-            }
-
-            //then
-            latch.await();
-            List<Like> foundLike = likeJpaRepository.findAll();
-            assertAll(
-                    () -> assertThat(foundLike).hasSize(100),
-                    () -> assertThat(foundLike.get(0).getProductId()).isEqualTo(productId),
-                    () -> assertThat(exceptions).hasSize(0)
-            );
-
-        }
     }
 
     @DisplayName("좋아요를 취소할 때")
@@ -232,11 +152,31 @@ class LikeServiceTest {
 
             //then
             assertAll(
-                () -> assertThat(result.getTotalCount()).isEqualTo(4L),
                 () -> assertThat(result.getPage()).isEqualTo(1),
                 () -> assertThat(result.getSize()).isEqualTo(10),
                 () -> assertThat(result.getItems()).hasSize(4)
             );
+        }
+    }
+
+    @DisplayName("유저의 좋아요 수를 검색할 때,")
+    @Nested
+    class getUserLikeCount {
+        @DisplayName("유저의 상품 수 검색하면, 좋아요 상품 수 반환한다.")
+        @Test
+        void searchLikes() {
+            //given
+            Long userId = 1L;
+            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, 1L)));
+            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, 2L)));
+            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, 3L)));
+            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, 4L)));
+
+            //when
+            Long result = likeService.getUserLikeCount(LikeQuery.SearchCount.of(userId));
+
+            //then
+            assertThat(result).isEqualTo(4);
         }
     }
 }

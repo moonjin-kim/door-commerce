@@ -11,16 +11,21 @@ import com.loopers.infrastructure.brand.BrandJpaRepository;
 import com.loopers.infrastructure.like.LikeJpaRepository;
 import com.loopers.infrastructure.product.ProductJpaRepository;
 import com.loopers.interfaces.api.ApiResponse;
+import com.loopers.support.cache.CommerceCache;
 import com.loopers.utils.DatabaseCleanUp;
+import com.loopers.utils.RedisCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import java.util.List;
 import java.util.function.Function;
@@ -40,6 +45,10 @@ class ProductV1E2ETest {
     private final TestRestTemplate testRestTemplate;
     @Autowired
     private final DatabaseCleanUp databaseCleanUp;
+    @Autowired
+    private RedisTemplate<String, String> cacheRedisTemplate;
+    @Autowired
+    private RedisCleanUp redisCleanUp;
 
     @Autowired
     public ProductV1E2ETest(ProductJpaRepository productJpaRepository,LikeJpaRepository likeJpaRepository, BrandJpaRepository brandJpaRepository, TestRestTemplate testRestTemplate, DatabaseCleanUp databaseCleanUp) {
@@ -53,6 +62,7 @@ class ProductV1E2ETest {
     @AfterEach
     void tearDown() {
         databaseCleanUp.truncateAllTables();
+        redisCleanUp.truncateAll();
     }
 
     @DisplayName("Get /api/v1/products/{productId}")
@@ -281,6 +291,52 @@ class ProductV1E2ETest {
             );
         }
 
+        @DisplayName("상품 아이디로 상품 정보를 요청시, 캐시가 없으면 캐시를 저장한다.")
+        @Test
+        void getBrandResponseCache_whenBrandIdIsProvide(){
+            //given
+            var brand = brandJpaRepository.save(
+                    Brand.create(
+                            new BrandCommand.Create("루퍼스", "루퍼스 공식 브랜드", "https://loopers.com/brand/logo.png")
+                    )
+            );
+            var product = productJpaRepository.save(
+                    Product.create(ProductCommand.Create.of(
+                            1L,
+                            "루퍼스 공식 티셔츠",
+                            "루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다.",
+                            "https://loopers.com/product/t-shirt.png",
+                            20000L
+                    ))
+            );
+            String requestUrl = ENDPOINT_GET.apply(1L);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("X-USER-ID", "1");
+
+            //when
+            ParameterizedTypeReference<ApiResponse<ProductV1Response.ProductDetail>> responseType = new ParameterizedTypeReference<>() {
+            };
+            ResponseEntity<ApiResponse<ProductV1Response.ProductDetail>> response =
+                    testRestTemplate.exchange(
+                            requestUrl,
+                            HttpMethod.GET,
+                            new HttpEntity<ProductV1Response.ProductDetail>(null, headers),
+                            responseType
+                    );
+
+            //then
+            assertAll(
+                    () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
+                    () -> assertThat(response.getBody().data().productId()).isEqualTo(1L),
+                    () -> assertThat(response.getBody().data().name()).isEqualTo("루퍼스 공식 티셔츠"),
+                    () -> assertThat(response.getBody().data().description()).isEqualTo("루퍼스의 공식 티셔츠입니다. 루퍼스는 루퍼스입니다."),
+                    () -> assertThat(response.getBody().data().imageUrl()).isEqualTo("https://loopers.com/product/t-shirt.png"),
+                    () -> assertThat(response.getBody().data().price()).isEqualTo(20000L),
+                    () -> assertThat(cacheRedisTemplate.opsForValue().get(CommerceCache.ProductCache.INSTANCE.getKey("1"))).isNotNull()
+            );
+        }
+
     }
 
     @DisplayName("Get /api/v1/products")
@@ -324,7 +380,6 @@ class ProductV1E2ETest {
             assertAll(
                     () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().getTotalCount()).isEqualTo(2),
                     () -> assertThat(response.getBody().data().getPage()).isEqualTo(1),
                     () -> assertThat(response.getBody().data().getSize()).isEqualTo(10),
                     () -> assertThat(response.getBody().data().getItems()).hasSize(2),
@@ -367,7 +422,6 @@ class ProductV1E2ETest {
             //then
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().getTotalCount()).isEqualTo(1),
                     () -> assertThat(response.getBody().data().getPage()).isEqualTo(1),
                     () -> assertThat(response.getBody().data().getSize()).isEqualTo(10),
                     () -> assertThat(response.getBody().data().getItems()).hasSize(1),
@@ -410,7 +464,6 @@ class ProductV1E2ETest {
             //then
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().getTotalCount()).isEqualTo(2),
                     () -> assertThat(response.getBody().data().getPage()).isEqualTo(1),
                     () -> assertThat(response.getBody().data().getSize()).isEqualTo(10),
                     () -> assertThat(response.getBody().data().getItems()).hasSize(2),

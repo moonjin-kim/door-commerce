@@ -15,4 +15,6 @@ public interface ProductRepository {
     Optional<Product> findBy(Long id);
 
     PageResponse<ProductView> search(PageRequest<ProductParams.Search> productSearch);
+    Long searchCount(ProductParams.SearchCount productSearch);
+
 }

@@ -24,4 +24,12 @@ public class LikeV1Response {
             );
         }
     }
+
+    public record LikeProductCount(
+            Long totalCount
+    ) {
+        public static LikeV1Response.LikeProductCount of(LikeResult.LikeProductCount likeProductCount) {
+            return new LikeV1Response.LikeProductCount(likeProductCount.totalCount());
+        }
+    }
 }

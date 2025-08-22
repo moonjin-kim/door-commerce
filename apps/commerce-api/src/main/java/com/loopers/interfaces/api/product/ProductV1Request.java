@@ -15,4 +15,14 @@ public class ProductV1Request {
             );
         }
     }
+
+    public record SearchCount(
+            Long brandId
+    ){
+        public ProductCriteria.SearchCount toCriteria() {
+            return ProductCriteria.SearchCount.of(
+                    brandId
+            );
+        }
+    }
 }

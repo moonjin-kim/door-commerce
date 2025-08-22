@@ -30,4 +30,12 @@ public interface LikeV1ApiSpec {
             Pageable pageable,
             Long userId
     );
+
+    @Operation(
+            summary = "좋아요 수 조회",
+            description = "좋아요한 상품들의 총 개수 조회합니다."
+    )
+    ApiResponse<LikeV1Response.LikeProductCount> countBy(
+            Long userId
+    );
 }

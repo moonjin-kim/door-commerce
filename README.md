@@ -6,14 +6,14 @@ Loopers 에서 제공하는 스프링 자바 템플릿 프로젝트입니다.
 ### Environment
 `local` 프로필로 동작할 수 있도록, 필요 인프라를 `docker-compose` 로 제공합니다.
 ```shell
-docker-compose -f ./docker/infra-compose.yml up
+docker compose -f ./docker/infra-compose.yml up
 ```
 ### Monitoring
 `local` 환경에서 모니터링을 할 수 있도록, `docker-compose` 를 통해 `prometheus` 와 `grafana` 를 제공합니다.
 
 애플리케이션 실행 이후, **http://localhost:3000** 로 접속해, admin/admin 계정으로 로그인하여 확인하실 수 있습니다.
 ```shell
-docker-compose -f ./docker/monitoring-compose.yml up
+docker compose -f ./docker/monitoring-compose.yml up
 ```
 
 ## About Multi-Module Project
@@ -29,6 +29,7 @@ Root
 │   └── 📦 commerce-api
 ├── modules ( reusable-configurations )
 │   └── 📦 jpa
+│   └── 📦 redis
 └── supports ( add-ons )
     ├── 📦 monitoring
     └── 📦 logging

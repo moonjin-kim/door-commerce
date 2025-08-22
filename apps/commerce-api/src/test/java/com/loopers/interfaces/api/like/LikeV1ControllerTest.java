@@ -9,6 +9,7 @@ import com.loopers.infrastructure.like.LikeJpaRepository;
 import com.loopers.infrastructure.product.ProductJpaRepository;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.utils.DatabaseCleanUp;
+import com.loopers.utils.RedisCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -37,23 +38,28 @@ class LikeV1ControllerTest {
     private final TestRestTemplate testRestTemplate;
     @Autowired
     private final DatabaseCleanUp databaseCleanUp;
+    @Autowired
+    private RedisCleanUp redisCleanUp;
 
     @Autowired
     public LikeV1ControllerTest(
             ProductJpaRepository productJpaRepository,
             LikeJpaRepository likeJpaRepository,
             TestRestTemplate testRestTemplate,
-            DatabaseCleanUp databaseCleanUp
+            DatabaseCleanUp databaseCleanUp,
+            RedisCleanUp redisCleanUp
     ) {
         this.productJpaRepository = productJpaRepository;
         this.likeJpaRepository = likeJpaRepository;
         this.testRestTemplate = testRestTemplate;
         this.databaseCleanUp = databaseCleanUp;
+        this.redisCleanUp = redisCleanUp;
     }
 
     @AfterEach
     void tearDown() {
         databaseCleanUp.truncateAllTables();
+        redisCleanUp.truncateAll();
     }
 
     @DisplayName("Post /api/v1/like/products/{productId} - 좋아요")
@@ -325,7 +331,6 @@ class LikeV1ControllerTest {
             //then
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertEquals(1, response.getBody().data().getTotalCount()),
                     () -> assertEquals(1, response.getBody().data().getItems().size()),
                     () -> assertEquals(product.getId(), response.getBody().data().getItems().get(0).productId())
             );
