@@ -6,8 +6,6 @@ import com.loopers.application.order.OrderResult;
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
 import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.interfaces.api.product.ProductV1Request;
-import com.loopers.interfaces.api.product.ProductV1Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -25,9 +23,19 @@ public class OrderV1Controller implements OrderV1ApiSpec{
             @RequestHeader("X-USER-ID") Long userId,
             @RequestBody OrderV1Request.Order request
     ) {
-        OrderResult.Order orders = orderFacade.order(request.toCommand(userId));
+        OrderResult.Order orders = orderFacade.order(request.toCriteria(userId));
 
         return ApiResponse.success(OrderV1Response.Order.from(orders));
+    }
+
+    @PostMapping("/callback")
+    @Override
+    public ApiResponse<?> callback(
+            @RequestBody OrderV1Request.Callback request
+    ) {
+        System.out.println("callback request = " + request);
+
+        return ApiResponse.success(orderFacade.callback(request.toCriteria()));
     }
 
     @GetMapping("/{orderId}")

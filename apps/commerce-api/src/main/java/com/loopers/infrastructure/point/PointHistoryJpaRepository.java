@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface PointHistoryJpaRepository extends JpaRepository<PointHistory, Long> {
     List<PointHistory> findByPointId(Long pointId);
-    Optional<PointHistory> findByOrderId(Long orderId);
+    Optional<PointHistory> findByOrderId(String orderId);
 }

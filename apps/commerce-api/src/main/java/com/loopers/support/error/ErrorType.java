@@ -26,7 +26,8 @@ public enum ErrorType {
     COUPON_ALREADY_USED(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(), "이미 사용한 쿠폰입니다."),
 
     /** 결제 에러 **/
-    UNSUPPORTED_PAYMENT_METHOD(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(), "지원하지 않는 결제수단입니다.");
+    UNSUPPORTED_PAYMENT_METHOD(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(), "지원하지 않는 결제수단입니다."),
+    PAYMENT_ERROR(HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST.getReasonPhrase(), "결제 실패 입니다.");
 
     private final HttpStatus status;
     private final String code;

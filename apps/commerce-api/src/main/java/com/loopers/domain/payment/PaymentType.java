@@ -1,8 +1,8 @@
 package com.loopers.domain.payment;
 
 public enum PaymentType {
-    CREDIT_CARD("creditCardPayment"),
-    POINT("pointPayment");
+    CARD("CARD"),
+    POINT("POINT");
 
     private final String beanName;
 

@@ -4,9 +4,11 @@ import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderRepository;
+import com.loopers.domain.order.OrderStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -26,7 +28,17 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
+    public Optional<Order> findByOrderId(String orderId) {
+        return orderJpaRepository.findByOrderId(orderId);
+    }
+
+    @Override
     public PageResponse<Order> findAllBy(PageRequest<OrderParams.GetOrdersBy> params) {
         return orderQueryDslRepository.findAllBy(params);
+    }
+
+    @Override
+    public List<Order> findAllBy(OrderStatus status) {
+        return orderJpaRepository.findAllByStatus(status);
     }
 }

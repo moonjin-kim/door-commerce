@@ -102,7 +102,7 @@ class OrderTest {
             assertAll(
                     ()-> assertEquals(1L, order.getUserId()),
                     () -> assertEquals(11000L, order.getTotalAmount().longValue()),
-                    () -> assertEquals(OrderStatus.CONFIRMED, order.getStatus()),
+                    () -> assertEquals(OrderStatus.PENDING, order.getStatus()),
                     () -> assertEquals(2, order.getOrderItems().size()),
                     () -> assertEquals("상품1", order.getOrderItems().get(0).getName()),
                     () -> assertEquals("상품2", order.getOrderItems().get(1).getName())

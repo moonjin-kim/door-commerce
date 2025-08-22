@@ -47,4 +47,11 @@ public class Stock extends BaseEntity {
         }
         this.quantity -= quantity;
     }
+
+    public void increase(int quantity) {
+        if(quantity <= 0) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "재고 증가 수량은 0보다 커야 합니다.");
+        }
+        this.quantity += quantity;
+    }
 }

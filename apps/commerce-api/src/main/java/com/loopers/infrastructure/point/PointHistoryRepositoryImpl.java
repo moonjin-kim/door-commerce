@@ -17,7 +17,7 @@ public class PointHistoryRepositoryImpl implements PointHistoryRepository {
     }
 
     @Override
-    public Optional<PointHistory> findByOrderId(Long orderId) {
+    public Optional<PointHistory> findByOrderId(String orderId) {
         return pointHistoryJpaRepository.findByOrderId(orderId);
     }
 }

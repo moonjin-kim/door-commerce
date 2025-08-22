@@ -1,5 +1,6 @@
 package com.loopers.interfaces.api.order;
 
+import com.loopers.application.order.payment.PaymentMethodType;
 import com.loopers.domain.PageResponse;
 import com.loopers.domain.coupon.Coupon;
 import com.loopers.domain.coupon.CouponCommand;
@@ -128,7 +129,11 @@ class OrderV1ControllerTest {
             ));
 
             var request = new OrderV1Request.Order(
-                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)),null
+                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)),
+                    null,
+                    PaymentMethodType.POINT,
+                    null,
+                    null
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -189,7 +194,11 @@ class OrderV1ControllerTest {
             ));
 
             var request = new OrderV1Request.Order(
-                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)), null
+                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)),
+                    null,
+                    PaymentMethodType.POINT,
+                    null,
+                    null
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -243,7 +252,11 @@ class OrderV1ControllerTest {
             ));
 
             var request = new OrderV1Request.Order(
-                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)), null
+                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)),
+                    null,
+                    PaymentMethodType.POINT,
+                    null,
+                    null
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -272,7 +285,7 @@ class OrderV1ControllerTest {
                     () -> assertThat(pointHistory.getPointId()).isEqualTo(point1.getId()),
                     () -> assertThat(pointHistory.getAmount()).isEqualTo(-20000L),
                     () -> assertThat(pointHistory.getStatus()).isEqualTo(PointStatus.USE),
-                    () -> assertThat(pointHistory.getOrderId()).isEqualTo(response.getBody().data().id())
+                    () -> assertThat(pointHistory.getOrderId()).isEqualTo(response.getBody().data().orderId())
             );
         }
 
@@ -304,7 +317,12 @@ class OrderV1ControllerTest {
             ));
 
             var request = new OrderV1Request.Order(
-                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)), null
+                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)),
+                    null,
+                    PaymentMethodType.POINT,
+                    null,
+                    null
+
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -357,7 +375,10 @@ class OrderV1ControllerTest {
             ));
 
             var request = new OrderV1Request.Order(
-                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)), null
+                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2)), null,
+                    PaymentMethodType.POINT,
+                    null,
+                    null
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -410,7 +431,11 @@ class OrderV1ControllerTest {
             ));
 
             var request = new OrderV1Request.Order(
-                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2),new OrderV1Request.OrderItem(2L, 2)), null
+                    List.of(new OrderV1Request.OrderItem(product1.getId(), 2),new OrderV1Request.OrderItem(2L, 2)),
+                    null,
+                    PaymentMethodType.POINT,
+                    null,
+                    null
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -475,7 +500,10 @@ class OrderV1ControllerTest {
 
             var request = new OrderV1Request.Order(
                     List.of(new OrderV1Request.OrderItem(product1.getId(), 2)),
-                    coupon.getId()
+                    coupon.getId(),
+                    PaymentMethodType.POINT,
+                    null,
+                    null
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -540,7 +568,10 @@ class OrderV1ControllerTest {
 
             var request = new OrderV1Request.Order(
                     List.of(new OrderV1Request.OrderItem(product1.getId(), 2)),
-                    1L
+                    1L,
+                    PaymentMethodType.POINT,
+                    null,
+                    null
             );
 
             HttpHeaders headers = new HttpHeaders();
@@ -754,6 +785,9 @@ class OrderV1ControllerTest {
 
             var request = new OrderV1Request.Order(
                     List.of(new OrderV1Request.OrderItem(product.getId(), 1)),
+                    null,
+                    PaymentMethodType.POINT,
+                    null,
                     null
             );
 

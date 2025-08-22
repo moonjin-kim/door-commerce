@@ -1,17 +1,29 @@
 package com.loopers.domain.payment;
 
-import com.loopers.application.payment.PaymentMethod;
+import com.loopers.domain.pg.CardType;
 
 public class PaymentCommand {
     public record Pay(
-            Long orderId,
+            String orderId,
             Long userId,
             Long amount,
-            String method
+            PaymentType method,
+            CardType cardType,
+            String cardNumber
     ) {
-        static public Pay of(Long orderId, Long userId, Long amount, String method) {
-            return new Pay(orderId, userId, amount, method);
+        static public Pay of(String orderId, Long userId, Long amount, PaymentType method) {
+            return new Pay(orderId, userId, amount, method, null,null);
+        }
+
+        static public Pay of(
+                String orderId,
+                Long userId,
+                Long amount,
+                PaymentType method,
+                CardType cardType,
+                String cardNumber
+        ) {
+            return new Pay(orderId, userId, amount, method, cardType, cardNumber);
         }
     }
-
 }

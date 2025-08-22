@@ -1,7 +1,6 @@
 package com.loopers.domain.brand;
 
-import com.loopers.domain.product.Product;
-import com.loopers.support.CacheRepository;
+import com.loopers.support.cache.CacheRepository;
 import com.loopers.support.cache.CommerceCache;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
