@@ -2,6 +2,8 @@ package com.loopers.infrastructure.pg;
 
 import com.loopers.domain.pg.CardType;
 
+import java.util.List;
+
 public class PgResponse {
     public record Pay(
             String transactionKey,
@@ -20,4 +22,19 @@ public class PgResponse {
             String reason
     ) {
     }
+
+    public record FindByOrderId(
+            String orderId,
+            List<Transactional> transactions
+    ) {
+        public static FindByOrderId of(String orderId, List<Transactional> transactions) {
+            return new FindByOrderId(orderId, transactions != null ? transactions : List.of());
+        }
+    }
+
+    public record Transactional(
+            String transactionKey,
+            String status,
+            String reason
+    ) {}
 }

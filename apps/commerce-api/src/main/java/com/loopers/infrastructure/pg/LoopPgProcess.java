@@ -2,6 +2,7 @@ package com.loopers.infrastructure.pg;
 
 import com.loopers.domain.pg.PgProcess;
 import com.loopers.infrastructure.payment.PaymentResponse;
+import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +27,13 @@ public class LoopPgProcess implements PgProcess {
     @CircuitBreaker(name = "pgCircuit")
     @Retry(name = "pgRetry")
     @Override
-    public List<PgResponse.Find> findByOrderId(String orderId, Long userId) {
-        PaymentResponse<List<PgResponse.Find>> result = pgFeignClient.findByOrderId(orderId, userId);
-        return result.getData();
+    public PgResponse.FindByOrderId findByOrderId(String orderId, Long userId) {
+        try {
+            PaymentResponse<PgResponse.FindByOrderId> result = pgFeignClient.findByOrderId(orderId, userId);
+            return result.getData();
+        } catch (FeignException.NotFound e) {
+            return PgResponse.FindByOrderId.of(orderId, List.of());
+        }
     }
 
     @CircuitBreaker(name = "pgCircuit")

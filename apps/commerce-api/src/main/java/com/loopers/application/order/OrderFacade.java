@@ -17,6 +17,7 @@ import com.loopers.domain.stock.StockService;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class OrderFacade {
@@ -107,34 +109,32 @@ public class OrderFacade {
         List<Order> orders = orderService.getPendingOrders();
 
         for(Order order : orders) {
-            if (!order.isExpire(currentTime)) {
-                continue;
-            }
-            List<PgInfo.Find> pgResults = pgService.findByOrderId(order.getOrderId(), order.getUserId());
-
-            boolean isNotPaid = pgResults.isEmpty();
-            String reason = "주문 정보가 없습니다.";
-            for(PgInfo.Find pgResult : pgResults) {
-                isNotPaid = true;
-                if(pgResult.status().equals("SUCCESS")) {
-                    // 결제 정보가 있는 경우 주문 만료 처리
-                    orderService.complete(order.getOrderId());
-                    paymentService.paymentComplete(order.getOrderId(), "AUTO_CANCEL");
-                    isNotPaid = false;
-                    break;
+            try {
+                if (!order.isExpire(currentTime)) {
+                    continue;
                 }
-            }
+                PgInfo.FindByOrderId pgResults = pgService.findByOrderId(order.getOrderId(), order.getUserId());
 
-            if(isNotPaid) {
-                // 결제 정보가 없거나 실패한 경우 주문 취소
-                orderService.cancel(order.getOrderId());
+                boolean isNotPaid = pgResults.transactions().isEmpty();
+                String reason = "주문 정보가 없습니다.";
+                for(PgInfo.Transactional pgResult : pgResults.transactions()) {
+                    isNotPaid = true;
+                    if(pgResult.status().equals("SUCCESS")) {
+                        // 결제 정보가 있는 경우 주문 만료 처리
+                        orderService.complete(order.getOrderId());
+                        paymentService.paymentComplete(order.getOrderId(), "AUTO_CANCEL");
+                        isNotPaid = false;
+                        break;
+                    }
+                }
 
-                // 재고 복구
-                order.getOrderItems().forEach(orderItem -> {
-                    stockService.increase(StockCommand.Increase.of(orderItem.getProductId(), orderItem.getQuantity()));
-                });
-
-                paymentService.paymentFail(order.getOrderId(), reason);
+                if(isNotPaid) {
+                    // 재고 복구
+                    orderTransactionService.cancelOrder(order.getOrderId());
+                    paymentService.paymentFail(order.getOrderId(), reason);
+                }
+            } catch (Exception e) {
+                log.error("주문 동기화 중 오류 발생: {}", order.getOrderId(), e);
             }
         }
     }

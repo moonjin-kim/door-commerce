@@ -25,11 +25,13 @@ public class PgService {
         return PgInfo.Find.from(response);
     }
 
-    public List<PgInfo.Find> findByOrderId(String orderId, Long userId) {
-        List<PgResponse.Find> responses = pgProcess.findByOrderId(orderId, userId);
+    public PgInfo.FindByOrderId findByOrderId(String orderId, Long userId) {
 
-        return responses.stream()
-                .map(PgInfo.Find::from)
-                .toList();
+        PgResponse.FindByOrderId responses = pgProcess.findByOrderId(orderId, userId);
+        for (PgResponse.Transactional response : responses.transactions()) {
+            System.out.println(response);
+        }
+
+        return PgInfo.FindByOrderId.from(responses);
     }
 }

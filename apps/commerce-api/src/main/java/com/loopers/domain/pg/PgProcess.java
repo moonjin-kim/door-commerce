@@ -10,5 +10,5 @@ public interface PgProcess {
 
     PgResponse.Find findByPGId(String paymentId, Long userId);
 
-    List<PgResponse.Find> findByOrderId(String orderId, Long userId);
+    PgResponse.FindByOrderId findByOrderId(String orderId, Long userId);
 }

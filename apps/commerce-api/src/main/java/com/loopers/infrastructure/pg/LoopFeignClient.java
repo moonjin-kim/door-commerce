@@ -18,5 +18,5 @@ public interface LoopFeignClient {
     PaymentResponse<PgResponse.Find> findByPaymentId(@PathVariable("paymentId") String paymentId, @RequestHeader("X-USER-ID") Long userId);
 
     @GetMapping("/api/v1/payments")
-    PaymentResponse<List<PgResponse.Find>> findByOrderId(@RequestParam("orderId") String orderId, @RequestHeader("X-USER-ID") Long userId);
+    PaymentResponse<PgResponse.FindByOrderId> findByOrderId(@RequestParam("orderId") String orderId, @RequestHeader("X-USER-ID") Long userId);
 }

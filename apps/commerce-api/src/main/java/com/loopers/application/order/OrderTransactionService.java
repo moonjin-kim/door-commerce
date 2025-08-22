@@ -76,4 +76,20 @@ public class OrderTransactionService {
 
         return order;
     }
+
+    @Transactional
+    public Order cancelOrder(String orderId) {
+        // 주문 조회
+        Order order = orderService.getByOrderId(orderId).orElseThrow(
+                () -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 주문: " + orderId)
+        );
+
+        // 재고 증가
+        order.getOrderItems().forEach(orderItem -> {
+            stockService.increase(StockCommand.Increase.of(orderItem.getProductId(), orderItem.getQuantity()));
+        });
+
+        // 주문 취소
+        return orderService.cancel(orderId);
+    }
 }
