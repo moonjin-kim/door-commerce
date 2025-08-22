@@ -34,7 +34,7 @@ resilience4j:
         minimum-number-of-calls: 4
         wait-duration-in-open-state: 2s # Open 상태 유지 시간
         permitted-number-of-calls-in-half-open-state: 2
-        slow-call-duration-threshold: 1s
+        slow-call-duration-threshold: 2s
         record-exceptions:
           - feign.FeignException.InternalServerError
           - java.io.IOException
