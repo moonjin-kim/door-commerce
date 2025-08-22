@@ -29,7 +29,7 @@ public class OrderTransactionService {
     private final CouponApplier couponApplier;
 
     @Transactional
-    public Order prepareOrder(OrderCriteria.Order criteria) {
+    public OrderResult.Order prepareOrder(OrderCriteria.Order criteria) {
         // Validate user
         var user = userService.getUser(criteria.userId());
         if (user.isEmpty()) {
@@ -74,11 +74,11 @@ public class OrderTransactionService {
             stockService.decrease(StockCommand.Decrease.from(orderItem));
         });
 
-        return order;
+        return OrderResult.Order.from(order);
     }
 
     @Transactional
-    public Order cancelOrder(String orderId) {
+    public OrderResult.Order cancelOrder(String orderId) {
         // 주문 조회
         Order order = orderService.getByOrderId(orderId).orElseThrow(
                 () -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 주문: " + orderId)
@@ -89,7 +89,15 @@ public class OrderTransactionService {
             stockService.increase(StockCommand.Increase.of(orderItem.getProductId(), orderItem.getQuantity()));
         });
 
+        order = orderService.cancel(orderId);
+
         // 주문 취소
-        return orderService.cancel(orderId);
+        return OrderResult.Order.from(order);
+    }
+
+    @Transactional
+    public OrderResult.Order complete(String orderId) {
+        Order order = orderService.complete(orderId);
+        return OrderResult.Order.from(order);
     }
 }

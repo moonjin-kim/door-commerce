@@ -36,17 +36,16 @@ public class OrderFacade {
     private final OrderTransactionService orderTransactionService;
     private final PgService pgService;
 
-    @Transactional
     public OrderResult.Order order(OrderCriteria.Order criteria) {
         // Validate user
-        Order order = orderTransactionService.prepareOrder(criteria);
+        OrderResult.Order order = orderTransactionService.prepareOrder(criteria);
 
         // 결제
         PaymentInfo.Pay paymentInfo = paymentProcess.processPayment(
             PaymentCriteria.Pay.of(
-                order.getOrderId(),
-                order.getUserId(),
-                order.getTotalAmount().longValue(),
+                order.orderId(),
+                order.userId(),
+                order.finalAmount(),
                 criteria.paymentMethodType().name(),
                 criteria.cardType(),
                 criteria.cardNumber()
@@ -55,16 +54,14 @@ public class OrderFacade {
 
         if(paymentInfo.status() == PaymentStatus.FAILED) {
             // 결제 실패 시 주문 취소(카드 정보 에러, 포인트 부족과 같은 결제 실패 사유)
-            order.getOrderItems().forEach(orderItem -> {
-                stockService.increase(StockCommand.Increase.of(orderItem.getProductId(), orderItem.getQuantity()));
-            });
-            order = orderService.cancel(order.getOrderId());
+            order = orderTransactionService.cancelOrder(order.orderId());
+            throw new CoreException(ErrorType.PAYMENT_ERROR, "결제 실패: " );
         } else if(paymentInfo.status() == PaymentStatus.COMPLETED) {
             // 포인트로 결제한 경우
-            order = orderService.complete(order.getOrderId());
+            order = orderTransactionService.complete(order.orderId());
         }
 
-        return OrderResult.Order.from(order);
+        return order;
     }
 
     @Transactional

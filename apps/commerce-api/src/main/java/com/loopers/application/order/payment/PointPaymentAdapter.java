@@ -18,7 +18,6 @@ public class PointPaymentAdapter implements PaymentMethod {
     private final PointService pointService;
     private final PaymentService paymentService;
 
-    @Transactional
     @Override
     public PaymentInfo.Pay pay(PaymentCriteria.Pay criteria) {
         PaymentInfo.Pay payInfo = paymentService.pay(PaymentCommand.Pay.of(
@@ -27,7 +26,7 @@ public class PointPaymentAdapter implements PaymentMethod {
                 criteria.amount(),
                 criteria.method()
         ));
-        
+
         try {
             Point point = pointService.using(PointCommand.Using.of(
                     criteria.userId(),

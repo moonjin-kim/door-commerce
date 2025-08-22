@@ -64,7 +64,7 @@ class PaymentServiceTest {
                     () -> assertThat(payment.getUserId()).isEqualTo(1000L),
                     () -> assertThat(payment.getPaymentAmount().longValue()).isEqualTo(10000L),
                     () -> assertThat(payment.getPaymentType()).isEqualTo(PaymentType.POINT),
-                    () -> assertThat(payment.getStatus()).isEqualTo(PaymentStatus.COMPLETED)
+                    () -> assertThat(payment.getStatus()).isEqualTo(PaymentStatus.PENDING)
             );
         }
 

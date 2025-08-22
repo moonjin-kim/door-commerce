@@ -3,6 +3,7 @@ package com.loopers.domain.brand;
 import com.loopers.infrastructure.brand.BrandJpaRepository;
 import com.loopers.support.cache.CacheRepository;
 import com.loopers.utils.DatabaseCleanUp;
+import com.loopers.utils.RedisCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,12 +25,16 @@ class BrandServiceTest {
     private BrandService brandService;
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
-    @MockitoSpyBean
+    @Autowired
     private CacheRepository cacheRepository;
+    @Autowired
+    private RedisCleanUp redisCleanUp;
+
 
     @AfterEach
     void tearDown() {
         databaseCleanUp.truncateAllTables();
+        redisCleanUp.truncateAll();
     }
 
     @DisplayName("브랜드를 조회할 때")
