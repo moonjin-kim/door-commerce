@@ -107,9 +107,6 @@ public class OrderFacade {
 
         for(Order order : orders) {
             try {
-                if (!order.isExpire(currentTime)) {
-                    continue;
-                }
                 PgInfo.FindByOrderId pgResults = pgService.findByOrderId(order.getOrderId(), order.getUserId());
 
                 boolean isNotPaid = pgResults.transactions().isEmpty();

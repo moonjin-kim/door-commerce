@@ -1,5 +1,6 @@
-package com.loopers.application.order;
+package com.loopers.interfaces.schedule.order;
 
+import com.loopers.application.order.OrderFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

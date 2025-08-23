@@ -89,6 +89,7 @@ public class OrderTransactionService {
             stockService.increase(StockCommand.Increase.of(orderItem.getProductId(), orderItem.getQuantity()));
         });
 
+        couponApplier.cancelCoupon(order);
         order = orderService.cancel(orderId);
 
         // 주문 취소

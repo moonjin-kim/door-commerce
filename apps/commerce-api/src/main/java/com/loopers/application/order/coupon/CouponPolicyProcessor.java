@@ -7,7 +7,8 @@ import com.loopers.domain.coupon.policy.PercentDiscountPolicy;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CouponPolicyAdapter {
+public class CouponPolicyProcessor {
+
     public DiscountPolicy getPolicy(UserCoupon userCoupon) {
         return switch (userCoupon.getType()) {
             case PERCENT -> new PercentDiscountPolicy(userCoupon.getValue());

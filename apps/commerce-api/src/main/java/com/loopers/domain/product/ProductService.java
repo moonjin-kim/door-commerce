@@ -43,7 +43,6 @@ public class ProductService {
 
     @CircuitBreaker(name = "productCircuit", fallbackMethod = "getProductsFallback")
     public PageResponse<ProductView> search(PageRequest<ProductCommand.Search> command) {
-
         PageRequest<ProductParams.Search> productParams = command.map(ProductCommand.Search::toParams);
 
         return productRepository.search(productParams);

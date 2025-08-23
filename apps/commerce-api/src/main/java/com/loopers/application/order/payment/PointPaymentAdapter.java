@@ -19,6 +19,7 @@ public class PointPaymentAdapter implements PaymentMethod {
     private final PaymentService paymentService;
 
     @Override
+    @Transactional
     public PaymentInfo.Pay pay(PaymentCriteria.Pay criteria) {
         PaymentInfo.Pay payInfo = paymentService.pay(PaymentCommand.Pay.of(
                 criteria.orderId(),
