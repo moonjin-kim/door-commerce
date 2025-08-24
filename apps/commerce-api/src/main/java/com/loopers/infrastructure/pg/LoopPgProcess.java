@@ -20,7 +20,6 @@ public class LoopPgProcess implements PgProcess {
     private final LoopFeignClient pgFeignClient;
 
     @CircuitBreaker(name = "pgCircuit", fallbackMethod = "fallbackPayment")
-    @Retry(name = "pgRetry")
     @Override
     public PgResponse.Pay payment(PgRequest.Pay request, Long userId) {
         return pgFeignClient.payment(request, userId).getData();

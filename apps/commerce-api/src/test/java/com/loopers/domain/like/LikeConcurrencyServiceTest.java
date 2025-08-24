@@ -1,7 +1,5 @@
 package com.loopers.domain.like;
 
-import com.loopers.domain.PageRequest;
-import com.loopers.domain.PageResponse;
 import com.loopers.infrastructure.like.LikeJpaRepository;
 import com.loopers.utils.DatabaseCleanUp;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +20,6 @@ import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @Slf4j
 @SpringBootTest
