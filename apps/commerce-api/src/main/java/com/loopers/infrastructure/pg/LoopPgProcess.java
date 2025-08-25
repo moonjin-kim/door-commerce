@@ -25,13 +25,14 @@ public class LoopPgProcess implements PgProcess {
         try {
             return pgFeignClient.payment(request, userId).getData();
         } catch (FeignException.BadRequest e) {
-            throw new CoreException(ErrorType.PAYMENT_ERROR, "PG 결제 요청이 거부되었습니다. 다시 시도해주세요.");
+            log.error("PG 결제 요청 실패: {}", e.getMessage());
+            throw new CoreException(ErrorType.PAYMENT_DECLINED, "PG 결제 요청이 거부되었습니다. 다시 시도해주세요.");
         }
 
     }
 
-    @CircuitBreaker(name = "pgCircuit")
     @Retry(name = "pgRetry")
+    @CircuitBreaker(name = "pgCircuit")
     @Override
     public PgResponse.FindByOrderId findByOrderId(String orderId, Long userId) {
         try {
@@ -42,8 +43,8 @@ public class LoopPgProcess implements PgProcess {
         }
     }
 
-    @CircuitBreaker(name = "pgCircuit")
     @Retry(name = "pgRetry")
+    @CircuitBreaker(name = "pgCircuit")
     @Override
     public PgResponse.Find findByPGId(String paymentId, Long userId) {
         PaymentResponse<PgResponse.Find> result = pgFeignClient.findByPaymentId(paymentId, userId);
