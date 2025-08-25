@@ -1,7 +1,7 @@
 package com.loopers.application.order;
 
 import com.loopers.application.order.payment.PaymentCriteria;
-import com.loopers.application.order.payment.PaymentProcess;
+import com.loopers.application.order.payment.PaymentProcessor;
 import com.loopers.domain.payment.PaymentInfo;
 import com.loopers.domain.payment.PaymentStatus;
 import com.loopers.domain.pg.PgService;
@@ -32,7 +32,7 @@ public class OrderFacade {
     private final OrderService orderService;
     private final PaymentService paymentService;
     private final StockService stockService;
-    private final PaymentProcess paymentProcess;
+    private final PaymentProcessor paymentProcess;
     private final OrderTransactionService orderTransactionService;
     private final PgService pgService;
 

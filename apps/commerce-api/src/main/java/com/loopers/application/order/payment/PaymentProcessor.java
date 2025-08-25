@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class PaymentProcess {
+public class PaymentProcessor {
     private final Map<String, PaymentMethod> paymentStrategyMap;
 
     public PaymentInfo.Pay processPayment(PaymentCriteria.Pay command) {

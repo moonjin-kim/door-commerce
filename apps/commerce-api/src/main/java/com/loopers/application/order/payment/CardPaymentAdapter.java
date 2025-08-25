@@ -4,6 +4,8 @@ import com.loopers.domain.pg.PgService;
 import com.loopers.infrastructure.pg.PgRequest;
 import com.loopers.domain.payment.PaymentInfo;
 import com.loopers.domain.payment.PaymentService;
+import com.loopers.support.error.CoreException;
+import com.loopers.support.error.ErrorType;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,9 +38,11 @@ public class CardPaymentAdapter implements PaymentMethod {
                     ),
                     criteria.userId()
             );
-        } catch (FeignException.BadRequest e) {
+        } catch (CoreException e) {
             log.error("PG 결제가 실패하였습니다. orderId: {}", criteria.orderId(), e);
-            paymentResult = paymentService.paymentFail(criteria.orderId(), e.getMessage());
+            if (e.getErrorType().equals(ErrorType.PAYMENT_ERROR)) {
+                paymentResult = paymentService.paymentFail(criteria.orderId(), e.getMessage());
+            }
         } catch (Exception e) {
             log.error("PG 결제 중 예외가 발생하였습니다. orderId: {}", criteria.orderId(), e);
         }
