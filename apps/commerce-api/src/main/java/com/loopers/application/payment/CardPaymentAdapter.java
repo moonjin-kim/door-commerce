@@ -21,7 +21,7 @@ public class CardPaymentAdapter implements PaymentMethod {
 
     @Override
     public PaymentInfo.Pay pay(PaymentCriteria.RequestPayment criteria) {
-        String callbackUrl = "http://localhost:8080/api/v1/orders/callback";
+        String callbackUrl = "http://localhost:8080/api/v1/payments/callback";
 
         PaymentInfo.Pay paymentResult = paymentService.requestPayment(
             criteria.toCommand()

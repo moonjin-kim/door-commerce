@@ -36,7 +36,7 @@ public class OrderFacade {
     private final PaymentService paymentService;
     private final StockService stockService;
     private final PgService pgService;
-    private final CommonApplicationPublisher eventPublisher;
+    private final OrderEventPublisher eventPublisher;
     private final ProductService productService;
     private final UserService userService;
     private final CouponProcessor couponApplier;

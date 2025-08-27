@@ -19,6 +19,7 @@ import com.loopers.infrastructure.order.OrderJpaRepository;
 import com.loopers.infrastructure.product.ProductJpaRepository;
 import com.loopers.infrastructure.stock.StockJpaRepository;
 import com.loopers.infrastructure.user.UserJpaRepository;
+import com.loopers.support.TestSupport;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
@@ -39,8 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
-class OrderFacadeTest {
+class OrderFacadeTest extends TestSupport {
     @Autowired
     private CouponJpaRepository couponJpaRepository;
     @Autowired
@@ -56,7 +56,7 @@ class OrderFacadeTest {
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
     @MockitoBean
-    private CommonApplicationPublisher eventPublisher;
+    private OrderEventPublisher eventPublisher;
     @Autowired
     private RedisCleanUp redisCleanUp;
 

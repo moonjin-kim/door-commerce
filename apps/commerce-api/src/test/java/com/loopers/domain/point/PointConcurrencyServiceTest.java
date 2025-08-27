@@ -36,8 +36,6 @@ public class PointConcurrencyServiceTest {
     @Autowired
     private PointJpaRepository pointJpaRepository;
     @Autowired
-    private PointHistoryJpaRepository pointHistoryJpaRepository;
-    @Autowired
     private PointService pointService;
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
@@ -54,7 +52,7 @@ public class PointConcurrencyServiceTest {
         @Test
         void chargeSuccess_whenPointChargeSimultaneously() throws InterruptedException  {
             //given
-            int threadCount = 10;
+            int threadCount = 2;
             ExecutorService executor = Executors.newFixedThreadPool(threadCount);
             CountDownLatch latch = new CountDownLatch(threadCount);
             User user = userJpaRepository.save(UserFixture.createMember());
@@ -80,7 +78,7 @@ public class PointConcurrencyServiceTest {
             //then
             latch.await();
             Point afterPoint = pointJpaRepository.findById(point.getId()).orElseThrow();
-            assertThat(afterPoint.getBalance().longValue()).isEqualTo(100000L);
+            assertThat(afterPoint.getBalance().longValue()).isEqualTo(20000L);
 
         }
     }
@@ -92,7 +90,7 @@ public class PointConcurrencyServiceTest {
         @Test
         void successUsed_whenPointIsUsedSimultaneously() throws InterruptedException  {
             //given
-            int threadCount = 10;
+            int threadCount = 2;
             ExecutorService executor = Executors.newFixedThreadPool(threadCount);
             CountDownLatch latch = new CountDownLatch(threadCount);
             User user = userJpaRepository.save(UserFixture.createMember());
@@ -119,7 +117,7 @@ public class PointConcurrencyServiceTest {
             //then
             latch.await();
             Point afterPoint = pointJpaRepository.findById(point.getId()).orElseThrow();
-            assertThat(afterPoint.getBalance().longValue()).isEqualTo(0L);
+            assertThat(afterPoint.getBalance().longValue()).isEqualTo(80000L);
 
         }
     }

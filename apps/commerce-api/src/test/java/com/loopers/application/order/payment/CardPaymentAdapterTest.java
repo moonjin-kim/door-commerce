@@ -7,7 +7,9 @@ import com.loopers.domain.payment.PaymentStatus;
 import com.loopers.domain.payment.PaymentType;
 import com.loopers.domain.pg.CardType;
 import com.loopers.domain.pg.PgProcess;
+import com.loopers.infrastructure.pg.LoopPgProcess;
 import com.loopers.infrastructure.pg.PgResponse;
+import com.loopers.support.TestSupport;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
@@ -27,14 +29,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest
-class CardPaymentAdapterTest {
+class CardPaymentAdapterTest extends TestSupport {
+
+    @MockitoBean
+    LoopPgProcess pgProcess;
 
     @Autowired
     CardPaymentAdapter cardPaymentAdapter;
-
-    @MockitoBean
-    PgProcess pgProcess;
 
     @Autowired
     DatabaseCleanUp databaseCleanUp;

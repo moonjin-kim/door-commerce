@@ -1,8 +1,11 @@
 package com.loopers.domain.payment;
 
+import com.loopers.domain.order.Order;
+import com.loopers.domain.order.OrderStatus;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -41,5 +44,10 @@ public class PaymentService {
 
     public Optional<Payment> getPaymentByOrderId(String orderId) {
         return paymentRepository.findByOrderId(orderId);
+    }
+
+    public List<Payment> getPendingOrders() {
+        // 주문 목록 조회
+        return paymentRepository.findAllBy(PaymentStatus.PENDING);
     }
 }

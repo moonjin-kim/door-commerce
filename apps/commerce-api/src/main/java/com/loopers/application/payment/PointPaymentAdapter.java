@@ -37,9 +37,11 @@ public class PointPaymentAdapter implements PaymentMethod {
             ));
             String transactionKey = UuidCreator.getTimeOrdered().toString();
             payInfo = paymentService.paymentComplete(criteria.orderId(), transactionKey);
+
             eventPublisher.publish(PaymentEvent.Success.of(criteria.orderId()));
         } catch (Exception e) {
             payInfo = paymentService.paymentFail(criteria.orderId(), e.getMessage());
+
             eventPublisher.publish(PaymentEvent.Failed.of(criteria.orderId()));
         }
 

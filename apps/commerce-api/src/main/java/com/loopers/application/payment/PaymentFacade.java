@@ -2,6 +2,7 @@ package com.loopers.application.payment;
 
 import com.loopers.application.order.OrderCriteria;
 import com.loopers.domain.PgInfo;
+import com.loopers.domain.order.Order;
 import com.loopers.domain.payment.Payment;
 import com.loopers.domain.payment.PaymentService;
 import com.loopers.domain.pg.PgService;
@@ -9,21 +10,31 @@ import com.loopers.infrastructure.comman.CommonApplicationPublisher;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class PaymentFacade {
     private final PaymentService paymentService;
     private final PgService pgService;
     private final CommonApplicationPublisher eventPublisher;
-    private final PaymentProcessor paymentProcessor;
+    private final Map<String, PaymentMethod> paymentStrategyMap;
 
     public void requestPayment(PaymentCriteria.RequestPayment criteria) {
-        paymentProcessor.processPayment(criteria);
+        PaymentMethod paymentMethod = paymentStrategyMap.get(criteria.method().name());
+        if (paymentMethod == null) {
+            throw new CoreException(ErrorType.UNSUPPORTED_PAYMENT_METHOD);
+        }
+
+        paymentMethod.pay(criteria);
     }
 
     @Transactional
@@ -36,13 +47,47 @@ public class PaymentFacade {
         PgInfo.Find pgResult = pgService.findByTransactionKey(criteria.transactionKey(), payment.getUserId());
         if(pgResult == null) {
             eventPublisher.publish(PaymentEvent.Failed.of(criteria.orderId()));
-        }else if(!Objects.equals(pgResult.status(), "SUCCESS")) {
+        } else if(!Objects.equals(pgResult.status(), "SUCCESS")) {
             eventPublisher.publish(PaymentEvent.Failed.of(criteria.orderId()));
         }
-
 
         // 결제 완료 저장
         paymentService.paymentComplete(payment.getOrderId(), pgResult.transactionKey());
         eventPublisher.publish(PaymentEvent.Success.of(criteria.orderId()));
+    }
+
+
+
+    public void syncPayment(LocalDateTime currentTime) {
+        // 주문 정보 조회
+        List<Payment> payments = paymentService.getPendingOrders();
+
+        for(Payment payment : payments) {
+            try {
+                PgInfo.FindByOrderId pgResults = pgService.findByOrderId(payment.getOrderId(), payment.getUserId());
+
+                boolean isNotPaid = pgResults.transactions().isEmpty();
+                String reason = "주문 정보가 없습니다.";
+                for(PgInfo.Transactional pgResult : pgResults.transactions()) {
+                    isNotPaid = true;
+                    if(pgResult.status().equals("SUCCESS")) {
+                        // 결제 정보가 있는 경우 주문 만료 처리
+                        paymentService.paymentComplete(payment.getOrderId(), "AUTO_CANCEL");
+
+                        eventPublisher.publish(PaymentEvent.Success.of(payment.getOrderId()));
+                        isNotPaid = false;
+                        break;
+                    }
+                }
+
+                if(isNotPaid) {
+                    // 재고 복구
+                    paymentService.paymentFail(payment.getOrderId(), reason);
+                    eventPublisher.publish(PaymentEvent.Failed.of(payment.getOrderId()));
+                }
+            } catch (Exception e) {
+                log.error("주문 동기화 중 오류 발생: {}", payment.getOrderId(), e);
+            }
+        }
     }
 }
