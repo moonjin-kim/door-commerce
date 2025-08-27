@@ -1,10 +1,9 @@
 package com.loopers.application.payment;
 
-import com.loopers.application.order.OrderCriteria;
 import com.loopers.domain.payment.PaymentCommand;
 import com.loopers.domain.payment.PaymentType;
 import com.loopers.domain.pg.CardType;
-import com.loopers.infrastructure.order.OrderEvent;
+import com.loopers.domain.order.OrderEvent;
 
 public class PaymentCriteria {
     public record RequestPayment(

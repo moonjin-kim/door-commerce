@@ -2,7 +2,7 @@ package com.loopers.interfaces.event.payment;
 
 import com.loopers.application.payment.PaymentCriteria;
 import com.loopers.application.payment.PaymentFacade;
-import com.loopers.infrastructure.order.OrderEvent;
+import com.loopers.domain.order.OrderEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;

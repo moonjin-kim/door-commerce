@@ -4,7 +4,6 @@ import com.loopers.application.order.coupon.CouponProcessor;
 import com.loopers.application.order.coupon.CouponApplierCommand;
 import com.loopers.application.order.coupon.CouponApplierInfo;
 import com.loopers.domain.pg.PgService;
-import com.loopers.domain.PgInfo;
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
 import com.loopers.domain.order.Order;
@@ -16,8 +15,7 @@ import com.loopers.domain.product.ProductService;
 import com.loopers.domain.stock.StockCommand;
 import com.loopers.domain.stock.StockService;
 import com.loopers.domain.user.UserService;
-import com.loopers.infrastructure.comman.CommonApplicationPublisher;
-import com.loopers.infrastructure.order.OrderEvent;
+import com.loopers.domain.order.OrderEvent;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -112,12 +109,16 @@ public class OrderFacade {
         });
 
         couponApplier.cancelCoupon(order);
+
+        eventPublisher.publish(OrderEvent.Cancel.of(orderId, order.getFinalAmount().longValue()));
     }
 
     @Transactional
     public void completeOrder(String orderId) {
         // 주문 완료
-        orderService.complete(orderId);
+        Order order = orderService.complete(orderId);
+
+        eventPublisher.publish(OrderEvent.Complete.of(orderId, order.getFinalAmount().longValue()));
     }
 
     @Transactional(readOnly = true)

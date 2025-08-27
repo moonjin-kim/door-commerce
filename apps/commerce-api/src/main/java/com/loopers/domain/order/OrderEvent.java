@@ -1,6 +1,5 @@
-package com.loopers.infrastructure.order;
+package com.loopers.domain.order;
 
-import com.loopers.application.payment.PaymentCriteria;
 import com.loopers.application.payment.PaymentMethodType;
 import com.loopers.domain.pg.CardType;
 
@@ -15,6 +14,24 @@ public class OrderEvent {
     ) {
         static public RequestPayment of(String orderId, Long userId, Long amount, PaymentMethodType methodType, CardType cardType, String cardNumber) {
             return new RequestPayment(orderId, userId, amount, methodType.name(), cardType != null ? cardType.name() : null, cardNumber);
+        }
+    }
+
+    public record Complete(
+        String orderId,
+        Long amount
+    ) {
+        static public Complete of(String orderId, Long amount) {
+            return new Complete(orderId, amount);
+        }
+    }
+
+    public record Cancel(
+        String orderId,
+        Long amount
+    ) {
+        static public Cancel of(String orderId, Long amount) {
+            return new Cancel(orderId, amount);
         }
     }
 }
