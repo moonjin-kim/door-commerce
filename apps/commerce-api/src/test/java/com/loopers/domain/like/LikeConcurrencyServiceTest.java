@@ -1,5 +1,6 @@
 package com.loopers.domain.like;
 
+import com.loopers.infrastructure.comman.CommonApplicationPublisher;
 import com.loopers.infrastructure.like.LikeJpaRepository;
 import com.loopers.utils.DatabaseCleanUp;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,8 @@ public class LikeConcurrencyServiceTest {
     private LikeService likeService;
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
+    @MockitoSpyBean
+    private CommonApplicationPublisher eventPublisher;
 
     @AfterEach
     void tearDown() {
@@ -74,7 +77,7 @@ public class LikeConcurrencyServiceTest {
                     () -> assertThat(foundLike).hasSize(1),
                     () -> assertThat(foundLike.get(0).getUserId()).isEqualTo(userId),
                     () -> assertThat(foundLike.get(0).getProductId()).isEqualTo(productId),
-                    () -> assertThat(exceptions).hasSize(0)
+                    () -> assertThat(exceptions).hasSize(9)
             );
 
         }

@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
-public class CouponApplier {
+public class CouponProcessor {
     private final CouponService couponService;
     private final CouponPolicyProcessor couponPolicyProcessor;
 

@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 public class PointConcurrencyServiceTest {
-    @MockitoSpyBean
+    @Autowired
     private UserJpaRepository userJpaRepository;
     @Autowired
     private PointJpaRepository pointJpaRepository;

@@ -1,4 +1,4 @@
-package com.loopers.application.order.payment;
+package com.loopers.application.payment;
 
 import com.loopers.domain.payment.PaymentInfo;
 import com.loopers.support.error.CoreException;
@@ -13,13 +13,11 @@ import java.util.Map;
 public class PaymentProcessor {
     private final Map<String, PaymentMethod> paymentStrategyMap;
 
-    public PaymentInfo.Pay processPayment(PaymentCriteria.Pay command) {
+    public void processPayment(PaymentCriteria.RequestPayment command) {
 
         PaymentMethod paymentMethod = paymentStrategyMap.get(command.method().name());
         if (paymentMethod == null) {
             throw new CoreException(ErrorType.UNSUPPORTED_PAYMENT_METHOD);
         }
-
-        return paymentMethod.pay(command);
     }
 }

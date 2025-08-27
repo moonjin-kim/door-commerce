@@ -1,4 +1,4 @@
-package com.loopers.domain.product;
+package com.loopers.interfaces.event.product;
 
 public class ProductEvent {
     public record IncreaseLikeCount(Long productId) {

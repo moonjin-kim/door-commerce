@@ -1,6 +1,6 @@
 package com.loopers.application.order;
 
-import com.loopers.application.order.coupon.CouponApplier;
+import com.loopers.application.order.coupon.CouponProcessor;
 import com.loopers.application.order.coupon.CouponApplierCommand;
 import com.loopers.application.order.coupon.CouponApplierInfo;
 import com.loopers.domain.coupon.*;
@@ -33,7 +33,7 @@ class CouponApplierTest {
     @Autowired
     private final OrderJpaRepository orderJpaRepository;
     @Autowired
-    private final CouponApplier couponApplier;
+    private final CouponProcessor couponApplier;
     @Autowired
     private final DatabaseCleanUp databaseCleanUp;
 
@@ -43,7 +43,7 @@ class CouponApplierTest {
             CouponJpaRepository couponRepository,
             UserCouponJpaRepository userCouponRepository,
             OrderJpaRepository orderRepository,
-            CouponApplier couponApplier,
+            CouponProcessor couponApplier,
             DatabaseCleanUp databaseCleanUp
     ) {
         this.couponJpaRepository = couponRepository;

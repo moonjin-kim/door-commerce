@@ -1,4 +1,4 @@
-package com.loopers.application.order.payment;
+package com.loopers.application.payment;
 
 public enum PaymentMethodType {
     POINT,

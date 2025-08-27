@@ -53,6 +53,9 @@ public class LoopPgProcess implements PgProcess {
 
     private PgResponse.Pay fallbackPayment(PgRequest.Pay request, Long userId, Throwable throwable) {
         log.error("PG 결제 요청 실패: {}", throwable.getMessage());
+        if (throwable instanceof feign.FeignException.BadRequest) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "PG 결제 요청이 거부되었습니다. 다시 시도해주세요.");
+        }
         throw new CoreException(ErrorType.PG_SERVER_ERROR, "PG 결제 요청에 실패했습니다. 잠시 후 다시 시도해주세요.");
     }
 }

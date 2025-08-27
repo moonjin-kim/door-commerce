@@ -1,5 +1,6 @@
-package com.loopers.domain.product;
+package com.loopers.interfaces.event.product;
 
+import com.loopers.domain.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;

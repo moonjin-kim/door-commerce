@@ -2,17 +2,11 @@ package com.loopers.domain.like;
 
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
-import com.loopers.domain.product.ProductEvent;
+import com.loopers.interfaces.event.product.ProductEvent;
 import com.loopers.infrastructure.comman.CommonApplicationPublisher;
-import jakarta.persistence.PersistenceException;
-import jakarta.persistence.RollbackException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.tool.schema.spi.CommandAcceptanceException;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j

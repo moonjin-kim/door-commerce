@@ -1,17 +1,15 @@
-package com.loopers.application.order.payment;
+package com.loopers.application.payment;
 
 import com.loopers.domain.pg.PgService;
+import com.loopers.infrastructure.comman.CommonApplicationPublisher;
 import com.loopers.infrastructure.pg.PgRequest;
 import com.loopers.domain.payment.PaymentInfo;
 import com.loopers.domain.payment.PaymentService;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
-import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Component("CARD")
@@ -19,15 +17,15 @@ import java.util.concurrent.TimeoutException;
 public class CardPaymentAdapter implements PaymentMethod {
     private final PgService pgService;
     private final PaymentService paymentService;
+    private final CommonApplicationPublisher eventPublisher;
 
     @Override
-    public PaymentInfo.Pay pay(PaymentCriteria.Pay criteria) {
+    public PaymentInfo.Pay pay(PaymentCriteria.RequestPayment criteria) {
         String callbackUrl = "http://localhost:8080/api/v1/orders/callback";
 
-        PaymentInfo.Pay paymentResult = paymentService.pay(
+        PaymentInfo.Pay paymentResult = paymentService.requestPayment(
             criteria.toCommand()
         );
-
 
         // todo: 리뷰 포인트
         try {
@@ -40,8 +38,9 @@ public class CardPaymentAdapter implements PaymentMethod {
             );
         } catch (CoreException e) {
             log.error("PG 결제가 실패하였습니다. orderId: {}", criteria.orderId(), e);
-            if (e.getErrorType().equals(ErrorType.PAYMENT_ERROR)) {
+            if (e.getErrorType().equals(ErrorType.PAYMENT_DECLINED)) {
                 paymentResult = paymentService.paymentFail(criteria.orderId(), e.getMessage());
+                eventPublisher.publish(PaymentEvent.Failed.of(criteria.orderId()));
             }
         } catch (Exception e) {
             log.error("PG 결제 중 예외가 발생하였습니다. orderId: {}", criteria.orderId(), e);

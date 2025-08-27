@@ -3,6 +3,8 @@ package com.loopers.domain.payment;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class PaymentService {
     private final CommercePaymentRepository paymentRepository;
@@ -11,7 +13,7 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    public PaymentInfo.Pay pay(PaymentCommand.Pay command) {
+    public PaymentInfo.Pay requestPayment(PaymentCommand.Pay command) {
         Payment payment = Payment.create(
                 command
         );
@@ -25,7 +27,7 @@ public class PaymentService {
         Payment payment = paymentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("결제 내역 없음"));
         payment.complete(transactionKey);
-        
+
         return PaymentInfo.Pay.from(paymentRepository.save(payment));
     }
 
@@ -35,5 +37,9 @@ public class PaymentService {
         payment.fail(reason);
 
         return PaymentInfo.Pay.from(paymentRepository.save(payment));
+    }
+
+    public Optional<Payment> getPaymentByOrderId(String orderId) {
+        return paymentRepository.findByOrderId(orderId);
     }
 }

@@ -2,7 +2,7 @@ package com.loopers.domain.like;
 
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
-import com.loopers.domain.product.ProductEvent;
+import com.loopers.interfaces.event.product.ProductEvent;
 import com.loopers.infrastructure.comman.CommonApplicationPublisher;
 import com.loopers.infrastructure.like.LikeJpaRepository;
 import com.loopers.utils.DatabaseCleanUp;

@@ -1,9 +1,8 @@
 package com.loopers.application.order;
 
-import com.loopers.application.order.payment.PaymentCriteria;
-import com.loopers.application.order.payment.PaymentProcessor;
-import com.loopers.domain.payment.PaymentInfo;
-import com.loopers.domain.payment.PaymentStatus;
+import com.loopers.application.order.coupon.CouponProcessor;
+import com.loopers.application.order.coupon.CouponApplierCommand;
+import com.loopers.application.order.coupon.CouponApplierInfo;
 import com.loopers.domain.pg.PgService;
 import com.loopers.domain.PgInfo;
 import com.loopers.domain.PageRequest;
@@ -12,8 +11,13 @@ import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderCommand;
 import com.loopers.domain.order.OrderService;
 import com.loopers.domain.payment.PaymentService;
+import com.loopers.domain.product.Product;
+import com.loopers.domain.product.ProductService;
 import com.loopers.domain.stock.StockCommand;
 import com.loopers.domain.stock.StockService;
+import com.loopers.domain.user.UserService;
+import com.loopers.infrastructure.comman.CommonApplicationPublisher;
+import com.loopers.infrastructure.order.OrderEvent;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Component
@@ -32,73 +35,89 @@ public class OrderFacade {
     private final OrderService orderService;
     private final PaymentService paymentService;
     private final StockService stockService;
-    private final PaymentProcessor paymentProcess;
-    private final OrderTransactionService orderTransactionService;
     private final PgService pgService;
+    private final CommonApplicationPublisher eventPublisher;
+    private final ProductService productService;
+    private final UserService userService;
+    private final CouponProcessor couponApplier;
 
+    @Transactional
     public OrderResult.Order order(OrderCriteria.Order criteria) {
         // Validate user
-        OrderResult.Order order = orderTransactionService.prepareOrder(criteria);
+        var user = userService.getUser(criteria.userId());
+        if (user.isEmpty()) {
+            throw new CoreException(ErrorType.NOT_FOUND, "User not found: " + criteria.userId());
+        }
+
+        //주문 상품 조회
+        List<OrderCommand.OrderItem> orderItems = criteria.items().stream()
+                .map(item -> {
+                    Product product = productService.getBy(item.productId()).orElseThrow(
+                            () -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 상품 : " + item.productId()
+                            ));
+                    return OrderCommand.OrderItem.from(
+                            product,
+                            item.quantity()
+                    );
+                })
+                .toList();
+
+        //주문서 생성
+        Order order = orderService.create(OrderCommand.Order.of(criteria.userId(), orderItems));
+
+        // 쿠폰 적용
+        if(criteria.couponId() != null) {
+            CouponApplierInfo.ApplyCoupon discountInfo = couponApplier.applyCoupon(
+                    new CouponApplierCommand.Apply(
+                            criteria.userId(),
+                            criteria.couponId(),
+                            order.getId(),
+                            order.getTotalAmount().value()
+                    )
+            );
+
+            order.applyCoupon(
+                    discountInfo.userCouponId(),
+                    discountInfo.discountAmount()
+            );
+        }
+
+        // 재고 차감
+        orderItems.forEach(orderItem -> {
+            stockService.decrease(StockCommand.Decrease.from(orderItem));
+        });
 
         // 결제
-        PaymentInfo.Pay paymentInfo = paymentProcess.processPayment(
-            PaymentCriteria.Pay.of(
-                order.orderId(),
-                order.userId(),
-                order.finalAmount(),
-                criteria.paymentMethodType().name(),
+        eventPublisher.publish(
+            OrderEvent.RequestPayment.of(
+                order.getOrderId(),
+                order.getUserId(),
+                order.getFinalAmount().longValue(),
+                criteria.paymentMethodType(),
                 criteria.cardType(),
                 criteria.cardNumber()
             )
         );
 
-        if(paymentInfo.status() == PaymentStatus.FAILED) {
-            // 결제 실패 시 주문 취소(카드 정보 에러, 포인트 부족과 같은 결제 실패 사유)
-            order = orderTransactionService.cancelOrder(order.orderId());
-            throw new CoreException(ErrorType.PAYMENT_ERROR, "결제 실패: " );
-        } else if(paymentInfo.status() == PaymentStatus.COMPLETED) {
-            // 포인트로 결제한 경우
-            order = orderTransactionService.complete(order.orderId());
-        }
-
-        return order;
+        return OrderResult.Order.from(order);
     }
 
     @Transactional
-    public OrderResult.Order callback(OrderCriteria.Callback criteria) {
-        // 주문 조회
-        Order order = orderService.getByOrderId(criteria.orderId()).orElseThrow(
-                () -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 주문: " + criteria.orderId() )
-        );
+    public void cancelOrder(String orderId) {
+        Order order = orderService.cancel(orderId);
 
-        PgInfo.Find pgResult = pgService.findByTransactionKey(criteria.transactionKey(), order.getUserId());
-        if(pgResult == null) {
-            orderService.cancel(criteria.orderId());
-            paymentService.paymentFail(order.getOrderId(), "결제 조회 실패");
+        // 재고 증가
+        order.getOrderItems().forEach(orderItem -> {
+            stockService.increase(StockCommand.Increase.of(orderItem.getProductId(), orderItem.getQuantity()));
+        });
 
-            order.getOrderItems().forEach(orderItem -> {
-                stockService.increase(StockCommand.Increase.of(orderItem.getProductId(), orderItem.getQuantity()));
-            });
+        couponApplier.cancelCoupon(order);
+    }
 
-            throw new CoreException(ErrorType.PAYMENT_ERROR, "결제 정보 조회 실패: " + criteria.orderId());
-        }
-        if(!Objects.equals(pgResult.status(), "SUCCESS")) {
-            orderService.cancel(criteria.orderId());
-            paymentService.paymentFail(order.getOrderId(), pgResult.reason());
-
-            order.getOrderItems().forEach(orderItem -> {
-                stockService.increase(StockCommand.Increase.of(orderItem.getProductId(), orderItem.getQuantity()));
-            });
-
-            return OrderResult.Order.from(order);
-        }
-
-
-        // 결제 완료 저장
-        order = orderService.complete(criteria.orderId());
-        paymentService.paymentComplete(order.getOrderId(), pgResult.transactionKey());
-
-        return OrderResult.Order.from(order);
+    @Transactional
+    public void completeOrder(String orderId) {
+        // 주문 완료
+        orderService.complete(orderId);
     }
 
     public void syncPayment(LocalDateTime currentTime) {
@@ -124,7 +143,7 @@ public class OrderFacade {
 
                 if(isNotPaid) {
                     // 재고 복구
-                    orderTransactionService.cancelOrder(order.getOrderId());
+                    cancelOrder(order.getOrderId());
                     paymentService.paymentFail(order.getOrderId(), reason);
                 }
             } catch (Exception e) {
