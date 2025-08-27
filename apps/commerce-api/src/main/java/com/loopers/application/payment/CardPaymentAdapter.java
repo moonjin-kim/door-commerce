@@ -1,5 +1,6 @@
 package com.loopers.application.payment;
 
+import com.loopers.domain.payment.PaymentEvent;
 import com.loopers.domain.pg.PgService;
 import com.loopers.infrastructure.comman.CommonApplicationPublisher;
 import com.loopers.infrastructure.pg.PgRequest;
@@ -40,7 +41,6 @@ public class CardPaymentAdapter implements PaymentMethod {
             log.error("PG 결제가 실패하였습니다. orderId: {}", criteria.orderId(), e);
             if (e.getErrorType().equals(ErrorType.PAYMENT_DECLINED)) {
                 paymentResult = paymentService.paymentFail(criteria.orderId(), e.getMessage());
-                eventPublisher.publish(PaymentEvent.Failed.of(criteria.orderId()));
             }
         } catch (Exception e) {
             log.error("PG 결제 중 예외가 발생하였습니다. orderId: {}", criteria.orderId(), e);

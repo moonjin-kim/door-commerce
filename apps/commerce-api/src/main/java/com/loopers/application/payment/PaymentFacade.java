@@ -1,9 +1,8 @@
 package com.loopers.application.payment;
 
-import com.loopers.application.order.OrderCriteria;
 import com.loopers.domain.PgInfo;
-import com.loopers.domain.order.Order;
 import com.loopers.domain.payment.Payment;
+import com.loopers.domain.payment.PaymentEvent;
 import com.loopers.domain.payment.PaymentService;
 import com.loopers.domain.pg.PgService;
 import com.loopers.infrastructure.comman.CommonApplicationPublisher;
@@ -25,7 +24,6 @@ import java.util.Objects;
 public class PaymentFacade {
     private final PaymentService paymentService;
     private final PgService pgService;
-    private final CommonApplicationPublisher eventPublisher;
     private final Map<String, PaymentMethod> paymentStrategyMap;
 
     public void requestPayment(PaymentCriteria.RequestPayment criteria) {
@@ -45,18 +43,17 @@ public class PaymentFacade {
         );
 
         PgInfo.Find pgResult = pgService.findByTransactionKey(criteria.transactionKey(), payment.getUserId());
-        if(pgResult == null) {
-            eventPublisher.publish(PaymentEvent.Failed.of(criteria.orderId()));
+        if (pgResult == null) {
+            paymentService.paymentFail(criteria.orderId(), "결제 정보가 없습니다.");
+            return;
         } else if(!Objects.equals(pgResult.status(), "SUCCESS")) {
-            eventPublisher.publish(PaymentEvent.Failed.of(criteria.orderId()));
+            paymentService.paymentFail(criteria.orderId(), pgResult.reason());
+            return;
         }
 
         // 결제 완료 저장
         paymentService.paymentComplete(payment.getOrderId(), pgResult.transactionKey());
-        eventPublisher.publish(PaymentEvent.Success.of(criteria.orderId()));
     }
-
-
 
     public void syncPayment(LocalDateTime currentTime) {
         // 주문 정보 조회
@@ -72,9 +69,7 @@ public class PaymentFacade {
                     isNotPaid = true;
                     if(pgResult.status().equals("SUCCESS")) {
                         // 결제 정보가 있는 경우 주문 만료 처리
-                        paymentService.paymentComplete(payment.getOrderId(), "AUTO_CANCEL");
-
-                        eventPublisher.publish(PaymentEvent.Success.of(payment.getOrderId()));
+                        paymentService.paymentComplete(payment.getOrderId(), pgResult.transactionKey());
                         isNotPaid = false;
                         break;
                     }
@@ -83,7 +78,6 @@ public class PaymentFacade {
                 if(isNotPaid) {
                     // 재고 복구
                     paymentService.paymentFail(payment.getOrderId(), reason);
-                    eventPublisher.publish(PaymentEvent.Failed.of(payment.getOrderId()));
                 }
             } catch (Exception e) {
                 log.error("주문 동기화 중 오류 발생: {}", payment.getOrderId(), e);

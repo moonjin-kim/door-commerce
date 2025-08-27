@@ -1,9 +1,7 @@
 package com.loopers.interfaces.event.order;
 
 import com.loopers.application.order.OrderFacade;
-import com.loopers.application.payment.PaymentCriteria;
-import com.loopers.application.payment.PaymentEvent;
-import com.loopers.infrastructure.order.OrderEvent;
+import com.loopers.domain.payment.PaymentEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;

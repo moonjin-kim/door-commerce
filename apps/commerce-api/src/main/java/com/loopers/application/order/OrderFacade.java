@@ -120,38 +120,6 @@ public class OrderFacade {
         orderService.complete(orderId);
     }
 
-    public void syncPayment(LocalDateTime currentTime) {
-        // 주문 정보 조회
-        List<Order> orders = orderService.getPendingOrders();
-
-        for(Order order : orders) {
-            try {
-                PgInfo.FindByOrderId pgResults = pgService.findByOrderId(order.getOrderId(), order.getUserId());
-
-                boolean isNotPaid = pgResults.transactions().isEmpty();
-                String reason = "주문 정보가 없습니다.";
-                for(PgInfo.Transactional pgResult : pgResults.transactions()) {
-                    isNotPaid = true;
-                    if(pgResult.status().equals("SUCCESS")) {
-                        // 결제 정보가 있는 경우 주문 만료 처리
-                        orderService.complete(order.getOrderId());
-                        paymentService.paymentComplete(order.getOrderId(), "AUTO_CANCEL");
-                        isNotPaid = false;
-                        break;
-                    }
-                }
-
-                if(isNotPaid) {
-                    // 재고 복구
-                    cancelOrder(order.getOrderId());
-                    paymentService.paymentFail(order.getOrderId(), reason);
-                }
-            } catch (Exception e) {
-                log.error("주문 동기화 중 오류 발생: {}", order.getOrderId(), e);
-            }
-        }
-    }
-
     @Transactional(readOnly = true)
     public OrderResult.Order getBy(Long orderId, Long userId) {
         // 주문 정보 조회

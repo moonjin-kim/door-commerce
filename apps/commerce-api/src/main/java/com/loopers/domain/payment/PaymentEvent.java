@@ -1,4 +1,4 @@
-package com.loopers.application.payment;
+package com.loopers.domain.payment;
 
 public class PaymentEvent {
     public record Success(String orderId) {

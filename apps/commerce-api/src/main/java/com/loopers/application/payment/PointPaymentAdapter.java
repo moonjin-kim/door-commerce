@@ -2,6 +2,7 @@ package com.loopers.application.payment;
 
 import com.github.f4b6a3.uuid.UuidCreator;
 import com.loopers.domain.payment.PaymentCommand;
+import com.loopers.domain.payment.PaymentEvent;
 import com.loopers.domain.payment.PaymentInfo;
 import com.loopers.domain.payment.PaymentService;
 import com.loopers.domain.point.Point;
@@ -38,11 +39,9 @@ public class PointPaymentAdapter implements PaymentMethod {
             String transactionKey = UuidCreator.getTimeOrdered().toString();
             payInfo = paymentService.paymentComplete(criteria.orderId(), transactionKey);
 
-            eventPublisher.publish(PaymentEvent.Success.of(criteria.orderId()));
         } catch (Exception e) {
             payInfo = paymentService.paymentFail(criteria.orderId(), e.getMessage());
 
-            eventPublisher.publish(PaymentEvent.Failed.of(criteria.orderId()));
         }
 
         return payInfo;
