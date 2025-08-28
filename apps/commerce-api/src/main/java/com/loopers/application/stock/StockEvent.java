@@ -9,8 +9,8 @@ public class StockEvent {
             return new StockEvent.Increase(productId, quantity);
         }
 
-        public StockCommand.Increase toCommand() {
-            return StockCommand.Increase.of(productId, quantity);
+        public StockCommand.Rollback toCommand() {
+            return StockCommand.Rollback.of(productId, quantity);
         }
     }
 
@@ -19,8 +19,8 @@ public class StockEvent {
             return new StockEvent.Decrease(productId, quantity);
         }
 
-        public StockCommand.Decrease toCommand() {
-            return StockCommand.Decrease.of(productId, quantity);
+        public StockCommand.Consume toCommand() {
+            return StockCommand.Consume.of(productId, quantity);
         }
     }
 }

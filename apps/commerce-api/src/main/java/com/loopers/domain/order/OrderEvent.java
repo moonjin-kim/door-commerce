@@ -17,6 +17,26 @@ public class OrderEvent {
         }
     }
 
+    public record ConsumeStockCommand(
+            Long productId,
+            int quantity
+    ) {
+        static public ConsumeStockCommand of(Long productId,
+                                             int quantity) {
+            return new ConsumeStockCommand(productId, quantity);
+        }
+    }
+
+    public record RollbackStockCommand(
+            Long productId,
+            int quantity
+    ) {
+        static public RollbackStockCommand of(Long productId,
+                                                 int quantity) {
+            return new RollbackStockCommand(productId, quantity);
+        }
+    }
+
     public record Complete(
         String orderId,
         Long amount

@@ -1,26 +1,26 @@
-package com.loopers.application.stock;
+package com.loopers.interfaces.event.stock;
 
+import com.loopers.domain.order.OrderEvent;
+import com.loopers.domain.stock.StockCommand;
 import com.loopers.domain.stock.StockService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
-public class StockHandler {
+public class StockListener {
     private final StockService stockService;
 
-    @Async
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-    public void increaseStock(StockEvent.Increase event) {
-        stockService.rollback(event.toCommand());
+    void handle(OrderEvent.ConsumeStockCommand event) {
+        stockService.consume(StockCommand.Consume.from(event));
     }
 
-    @Async
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-    public void decreaseStock(StockEvent.Decrease event) {
-        stockService.consume(event.toCommand());
+    void handle(OrderEvent.RollbackStockCommand event) {
+        stockService.rollback(StockCommand.Rollback.from(event));
     }
+
 }

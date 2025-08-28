@@ -42,7 +42,7 @@ class StockServiceTest {
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                stockService.decrease(new StockCommand.Decrease(productId, quantity));
+                stockService.consume(new StockCommand.Consume(productId, quantity));
             });
 
             //then
@@ -59,7 +59,7 @@ class StockServiceTest {
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                stockService.decrease(new StockCommand.Decrease(productId, 11));
+                stockService.consume(new StockCommand.Consume(productId, 11));
             });
 
             //then
@@ -76,7 +76,7 @@ class StockServiceTest {
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> {
-                stockService.decrease(new StockCommand.Decrease(productId, -1));
+                stockService.consume(new StockCommand.Consume(productId, -1));
             });
 
             //then
@@ -92,7 +92,7 @@ class StockServiceTest {
             Stock stock = stockJpaRepository.save(new Stock(productId, initialQuantity));
 
             //when
-            stockService.decrease(new StockCommand.Decrease(productId, 10));
+            stockService.consume(new StockCommand.Consume(productId, 10));
 
             //then
             Stock foundStock = stockJpaRepository.findById(productId).get();
@@ -116,8 +116,8 @@ class StockServiceTest {
             CoreException exception = assertThrows(CoreException.class, () -> {
                 stockService.decreaseAll(
                         List.of(
-                                new StockCommand.Increase(productId, 1),
-                                new StockCommand.Increase(2L, 1)
+                                new StockCommand.Rollback(productId, 1),
+                                new StockCommand.Rollback(2L, 1)
                         )
                 );
             });
@@ -137,8 +137,8 @@ class StockServiceTest {
             CoreException exception = assertThrows(CoreException.class, () -> {
                 stockService.decreaseAll(
                         List.of(
-                                new StockCommand.Increase(1L, 10),
-                                new StockCommand.Increase(2L, 6)
+                                new StockCommand.Rollback(1L, 10),
+                                new StockCommand.Rollback(2L, 6)
                         )
                 );
             });
@@ -158,8 +158,8 @@ class StockServiceTest {
             CoreException exception = assertThrows(CoreException.class, () -> {
                 stockService.decreaseAll(
                         List.of(
-                                new StockCommand.Increase(1L, 10),
-                                new StockCommand.Increase(2L, -1)
+                                new StockCommand.Rollback(1L, 10),
+                                new StockCommand.Rollback(2L, -1)
                         )
                 );
             });
@@ -178,8 +178,8 @@ class StockServiceTest {
             //when
             stockService.decreaseAll(
                     List.of(
-                            new StockCommand.Increase(1L, 10),
-                            new StockCommand.Increase(2L, 5)
+                            new StockCommand.Rollback(1L, 10),
+                            new StockCommand.Rollback(2L, 5)
                     )
             );
 

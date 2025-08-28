@@ -35,6 +35,8 @@ public class CouponProcessor {
 
     @Transactional
     public void cancelCoupon(Order order) {
-        couponService.cancel(order.getUserId(), order.getUserCouponId(), order.getId());
+        if(order.getUserCouponId() != null) {
+            couponService.cancel(order.getUserId(), order.getUserCouponId(), order.getId());
+        }
     }
 }

@@ -16,6 +16,16 @@ public class OrderApplicationEventPublisher implements OrderEventPublisher {
     }
 
     @Override
+    public void publish(OrderEvent.ConsumeStockCommand event) {
+        applicationEventPublisher.publishEvent(event);
+    }
+
+    @Override
+    public void publish(OrderEvent.RollbackStockCommand event) {
+        applicationEventPublisher.publishEvent(event);
+    }
+
+    @Override
     public void publish(OrderEvent.Complete event) {
         applicationEventPublisher.publishEvent(event);
     }

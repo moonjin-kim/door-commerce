@@ -45,7 +45,9 @@ public class PaymentService {
 
         PaymentInfo.Pay paymentInfo = PaymentInfo.Pay.from(paymentRepository.save(payment));
 
-        eventPublisher.publish(PaymentEvent.Success.of(orderId));
+        System.out.println("########################### 결제 실패 이벤트 발행 ###########################");
+
+        eventPublisher.publish(PaymentEvent.Failed.of(orderId));
 
         return paymentInfo;
     }

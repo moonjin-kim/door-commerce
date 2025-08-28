@@ -3,13 +3,11 @@ package com.loopers.application.order;
 import com.loopers.application.order.coupon.CouponProcessor;
 import com.loopers.application.order.coupon.CouponApplierCommand;
 import com.loopers.application.order.coupon.CouponApplierInfo;
-import com.loopers.domain.pg.PgService;
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderCommand;
 import com.loopers.domain.order.OrderService;
-import com.loopers.domain.payment.PaymentService;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductService;
 import com.loopers.domain.stock.StockCommand;
@@ -30,10 +28,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderFacade {
     private final OrderService orderService;
-    private final PaymentService paymentService;
     private final StockService stockService;
-    private final PgService pgService;
-    private final OrderEventPublisher eventPublisher;
+    private final OrderEventPublisher orderEventPublisher;
     private final ProductService productService;
     private final UserService userService;
     private final CouponProcessor couponApplier;
@@ -81,11 +77,13 @@ public class OrderFacade {
 
         // 재고 차감
         orderItems.forEach(orderItem -> {
-            stockService.decrease(StockCommand.Decrease.from(orderItem));
+            orderEventPublisher.publish(
+                    OrderEvent.ConsumeStockCommand.of(orderItem.productId(), orderItem.quantity())
+            );
         });
 
         // 결제
-        eventPublisher.publish(
+        orderEventPublisher.publish(
             OrderEvent.RequestPayment.of(
                 order.getOrderId(),
                 order.getUserId(),
@@ -105,12 +103,15 @@ public class OrderFacade {
 
         // 재고 증가
         order.getOrderItems().forEach(orderItem -> {
-            stockService.increase(StockCommand.Increase.of(orderItem.getProductId(), orderItem.getQuantity()));
+            orderEventPublisher.publish(
+                    OrderEvent.RollbackStockCommand.of(orderItem.getProductId()
+                            , orderItem.getQuantity())
+            );
         });
 
         couponApplier.cancelCoupon(order);
 
-        eventPublisher.publish(OrderEvent.Cancel.of(orderId, order.getFinalAmount().longValue()));
+        orderEventPublisher.publish(OrderEvent.Cancel.of(orderId, order.getFinalAmount().longValue()));
     }
 
     @Transactional
@@ -118,7 +119,7 @@ public class OrderFacade {
         // 주문 완료
         Order order = orderService.complete(orderId);
 
-        eventPublisher.publish(OrderEvent.Complete.of(orderId, order.getFinalAmount().longValue()));
+        orderEventPublisher.publish(OrderEvent.Complete.of(orderId, order.getFinalAmount().longValue()));
     }
 
     @Transactional(readOnly = true)
