@@ -102,6 +102,42 @@ class StockServiceTest {
         }
     }
 
+    @DisplayName("재고 롤백 처리 시")
+    @Nested
+    class Rollback {
+        @DisplayName("존재하지 않는 상품 아이디가 주어지면 예외가 발생한다.")
+        @Test
+        void throwException_whenProductIdIsNotFound() {
+            // given
+            Long productId = 1L;
+            int quantity = 10;
+
+            // when
+            CoreException exception = assertThrows(CoreException.class, () -> {
+                stockService.rollback(new StockCommand.Rollback(productId, quantity));
+            });
+
+            // then
+            assertEquals(ErrorType.BAD_REQUEST, exception.getErrorType());
+        }
+
+        @DisplayName("재고가 정상적으로 증가한다.")
+        @Test
+        void rollbackStockSuccessfully() {
+            // given
+            Long productId = 1L;
+            int initialQuantity = 10;
+            Stock stock = stockJpaRepository.save(new Stock(productId, initialQuantity));
+
+            // when
+            stockService.rollback(new StockCommand.Rollback(productId, 5));
+
+            // then
+            Stock foundStock = stockJpaRepository.findById(productId).get();
+            assertThat(foundStock.getQuantity()).isEqualTo(initialQuantity + 5);
+        }
+    }
+
     @DisplayName("여러 상품의 재고를 감소시킬 때,")
     @Nested
     class decreaseAll {
@@ -192,4 +228,5 @@ class StockServiceTest {
             );
         }
     }
+
 }

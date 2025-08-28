@@ -15,13 +15,13 @@ public class ProductListener {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    void handle(LikeEvent.AddLike event) {
+    void handle(LikeEvent.Like event) {
         productService.increaseLikeCount(event.productId());
     }
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    void handle(LikeEvent.CancelLike event) {
+    void handle(LikeEvent.UnLike event) {
         productService.decreaseLikeCount(event.productId());
     }
 }

@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class LikeService {
     private final LikeRepository likeRepository;
-    private final CommonApplicationPublisher eventPublisher;
+    private final LikeEventPublisher eventPublisher;
 
     // 예시: 만약 PersistenceException이 발생했다면
     @Transactional
@@ -22,9 +22,9 @@ public class LikeService {
             return;
         }
 
-        System.out.println("command = " + command.productId());
-        likeRepository.save(Like.create(command));
-        eventPublisher.publish(LikeEvent.AddLike.of(command.productId()));
+        likeRepository.save(com.loopers.domain.like.Like.create(command));
+
+        eventPublisher.publish(LikeEvent.Like.of(command.productId()));
     }
 
     @Transactional
@@ -32,7 +32,7 @@ public class LikeService {
         if (likeRepository.existsBy(command.userId(), command.productId())) {
             likeRepository.delete(command.userId(), command.productId());
 
-            eventPublisher.publish(LikeEvent.CancelLike.of(command.productId()));
+            eventPublisher.publish(LikeEvent.UnLike.of(command.productId()));
         }
     }
 
