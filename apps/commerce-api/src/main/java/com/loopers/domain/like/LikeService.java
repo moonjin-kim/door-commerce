@@ -19,6 +19,7 @@ public class LikeService {
     @Transactional
     public void like(LikeCommand.Like command) {
         if (likeRepository.existsBy(command.userId(), command.productId())) {
+            System.out.println("이미 좋아요가 존재합니다. userId=" + command.userId() + ", productId=" + command.productId());
             return;
         }
 
