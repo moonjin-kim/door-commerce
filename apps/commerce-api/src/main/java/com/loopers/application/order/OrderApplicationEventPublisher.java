@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 public class OrderApplicationEventPublisher implements OrderEventPublisher {
     private final ApplicationEventPublisher applicationEventPublisher;
 
-
     @Override
     public void publish(OrderEvent.RequestPayment event) {
         applicationEventPublisher.publishEvent(event);

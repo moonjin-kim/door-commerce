@@ -2,7 +2,6 @@ package com.loopers.domain.like;
 
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
-import com.loopers.interfaces.event.product.ProductEvent;
 import com.loopers.infrastructure.comman.CommonApplicationPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +22,9 @@ public class LikeService {
             return;
         }
 
+        System.out.println("command = " + command.productId());
         likeRepository.save(Like.create(command));
-        eventPublisher.publish(ProductEvent.IncreaseLikeCount.of(command.productId()));
+        eventPublisher.publish(LikeEvent.AddLike.of(command.productId()));
     }
 
     @Transactional
@@ -32,7 +32,7 @@ public class LikeService {
         if (likeRepository.existsBy(command.userId(), command.productId())) {
             likeRepository.delete(command.userId(), command.productId());
 
-            eventPublisher.publish(ProductEvent.DecreaseLikeCount.of(command.productId()));
+            eventPublisher.publish(LikeEvent.CancelLike.of(command.productId()));
         }
     }
 

@@ -13,14 +13,14 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class OrderListener {
     private final OrderFacade orderFacade;
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     void handle(PaymentEvent.Failed event) {
         orderFacade.cancelOrder(event.orderId());
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     void handle(PaymentEvent.Success event) {
         orderFacade.completeOrder(event.orderId());
     }

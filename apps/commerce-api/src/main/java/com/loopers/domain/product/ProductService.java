@@ -23,7 +23,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CacheRepository cacheRepository;
 
-
+    @Transactional
     public void increaseLikeCount(Long productId) {
         Product product = productRepository.findBy(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
@@ -31,6 +31,7 @@ public class ProductService {
         product.increaseLikeCount();
     }
 
+    @Transactional
     public void decreaseLikeCount(Long productId) {
         Product product = productRepository.findBy(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));

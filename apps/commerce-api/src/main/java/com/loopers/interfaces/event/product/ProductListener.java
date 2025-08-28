@@ -1,5 +1,6 @@
 package com.loopers.interfaces.event.product;
 
+import com.loopers.domain.like.LikeEvent;
 import com.loopers.domain.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
@@ -9,18 +10,18 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
-public class ProductHandler {
+public class ProductListener {
     private final ProductService productService;
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
-    void handle(ProductEvent.IncreaseLikeCount event) {
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    void handle(LikeEvent.AddLike event) {
         productService.increaseLikeCount(event.productId());
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
-    void handle(ProductEvent.DecreaseLikeCount event) {
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    void handle(LikeEvent.CancelLike event) {
         productService.decreaseLikeCount(event.productId());
     }
 }

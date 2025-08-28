@@ -1,34 +1,30 @@
 package com.loopers.domain.payment;
 
-import com.loopers.domain.order.Order;
-import com.loopers.domain.order.OrderStatus;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class PaymentService {
     private final CommercePaymentRepository paymentRepository;
     private final PaymentEventPublisher eventPublisher;
 
-//    public PaymentService(@Qualifier("paymentRepositoryImpl") CommercePaymentRepository paymentRepository) {
-//        this.paymentRepository = paymentRepository;
-//    }
-
-    public PaymentInfo.Pay requestPayment(PaymentCommand.Pay command) {
-        Payment payment = Payment.create(
+    @Transactional
+    public PaymentInfo.Pay createPayment(PaymentCommand.Pay command) {
+        Payment payment = paymentRepository.save(Payment.create(
                 command
-        );
+        ));
 
-        return PaymentInfo.Pay.from(
-                paymentRepository.save(payment)
-        );
+        return PaymentInfo.Pay.from(payment);
     }
 
+    @Transactional
     public PaymentInfo.Pay paymentComplete(String orderId, String transactionKey) {
         Payment payment = paymentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("결제 내역 없음"));
@@ -41,6 +37,7 @@ public class PaymentService {
         return paymentInfo;
     }
 
+    @Transactional
     public PaymentInfo.Pay paymentFail(String orderId, String reason) {
         Payment payment = paymentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("결제 내역 없음"));

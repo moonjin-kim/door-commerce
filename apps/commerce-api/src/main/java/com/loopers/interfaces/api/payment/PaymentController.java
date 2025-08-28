@@ -6,6 +6,8 @@ import com.loopers.domain.payment.PaymentService;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.order.OrderV1Request;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,8 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class PaymentController implements PaymentV1ApiSpec {
     private final PaymentFacade paymentFacade;
 
+    @PostMapping("/callback")
     @Override
-    public ApiResponse<?> callback(PaymentV1Request.Callback request) {
+    public ApiResponse<?> callback(@RequestBody PaymentV1Request.Callback request) {
         paymentFacade.callback(request.toCriteria());
         return ApiResponse.success();
     }

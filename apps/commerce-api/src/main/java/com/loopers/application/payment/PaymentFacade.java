@@ -24,19 +24,20 @@ import java.util.Objects;
 public class PaymentFacade {
     private final PaymentService paymentService;
     private final PgService pgService;
-    private final Map<String, PaymentMethod> paymentStrategyMap;
+    private final List<PaymentMethod> paymentMethods;
 
     public void requestPayment(PaymentCriteria.RequestPayment criteria) {
-        PaymentMethod paymentMethod = paymentStrategyMap.get(criteria.method().name());
-        if (paymentMethod == null) {
-            throw new CoreException(ErrorType.UNSUPPORTED_PAYMENT_METHOD);
-        }
+        PaymentMethod paymentMethod = paymentMethods.stream()
+                .filter(pm -> pm.getMethodType() == PaymentMethodType.valueOf(criteria.method().getBeanName()))
+                .findFirst()
+                .orElseThrow(() -> new CoreException(ErrorType.UNSUPPORTED_PAYMENT_METHOD));
 
         paymentMethod.pay(criteria);
     }
 
     @Transactional
     public void callback(PaymentCriteria.Callback criteria) {
+        log.info("callback called {}", criteria);
         // 주문 조회
         Payment payment = paymentService.getPaymentByOrderId(criteria.orderId()).orElseThrow(
                 () -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 결제: " + criteria.orderId() )

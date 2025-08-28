@@ -37,7 +37,7 @@ class PaymentServiceTest {
             PaymentCommand.Pay command = PaymentCommand.Pay.of("123456", 1000L, 10000L, PaymentType.POINT);
 
             // when
-            PaymentInfo.Pay paymentInfo = paymentService.requestPayment(command);
+            PaymentInfo.Pay paymentInfo = paymentService.createPayment(command);
 
             // then
             assertAll(
@@ -54,7 +54,7 @@ class PaymentServiceTest {
             PaymentCommand.Pay command = PaymentCommand.Pay.of("123456", 1000L, 10000L, PaymentType.POINT);
 
             // when
-            PaymentInfo.Pay paymentInfo = paymentService.requestPayment(command);
+            PaymentInfo.Pay paymentInfo = paymentService.createPayment(command);
 
             // then
             Payment payment = paymentJpaRepository.findById(paymentInfo.paymentId()).orElseThrow();
@@ -76,7 +76,7 @@ class PaymentServiceTest {
 
             // when & then
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-                paymentService.requestPayment(command);
+                paymentService.createPayment(command);
             });
 
             // then
@@ -92,7 +92,7 @@ class PaymentServiceTest {
 
             // when & then
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-                paymentService.requestPayment(command);
+                paymentService.createPayment(command);
             });
 
             // then
@@ -107,7 +107,7 @@ class PaymentServiceTest {
 
             // when & then
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-                paymentService.requestPayment(command);
+                paymentService.createPayment(command);
             });
 
             // then

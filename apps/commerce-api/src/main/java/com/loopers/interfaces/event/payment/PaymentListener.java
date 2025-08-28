@@ -14,8 +14,8 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class PaymentListener {
     private final PaymentFacade paymentFacade;
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     void handle(OrderEvent.RequestPayment event) {
         paymentFacade.requestPayment(PaymentCriteria.RequestPayment.from(
                 event

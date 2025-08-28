@@ -2,7 +2,6 @@ package com.loopers.domain.like;
 
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
-import com.loopers.interfaces.event.product.ProductEvent;
 import com.loopers.infrastructure.comman.CommonApplicationPublisher;
 import com.loopers.infrastructure.like.LikeJpaRepository;
 import com.loopers.utils.DatabaseCleanUp;
@@ -77,7 +76,7 @@ class LikeServiceTest {
             boolean foundLike = likeJpaRepository.existsByUserIdAndProductId(command.userId(), command.productId());
             assertAll(
                     () -> assertThat(foundLike).isTrue(),
-                    () -> verify(eventPublisher, times(1)).publish(any(ProductEvent.IncreaseLikeCount.class))
+                    () -> verify(eventPublisher, times(1)).publish(any(LikeEvent.AddLike.class))
             );
         }
 

@@ -1,6 +1,5 @@
 package com.loopers.application.payment;
 
-import com.loopers.domain.payment.PaymentEvent;
 import com.loopers.domain.pg.PgService;
 import com.loopers.infrastructure.comman.CommonApplicationPublisher;
 import com.loopers.infrastructure.pg.PgRequest;
@@ -11,20 +10,24 @@ import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
-@Component("CARD")
+@Component
 @RequiredArgsConstructor
 public class CardPaymentAdapter implements PaymentMethod {
     private final PgService pgService;
     private final PaymentService paymentService;
-    private final CommonApplicationPublisher eventPublisher;
+    private final String CALLBACK_URL = "http://localhost:8080/api/v1/payments/callback";
+
+    @Override
+    public PaymentMethodType getMethodType() {
+        return PaymentMethodType.CARD;
+    }
 
     @Override
     public PaymentInfo.Pay pay(PaymentCriteria.RequestPayment criteria) {
-        String callbackUrl = "http://localhost:8080/api/v1/payments/callback";
-
-        PaymentInfo.Pay paymentResult = paymentService.requestPayment(
+        PaymentInfo.Pay paymentResult = paymentService.createPayment(
             criteria.toCommand()
         );
 
@@ -33,7 +36,7 @@ public class CardPaymentAdapter implements PaymentMethod {
             pgService.payment(
                     PgRequest.Pay.from(
                             criteria,
-                            callbackUrl
+                            CALLBACK_URL
                     ),
                     criteria.userId()
             );

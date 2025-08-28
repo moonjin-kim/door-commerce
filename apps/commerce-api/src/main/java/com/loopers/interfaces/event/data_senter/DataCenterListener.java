@@ -10,14 +10,14 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Component
 @Slf4j
 public class DataCenterListener {
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     void handle(OrderEvent.Complete event) {
         log.info("Order complete event: {}", event);
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     void handle(OrderEvent.Cancel event) {
         log.info("Order Cancel event: {}", event);
     }
