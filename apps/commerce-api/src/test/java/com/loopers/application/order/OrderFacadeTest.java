@@ -6,15 +6,14 @@ import com.loopers.domain.coupon.CouponCommand;
 import com.loopers.domain.coupon.CouponJpaRepository;
 import com.loopers.domain.coupon.DiscountType;
 import com.loopers.domain.order.Order;
+import com.loopers.domain.order.OrderEvent;
 import com.loopers.domain.order.OrderStatus;
-import com.loopers.domain.point.Point;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductCommand;
 import com.loopers.domain.stock.Stock;
 import com.loopers.domain.stock.StockCommand;
 import com.loopers.domain.user.User;
 import com.loopers.fixture.UserFixture;
-import com.loopers.infrastructure.comman.CommonApplicationPublisher;
 import com.loopers.infrastructure.order.OrderJpaRepository;
 import com.loopers.infrastructure.product.ProductJpaRepository;
 import com.loopers.infrastructure.stock.StockJpaRepository;
@@ -29,7 +28,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
@@ -80,7 +78,7 @@ class OrderFacadeTest extends TestSupport {
             )));
             Stock stock = stockJpaRepository.save(Stock.create(StockCommand.Create.of(product.getId(), 2)));
 
-            doNothing().when(eventPublisher).publish(any());
+            doNothing().when(eventPublisher).publish(any(OrderEvent.RequestPayment.class));
 
             OrderCriteria.Order criteria = new OrderCriteria.Order(
                     user.getId(),
@@ -95,7 +93,7 @@ class OrderFacadeTest extends TestSupport {
             orderFacade.order(criteria);
 
             // then
-            verify(eventPublisher).publish(any());
+            verify(eventPublisher).publish(any(OrderEvent.RequestPayment.class));
         }
 
         @DisplayName("존재하지 않는 상품으로 주문 시 결제 이벤트가 발행되지 않는다")
@@ -107,7 +105,7 @@ class OrderFacadeTest extends TestSupport {
             // 존재하지 않는 productId 사용
             Long notExistProductId = 999L;
 
-            doNothing().when(eventPublisher).publish(any());
+            doNothing().when(eventPublisher).publish(any(OrderEvent.RequestPayment.class));
 
             OrderCriteria.Order criteria = new OrderCriteria.Order(
                     user.getId(),
@@ -125,7 +123,7 @@ class OrderFacadeTest extends TestSupport {
             );
             // 결제 이벤트가 발행되지 않았는지 검증
             assertThat(coreException.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
-            verify(eventPublisher, never()).publish(any());
+            verify(eventPublisher, never()).publish(any(OrderEvent.RequestPayment.class));
         }
 
         @DisplayName("존재하지 않는 쿠폰을 사용하면 주문이 생성되지 않고 BadRequest예외가 발생한다")
@@ -139,7 +137,7 @@ class OrderFacadeTest extends TestSupport {
             )));
             Stock stock = stockJpaRepository.save(Stock.create(StockCommand.Create.of(product.getId(), 2)));
 
-            doNothing().when(eventPublisher).publish(any());
+            doNothing().when(eventPublisher).publish(any(OrderEvent.RequestPayment.class));
 
             OrderCriteria.Order criteria = new OrderCriteria.Order(
                     user.getId(),
@@ -157,7 +155,7 @@ class OrderFacadeTest extends TestSupport {
             );
             // 결제 이벤트가 발행되지 않았는지 검증
             assertThat(coreException.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
-            verify(eventPublisher, never()).publish(any());
+            verify(eventPublisher, never()).publish(any(OrderEvent.RequestPayment.class));
         }
 
         @DisplayName("쿠폰이 제공되지 않으면 쿠폰이 적용되지 않고 주문이 생성된다")
@@ -171,7 +169,8 @@ class OrderFacadeTest extends TestSupport {
             )));
             Stock stock = stockJpaRepository.save(Stock.create(StockCommand.Create.of(product.getId(), 2)));
 
-            doNothing().when(eventPublisher).publish(any());
+            doNothing().when(eventPublisher).publish(any(OrderEvent.RequestPayment.class));
+            doNothing().when(eventPublisher).publish(any(OrderEvent.ConsumeStockCommand.class));
 
             OrderCriteria.Order criteria = new OrderCriteria.Order(
                     user.getId(),
@@ -187,18 +186,17 @@ class OrderFacadeTest extends TestSupport {
 
             // then
             Order order = orderJpaRepository.findById(result.id()).orElseThrow();
-            Stock updatedStock = stockJpaRepository.findByProductId(product.getId()).orElseThrow();
 
             assertThat(order.getUserId()).isEqualTo(user.getId());
             assertThat(order.getUserCouponId()).isEqualTo(null);
             assertThat(order.getCouponDiscountAmount().longValue()).isEqualTo(0L); // 10% 할인
             assertThat(order.getFinalAmount().longValue()).isEqualTo(20000L);
-            assertThat(updatedStock.getQuantity()).isEqualTo(0);
 
-            verify(eventPublisher).publish(any());
+            verify(eventPublisher).publish(any(OrderEvent.RequestPayment.class));
+            verify(eventPublisher).publish(any(OrderEvent.ConsumeStockCommand.class));
         }
 
-        @DisplayName("정상적이면 재고 차감, 결제 이벤트 발행, 쿠폰 적용 후 주문이 생성된다")
+        @DisplayName("정상적이면 재고 차감 이벤트 발행, 결제 이벤트 발행, 쿠폰 적용 후 주문이 생성된다")
         @Test
         void orderIntegrationTest() {
             // given
@@ -213,7 +211,8 @@ class OrderFacadeTest extends TestSupport {
                     CouponCommand.Create.of("10% 할인", "설명", BigDecimal.valueOf(10), DiscountType.PERCENT)
             ));
 
-            doNothing().when(eventPublisher).publish(any());
+            doNothing().when(eventPublisher).publish(any(OrderEvent.RequestPayment.class));
+            doNothing().when(eventPublisher).publish(any(OrderEvent.ConsumeStockCommand.class));
 
             OrderCriteria.Order criteria = new OrderCriteria.Order(
                     user.getId(),
@@ -229,14 +228,13 @@ class OrderFacadeTest extends TestSupport {
 
             // then
             Order order = orderJpaRepository.findById(result.id()).orElseThrow();
-            Stock updatedStock = stockJpaRepository.findByProductId(product.getId()).orElseThrow();
 
             assertThat(order.getUserId()).isEqualTo(user.getId());
             assertThat(order.getCouponDiscountAmount().longValue()).isEqualTo(2000L); // 10% 할인
             assertThat(order.getFinalAmount().longValue()).isEqualTo(18000L);
-            assertThat(updatedStock.getQuantity()).isEqualTo(0);
 
-            verify(eventPublisher).publish(any());
+            verify(eventPublisher).publish(any(OrderEvent.RequestPayment.class));
+            verify(eventPublisher).publish(any(OrderEvent.ConsumeStockCommand.class));
         }
     }
 
@@ -257,7 +255,7 @@ class OrderFacadeTest extends TestSupport {
                     CouponCommand.Create.of("10% 할인", "설명", BigDecimal.valueOf(10), DiscountType.PERCENT)
             ));
 
-            doNothing().when(eventPublisher).publish(any());
+            doNothing().when(eventPublisher).publish(any(OrderEvent.RequestPayment.class));
 
             OrderCriteria.Order criteria = new OrderCriteria.Order(
                     user.getId(),
@@ -279,7 +277,7 @@ class OrderFacadeTest extends TestSupport {
             assertThat(canceledOrder.getStatus()).isEqualTo(OrderStatus.CANCELLED);
             assertThat(restoredStock.getQuantity()).isEqualTo(2); // 재고 복구
             // 쿠폰 취소 검증 (쿠폰 상태 등)
-            verify(eventPublisher, atLeastOnce()).publish(any());
+            verify(eventPublisher, atLeastOnce()).publish(any(OrderEvent.RequestPayment.class));
         }
 
         @DisplayName("존재하지 않는 주문 취소 시 예외 발생")
@@ -291,7 +289,7 @@ class OrderFacadeTest extends TestSupport {
             // when & then
             CoreException ex = assertThrows(CoreException.class, () -> orderFacade.cancelOrder(notExistOrderId));
             assertThat(ex.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
-            verify(eventPublisher, never()).publish(any());
+            verify(eventPublisher, never()).publish(any(OrderEvent.RequestPayment.class));
         }
     }
 

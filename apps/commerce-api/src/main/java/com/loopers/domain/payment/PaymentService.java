@@ -1,5 +1,7 @@
 package com.loopers.domain.payment;
 
+import com.loopers.support.error.CoreException;
+import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,7 @@ public class PaymentService {
     @Transactional
     public PaymentInfo.Pay paymentComplete(String orderId, String transactionKey) {
         Payment payment = paymentRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("결제 내역 없음"));
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "결제 내역 없음 orderId=" + orderId));
         payment.complete(transactionKey);
 
         PaymentInfo.Pay paymentInfo = PaymentInfo.Pay.from(paymentRepository.save(payment));
@@ -40,12 +42,10 @@ public class PaymentService {
     @Transactional
     public PaymentInfo.Pay paymentFail(String orderId, String reason) {
         Payment payment = paymentRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("결제 내역 없음"));
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "결제 내역 없음 orderId=" + orderId));
         payment.fail(reason);
 
         PaymentInfo.Pay paymentInfo = PaymentInfo.Pay.from(paymentRepository.save(payment));
-
-        System.out.println("########################### 결제 실패 이벤트 발행 ###########################");
 
         eventPublisher.publish(PaymentEvent.Failed.of(orderId));
 

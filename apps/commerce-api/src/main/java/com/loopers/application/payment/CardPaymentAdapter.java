@@ -42,7 +42,6 @@ public class CardPaymentAdapter implements PaymentMethod {
             );
         } catch (CoreException e) {
             log.error("PG 결제가 실패하였습니다. orderId: {}", criteria.orderId(), e);
-            log.error("PG Resi;ts: {}", e.getMessage());
             if (e.getErrorType().equals(ErrorType.PAYMENT_DECLINED)) {
                 paymentResult = paymentService.paymentFail(criteria.orderId(), e.getMessage());
             }
