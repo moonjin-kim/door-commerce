@@ -19,10 +19,25 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class ProductService {
     private final ProductRepository productRepository;
     private final CacheRepository cacheRepository;
+
+    @Transactional
+    public void increaseLikeCount(Long productId) {
+        Product product = productRepository.findBy(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
+
+        product.increaseLikeCount();
+    }
+
+    @Transactional
+    public void decreaseLikeCount(Long productId) {
+        Product product = productRepository.findBy(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
+
+        product.decreaseLikeCount();
+    }
 
     public Optional<Product> getBy(Long id) {
         Optional<Product> cachedProduct = cacheRepository.get(
@@ -43,7 +58,6 @@ public class ProductService {
 
     @CircuitBreaker(name = "productCircuit", fallbackMethod = "getProductsFallback")
     public PageResponse<ProductView> search(PageRequest<ProductCommand.Search> command) {
-
         PageRequest<ProductParams.Search> productParams = command.map(ProductCommand.Search::toParams);
 
         return productRepository.search(productParams);

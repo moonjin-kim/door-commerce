@@ -11,6 +11,7 @@ import com.loopers.infrastructure.brand.BrandJpaRepository;
 import com.loopers.infrastructure.like.LikeJpaRepository;
 import com.loopers.infrastructure.product.ProductJpaRepository;
 import com.loopers.interfaces.api.ApiResponse;
+import com.loopers.support.E2ETestSupport;
 import com.loopers.support.cache.CommerceCache;
 import com.loopers.utils.DatabaseCleanUp;
 import com.loopers.utils.RedisCleanUp;
@@ -33,8 +34,7 @@ import java.util.function.Function;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class ProductV1E2ETest {
+class ProductV1E2ETest extends E2ETestSupport {
     @Autowired
     private final ProductJpaRepository productJpaRepository;
     @Autowired

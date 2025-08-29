@@ -16,7 +16,7 @@ public class StockService {
     private final StockRepository stockRepository;
 
     @Transactional
-    public void decrease(StockCommand.Decrease command) {
+    public void consume(StockCommand.Consume command) {
         Stock stock = stockRepository.findByIdWithPessimisticWriteLock(command.productId())
                 .orElseThrow(() ->
                         new CoreException(ErrorType.BAD_REQUEST, "[productId = " + command.productId() + "] 존재하지 않는 재고입니다.")
@@ -26,7 +26,7 @@ public class StockService {
     }
 
     @Transactional
-    public void increase(StockCommand.Increase command) {
+    public void rollback(StockCommand.Rollback command) {
         Stock stock = stockRepository.findByIdWithPessimisticWriteLock(command.productId())
                 .orElseThrow(() ->
                         new CoreException(ErrorType.BAD_REQUEST, "[productId = " + command.productId() + "] 존재하지 않는 재고입니다.")
@@ -37,9 +37,9 @@ public class StockService {
 
 
     @Transactional
-    public void decreaseAll(List<StockCommand.Increase> command) {
+    public void decreaseAll(List<StockCommand.Rollback> command) {
         List<Long> productIds = command.stream()
-                .map(StockCommand.Increase::productId)
+                .map(StockCommand.Rollback::productId)
                 .toList();
 
         List<Stock> stocks = stockRepository.findAllByWithPessimisticWriteLock(productIds);

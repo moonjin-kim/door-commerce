@@ -8,6 +8,7 @@ import com.loopers.domain.product.ProductCommand;
 import com.loopers.infrastructure.like.LikeJpaRepository;
 import com.loopers.infrastructure.product.ProductJpaRepository;
 import com.loopers.interfaces.api.ApiResponse;
+import com.loopers.support.E2ETestSupport;
 import com.loopers.utils.DatabaseCleanUp;
 import com.loopers.utils.RedisCleanUp;
 import org.junit.jupiter.api.AfterEach;
@@ -28,8 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class LikeV1ControllerTest {
+class LikeV1ControllerTest extends E2ETestSupport {
     @Autowired
     private final ProductJpaRepository productJpaRepository;
     @Autowired

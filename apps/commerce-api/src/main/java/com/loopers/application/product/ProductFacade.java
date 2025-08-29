@@ -43,14 +43,12 @@ public class ProductFacade {
 
         LikeInfo.GetLikeCount likeCount = likeService.getLikeCount(productId);
 
-        ProductResult.ProductDetail productDetail = ProductResult.ProductDetail.of(
+        return ProductResult.ProductDetail.of(
                 product,
                 brand,
                 likeInfo.isLiked(),
                 likeCount.count()
         );
-
-        return productDetail;
     }
 
 

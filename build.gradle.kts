@@ -63,6 +63,7 @@ subprojects {
         testImplementation("com.ninja-squad:springmockk:${project.properties["springMockkVersion"]}")
         testImplementation("org.mockito:mockito-core:${project.properties["mockitoVersion"]}")
         testImplementation("org.instancio:instancio-junit:${project.properties["instancioJUnitVersion"]}")
+
         // Testcontainers
         testImplementation("org.springframework.boot:spring-boot-testcontainers")
         testImplementation("org.testcontainers:testcontainers")
@@ -73,6 +74,7 @@ subprojects {
         implementation("io.github.openfeign:feign-httpclient:11.0")
         implementation("com.github.f4b6a3:uuid-creator:5.3.2")
 
+        // resilience4j
         implementation("io.github.resilience4j:resilience4j-spring-boot3")
     }
 

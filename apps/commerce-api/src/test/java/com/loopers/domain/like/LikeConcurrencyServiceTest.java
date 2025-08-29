@@ -1,7 +1,7 @@
 package com.loopers.domain.like;
 
-import com.loopers.domain.PageRequest;
-import com.loopers.domain.PageResponse;
+import com.loopers.domain.payment.PaymentEvent;
+import com.loopers.infrastructure.comman.CommonApplicationPublisher;
 import com.loopers.infrastructure.like.LikeJpaRepository;
 import com.loopers.utils.DatabaseCleanUp;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import java.util.ArrayList;
@@ -23,8 +24,7 @@ import java.util.concurrent.Executors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @Slf4j
 @SpringBootTest
@@ -36,6 +36,8 @@ public class LikeConcurrencyServiceTest {
     private LikeService likeService;
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
+    @MockitoBean
+    private LikeEventPublisher eventPublisher;
 
     @AfterEach
     void tearDown() {
@@ -55,6 +57,7 @@ public class LikeConcurrencyServiceTest {
             Long userId = 1L;
             Long productId = 1L;
             var command = LikeCommand.Like.of(userId, productId);
+            doNothing().when(eventPublisher).publish(any(LikeEvent.Like.class));
 
             // 포인트 사용 실패 에러 저장 위치
             List<Exception> exceptions = Collections.synchronizedList(new ArrayList<>());
@@ -79,7 +82,8 @@ public class LikeConcurrencyServiceTest {
                     () -> assertThat(foundLike).hasSize(1),
                     () -> assertThat(foundLike.get(0).getUserId()).isEqualTo(userId),
                     () -> assertThat(foundLike.get(0).getProductId()).isEqualTo(productId),
-                    () -> assertThat(exceptions).hasSize(0)
+                    () -> assertThat(exceptions).hasSize(9),
+                    () -> verify(eventPublisher, times(1)).publish(any(LikeEvent.Like.class))
             );
 
         }
@@ -121,7 +125,7 @@ public class LikeConcurrencyServiceTest {
             assertAll(
                     () -> assertThat(foundLike).hasSize(10),
                     () -> assertThat(foundLike.get(0).getProductId()).isEqualTo(productId),
-                    () -> assertThat(exceptions).hasSize(0)
+                    () -> verify(eventPublisher, times(10)).publish(any(LikeEvent.Like.class))
             );
 
         }

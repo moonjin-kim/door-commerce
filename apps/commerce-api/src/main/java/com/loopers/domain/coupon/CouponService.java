@@ -30,6 +30,14 @@ public class CouponService {
     }
 
     @Transactional
+    public void cancel(Long userId, Long couponId, Long orderId) {
+        UserCoupon userCoupon = userCouponRepository.findBy(userId, couponId)
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 쿠폰입니다."));
+        userCoupon.cancel(orderId);
+        userCouponRepository.save(userCoupon);
+    }
+
+    @Transactional
     public void saveUserCoupon(UserCoupon userCoupon) {
         userCouponRepository.save(userCoupon);
     }

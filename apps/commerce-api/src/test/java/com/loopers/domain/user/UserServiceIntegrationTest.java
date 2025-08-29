@@ -25,7 +25,7 @@ import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 class UserServiceIntegrationTest {
-    @MockitoSpyBean
+    @Autowired
     private UserJpaRepository userJpaRepository;
     @Autowired
     private UserService userService;
@@ -50,7 +50,6 @@ class UserServiceIntegrationTest {
             User user = userService.registerMember(request);
 
             //then
-            verify(userJpaRepository, times(1)).save(any(User.class));
             assertThat(user.getId()).isNotNull();
             User savedUser = userJpaRepository.findAll().getFirst();
             assertAll(

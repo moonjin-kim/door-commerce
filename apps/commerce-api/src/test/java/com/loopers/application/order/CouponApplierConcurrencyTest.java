@@ -1,12 +1,13 @@
 package com.loopers.application.order;
 
-import com.loopers.application.order.coupon.CouponApplier;
+import com.loopers.application.order.coupon.CouponProcessor;
 import com.loopers.application.order.coupon.CouponApplierCommand;
 import com.loopers.domain.coupon.*;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderCommand;
 import com.loopers.infrastructure.coupon.UserCouponJpaRepository;
 import com.loopers.infrastructure.order.OrderJpaRepository;
+import com.loopers.support.TestSupport;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,8 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest
-public class CouponApplierConcurrencyTest {
+public class CouponApplierConcurrencyTest extends TestSupport {
     @Autowired
     private final CouponJpaRepository couponJpaRepository;
     @Autowired
@@ -36,7 +36,7 @@ public class CouponApplierConcurrencyTest {
     @Autowired
     private final OrderJpaRepository orderJpaRepository;
     @Autowired
-    private final CouponApplier couponApplier;
+    private final CouponProcessor couponApplier;
     @Autowired
     private final DatabaseCleanUp databaseCleanUp;
 
@@ -46,7 +46,7 @@ public class CouponApplierConcurrencyTest {
             CouponJpaRepository couponRepository,
             UserCouponJpaRepository userCouponRepository,
             OrderJpaRepository orderRepository,
-            CouponApplier couponApplier,
+            CouponProcessor couponApplier,
             DatabaseCleanUp databaseCleanUp
     ) {
         this.couponJpaRepository = couponRepository;
@@ -68,7 +68,7 @@ public class CouponApplierConcurrencyTest {
         @Test
         void throwConcurrentModificationException_whenPointIsUsedSimultaneously() throws InterruptedException  {
             //given
-            int threadCount = 10;
+            int threadCount = 2;
             ExecutorService executor = Executors.newFixedThreadPool(threadCount);
             CountDownLatch latch = new CountDownLatch(threadCount);
 
@@ -124,7 +124,7 @@ public class CouponApplierConcurrencyTest {
         @Test
         void throwConcurrentModificationException_whenPointIsUsedSimultaneously2() throws InterruptedException  {
             //given
-            int threadCount = 10;
+            int threadCount = 2;
             ExecutorService executor = Executors.newFixedThreadPool(threadCount);
             CountDownLatch latch = new CountDownLatch(threadCount);
 

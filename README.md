@@ -6,7 +6,7 @@ Loopers 에서 제공하는 스프링 자바 템플릿 프로젝트입니다.
 ### Environment
 `local` 프로필로 동작할 수 있도록, 필요 인프라를 `docker-compose` 로 제공합니다.
 ```shell
-docker compose -f ./docker/infra-compose.yml up
+docker compose -f ./docker/infra-compose.yml up -d
 ```
 ### Monitoring
 `local` 환경에서 모니터링을 할 수 있도록, `docker-compose` 를 통해 `prometheus` 와 `grafana` 를 제공합니다.

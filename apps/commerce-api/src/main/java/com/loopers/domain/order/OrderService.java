@@ -2,6 +2,7 @@ package com.loopers.domain.order;
 
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
+import com.loopers.infrastructure.comman.CommonApplicationPublisher;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -22,18 +23,6 @@ public class OrderService {
         return orderRepository.save(Order.create(order));
     }
 
-    @Transactional(readOnly = true)
-    public Optional<Order> getBy(OrderCommand.GetBy command) {
-        // 주문 조회
-        return orderRepository.findById(command.orderId());
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<Order> getByOrderId(String orderId) {
-        // 주문 조회
-        return orderRepository.findByOrderId(orderId);
-    }
-
 
     @Transactional
     public Order complete(String orderId) {
@@ -49,7 +38,6 @@ public class OrderService {
 
     @Transactional
     public Order cancel(String orderId) {
-        System.out.println("OrderService.cancel: " + orderId);
         // 주문 조회
         Order order = orderRepository.findByOrderId(orderId).orElseThrow(
                 () -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 주문: " + orderId )
@@ -58,6 +46,18 @@ public class OrderService {
         order.cancel();
 
         return order;
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Order> getBy(OrderCommand.GetBy command) {
+        // 주문 조회
+        return orderRepository.findById(command.orderId());
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Order> getByOrderId(String orderId) {
+        // 주문 조회
+        return orderRepository.findByOrderId(orderId);
     }
 
     @Transactional(readOnly = true)

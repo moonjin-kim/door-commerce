@@ -1,10 +1,12 @@
 package com.loopers.testcontainers;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @Configuration
+@ActiveProfiles("test")
 public class MySqlTestContainersConfig {
 
     private static final MySQLContainer<?> mySqlContainer;

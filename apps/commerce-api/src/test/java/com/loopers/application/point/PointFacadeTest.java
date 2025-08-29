@@ -6,6 +6,7 @@ import com.loopers.fixture.UserFixture;
 import com.loopers.infrastructure.point.PointJpaRepository;
 import com.loopers.infrastructure.user.UserJpaRepository;
 import com.loopers.interfaces.api.point.PointV1Request;
+import com.loopers.support.TestSupport;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
@@ -22,8 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest
-class PointFacadeTest {
+class PointFacadeTest extends TestSupport {
     @Autowired
     private UserJpaRepository userJpaRepository;
     @Autowired

@@ -1,6 +1,6 @@
 package com.loopers.application.order;
 
-import com.loopers.application.order.coupon.CouponApplier;
+import com.loopers.application.order.coupon.CouponProcessor;
 import com.loopers.application.order.coupon.CouponApplierCommand;
 import com.loopers.application.order.coupon.CouponApplierInfo;
 import com.loopers.domain.coupon.*;
@@ -8,6 +8,7 @@ import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderCommand;
 import com.loopers.infrastructure.coupon.UserCouponJpaRepository;
 import com.loopers.infrastructure.order.OrderJpaRepository;
+import com.loopers.support.TestSupport;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
@@ -24,8 +25,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-class CouponApplierTest {
+class CouponApplierTest extends TestSupport {
     @Autowired
     private final CouponJpaRepository couponJpaRepository;
     @Autowired
@@ -33,7 +33,7 @@ class CouponApplierTest {
     @Autowired
     private final OrderJpaRepository orderJpaRepository;
     @Autowired
-    private final CouponApplier couponApplier;
+    private final CouponProcessor couponApplier;
     @Autowired
     private final DatabaseCleanUp databaseCleanUp;
 
@@ -43,7 +43,7 @@ class CouponApplierTest {
             CouponJpaRepository couponRepository,
             UserCouponJpaRepository userCouponRepository,
             OrderJpaRepository orderRepository,
-            CouponApplier couponApplier,
+            CouponProcessor couponApplier,
             DatabaseCleanUp databaseCleanUp
     ) {
         this.couponJpaRepository = couponRepository;

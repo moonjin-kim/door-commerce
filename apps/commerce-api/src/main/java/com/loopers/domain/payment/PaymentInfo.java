@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 public class PaymentInfo {
     public record Pay(
             Long paymentId,
+            String orderId,
             BigDecimal paymentAmount,
             PaymentType type,
             PaymentStatus status
@@ -12,6 +13,7 @@ public class PaymentInfo {
         static public Pay from(Payment payment) {
             return new Pay(
                     payment.getId(),
+                    payment.getOrderId(),
                     payment.getPaymentAmount().value(),
                     payment.getPaymentType(),
                     payment.getStatus()

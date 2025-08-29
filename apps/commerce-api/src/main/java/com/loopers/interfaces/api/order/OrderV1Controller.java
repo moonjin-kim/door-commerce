@@ -28,16 +28,6 @@ public class OrderV1Controller implements OrderV1ApiSpec{
         return ApiResponse.success(OrderV1Response.Order.from(orders));
     }
 
-    @PostMapping("/callback")
-    @Override
-    public ApiResponse<?> callback(
-            @RequestBody OrderV1Request.Callback request
-    ) {
-        System.out.println("callback request = " + request);
-
-        return ApiResponse.success(orderFacade.callback(request.toCriteria()));
-    }
-
     @GetMapping("/{orderId}")
     @Override
     public ApiResponse<OrderV1Response.Order> getBy(

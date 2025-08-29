@@ -19,12 +19,6 @@ public interface OrderV1ApiSpec {
     ApiResponse<OrderV1Response.Order> order(Long userId, OrderV1Request.Order request);
 
     @Operation(
-            summary = "주문",
-            description = "주문"
-    )
-    ApiResponse<?> callback(OrderV1Request.Callback request);
-
-    @Operation(
             summary = "주문 상세 조회",
             description = "주문"
     )

@@ -26,7 +26,7 @@ public class LikeV1Controller implements LikeV1ApiSpec{
             @PathVariable("productId") Long productId,
             @RequestHeader("X-USER-ID") Long userId
     ) {
-        return ApiResponse.success(likeFacade.like(LikeCriteria.Like.of(productId, userId)));
+        return ApiResponse.success(likeFacade.like(LikeCriteria.Like.of(userId, productId)));
     }
 
     @DeleteMapping("/products/{productId}")
@@ -35,7 +35,7 @@ public class LikeV1Controller implements LikeV1ApiSpec{
             @PathVariable("productId") Long productId,
             @RequestHeader("X-USER-ID") Long userId
     ) {
-        return ApiResponse.success(likeFacade.unLike(LikeCriteria.UnLike.of(productId, userId)));
+        return ApiResponse.success(likeFacade.unLike(LikeCriteria.UnLike.of(userId, productId)));
     }
 
     @GetMapping("/products")

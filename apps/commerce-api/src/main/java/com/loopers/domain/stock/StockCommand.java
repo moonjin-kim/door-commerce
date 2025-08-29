@@ -1,6 +1,7 @@
 package com.loopers.domain.stock;
 
 import com.loopers.domain.order.OrderCommand;
+import com.loopers.domain.order.OrderEvent;
 
 public class StockCommand {
     public record Create(
@@ -13,29 +14,37 @@ public class StockCommand {
     }
 
 
-    public record Decrease(
+    public record Consume(
             Long productId,
             int quantity
     ) {
-        public static Decrease of(Long productId, int quantity) {
-            return new Decrease(productId, quantity);
+        public static Consume of(Long productId, int quantity) {
+            return new Consume(productId, quantity);
         }
 
-        public static Decrease from(OrderCommand.OrderItem orderItem) {
-            return new Decrease(orderItem.productId(), orderItem.quantity());
+        public static Consume from(OrderCommand.OrderItem orderItem) {
+            return new Consume(orderItem.productId(), orderItem.quantity());
+        }
+
+        public static Consume from(OrderEvent.ConsumeStockCommand event) {
+            return new Consume(event.productId(), event.quantity());
         }
     }
 
-    public record Increase(
+    public record Rollback(
             Long productId,
             int quantity
     ) {
-        public static Increase of(Long productId, int quantity) {
-            return new Increase(productId, quantity);
+        public static Rollback of(Long productId, int quantity) {
+            return new Rollback(productId, quantity);
         }
 
-        public static Increase from(OrderCommand.OrderItem orderItem) {
-            return new Increase(orderItem.productId(), orderItem.quantity());
+        public static Rollback from(OrderCommand.OrderItem orderItem) {
+            return new Rollback(orderItem.productId(), orderItem.quantity());
+        }
+
+        public static Rollback from(OrderEvent.RollbackStockCommand event) {
+            return new Rollback(event.productId(), event.quantity());
         }
     }
 
