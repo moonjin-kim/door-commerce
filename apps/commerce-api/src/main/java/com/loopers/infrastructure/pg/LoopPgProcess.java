@@ -20,14 +20,19 @@ public class LoopPgProcess implements PgProcess {
     private final LoopFeignClient pgFeignClient;
 
     @CircuitBreaker(name = "pgCircuit", fallbackMethod = "fallbackPayment")
-    @Retry(name = "pgRetry")
     @Override
     public PgResponse.Pay payment(PgRequest.Pay request, Long userId) {
-        return pgFeignClient.payment(request, userId).getData();
+        try {
+            return pgFeignClient.payment(request, userId).getData();
+        } catch (FeignException.BadRequest e) {
+            log.error("PG 결제 요청 실패: {}", e.getMessage());
+            throw new CoreException(ErrorType.PAYMENT_DECLINED, "PG 결제 요청이 거부되었습니다. 다시 시도해주세요.");
+        }
+
     }
 
-    @CircuitBreaker(name = "pgCircuit", fallbackMethod = "fallbackPayment")
     @Retry(name = "pgRetry")
+    @CircuitBreaker(name = "pgCircuit")
     @Override
     public PgResponse.FindByOrderId findByOrderId(String orderId, Long userId) {
         try {
@@ -38,8 +43,8 @@ public class LoopPgProcess implements PgProcess {
         }
     }
 
-    @CircuitBreaker(name = "pgCircuit", fallbackMethod = "fallbackPayment")
     @Retry(name = "pgRetry")
+    @CircuitBreaker(name = "pgCircuit")
     @Override
     public PgResponse.Find findByPGId(String paymentId, Long userId) {
         PaymentResponse<PgResponse.Find> result = pgFeignClient.findByPaymentId(paymentId, userId);
@@ -48,6 +53,9 @@ public class LoopPgProcess implements PgProcess {
 
     private PgResponse.Pay fallbackPayment(PgRequest.Pay request, Long userId, Throwable throwable) {
         log.error("PG 결제 요청 실패: {}", throwable.getMessage());
-        throw new CoreException(ErrorType.PG_ERROR, "PG 결제 요청에 실패했습니다. 잠시 후 다시 시도해주세요.");
+        if (throwable instanceof feign.FeignException.BadRequest) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "PG 결제 요청이 거부되었습니다. 다시 시도해주세요.");
+        }
+        throw new CoreException(ErrorType.PG_SERVER_ERROR, "PG 결제 요청에 실패했습니다. 잠시 후 다시 시도해주세요.");
     }
 }

@@ -1,5 +1,8 @@
 package com.loopers.domain.payment;
 
+import lombok.Getter;
+
+@Getter
 public enum PaymentType {
     CARD("CARD"),
     POINT("POINT");
@@ -11,16 +14,13 @@ public enum PaymentType {
     }
 
 
-    static public PaymentType of(String status) {
+    static public PaymentType of(String type) {
         for (PaymentType paymentType : PaymentType.values()) {
-            if (paymentType.getBeanName().equalsIgnoreCase(status)) {
+            if (paymentType.getBeanName().equalsIgnoreCase(type)) {
                 return paymentType;
             }
         }
-        throw new IllegalArgumentException("Unknown payment status: " + status);
+        throw new IllegalArgumentException("Unknown payment status: " + type);
     }
 
-    public String getBeanName() {
-        return beanName;
-    }
 }

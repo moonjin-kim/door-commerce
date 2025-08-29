@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
-public class CouponApplier {
+public class CouponProcessor {
     private final CouponService couponService;
     private final CouponPolicyProcessor couponPolicyProcessor;
 
@@ -35,6 +35,8 @@ public class CouponApplier {
 
     @Transactional
     public void cancelCoupon(Order order) {
-        couponService.cancel(order.getUserId(), order.getUserCouponId(), order.getId());
+        if(order.getUserCouponId() != null) {
+            couponService.cancel(order.getUserId(), order.getUserCouponId(), order.getId());
+        }
     }
 }

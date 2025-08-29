@@ -1,6 +1,6 @@
-package com.loopers.interfaces.schedule.order;
+package com.loopers.interfaces.schedule.payment;
 
-import com.loopers.application.order.OrderFacade;
+import com.loopers.application.payment.PaymentFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
-public class OrderSchedules {
-    private final OrderFacade orderFacade;
+public class PaymentSchedules {
+    private final PaymentFacade paymentFacade;
 
     @Scheduled(fixedRate = 60000)
     public void processPendingOrders() {
-        orderFacade.syncPayment(LocalDateTime.now());
+        paymentFacade.syncPayment(LocalDateTime.now());
     }
 }
