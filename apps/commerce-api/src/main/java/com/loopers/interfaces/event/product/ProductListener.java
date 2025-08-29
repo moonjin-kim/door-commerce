@@ -14,12 +14,14 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class ProductListener {
     private final ProductService productService;
 
-    @EventListener
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     void handle(LikeEvent.Like event) {
         productService.increaseLikeCount(event.productId());
     }
 
-    @EventListener
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     void handle(LikeEvent.UnLike event) {
         productService.decreaseLikeCount(event.productId());
     }

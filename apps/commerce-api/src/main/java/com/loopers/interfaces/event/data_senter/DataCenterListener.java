@@ -13,25 +13,25 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Slf4j
 public class DataCenterListener {
     @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     void handle(OrderEvent.Complete event) {
         log.info("Order complete event: {}", event);
     }
 
     @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     void handle(OrderEvent.Cancel event) {
         log.info("Order Cancel event: {}", event);
     }
 
     @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     void handle(OrderEvent.RequestPayment event) {
         log.info("결제 요청 {}", event);
     }
 
     @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     void handle(LikeEvent.Like event) {
         log.info("유저의 좋아요: {}", event);
     }
