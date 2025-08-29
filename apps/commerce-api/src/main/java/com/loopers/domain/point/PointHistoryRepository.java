@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface PointHistoryRepository {
     PointHistory save(PointHistory pointHistory);
 
-    Optional<PointHistory> findByOrderId(Long orderId);
+    Optional<PointHistory> findByOrderId(String orderId);
 }

@@ -62,7 +62,7 @@ class PointHistoryTest {
         @Test
         void throwInvalidPointAmount_chargeAmountZeroOrLess() {
             //given
-            PointCommand.Using command = new PointCommand.Using(1L, 1L, 0L);
+            PointCommand.Using command = new PointCommand.Using(1L, "123456", 0L);
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> PointHistory.use(1L, command));
@@ -75,7 +75,7 @@ class PointHistoryTest {
         @Test
         void throwInvalidPointAmount_pointIdNull() {
             //given
-            PointCommand.Using command = new PointCommand.Using(1L, 1L, 1000L);
+            PointCommand.Using command = new PointCommand.Using(1L, "123456", 1000L);
 
             //when
             CoreException exception = assertThrows(CoreException.class, () -> PointHistory.use(null, command));

@@ -107,7 +107,7 @@ public class PointConcurrencyServiceTest {
             for (int i = 0; i < threadCount; i++) {
                 executor.submit(() -> {
                     try {
-                        pointService.using(PointCommand.Using.of(user.getId(), 1L, 10000L));
+                        pointService.using(PointCommand.Using.of(user.getId(), "123456", 10000L));
                     } catch (Exception e) {
                         exceptions.add(e);
                     } finally {

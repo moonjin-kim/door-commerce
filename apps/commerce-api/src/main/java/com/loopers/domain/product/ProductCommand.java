@@ -1,6 +1,5 @@
 package com.loopers.domain.product;
 
-import com.loopers.application.product.ProductCriteria;
 import com.loopers.infrastructure.product.ProductParams;
 
 public class ProductCommand {
@@ -18,12 +17,12 @@ public class ProductCommand {
 
 
     public record Search(
-            ProductSortOption sort,
+            SortOption sort,
             Long brandId
     ) {
         public static Search of(String sort, Long brandId) {
             return new Search(
-                    ProductSortOption.fromValue(sort),
+                    SortOption.fromValue(sort),
                     brandId
             );
         }
@@ -47,14 +46,14 @@ public class ProductCommand {
         }
     }
 
-    public enum ProductSortOption {
+    public enum SortOption {
         PRICE_ASC("price_asc"),
         LATEST("latest"),
         LIKE_DESC("like_desc");
 
         private final String value;
 
-        ProductSortOption(String value) {
+        SortOption(String value) {
             this.value = value;
         }
 
@@ -62,8 +61,8 @@ public class ProductCommand {
             return value;
         }
 
-        public static ProductSortOption fromValue(String value) {
-            for (ProductSortOption sort : values()) {
+        public static SortOption fromValue(String value) {
+            for (SortOption sort : values()) {
                 if (sort.value.equals(value)) {
                     return sort;
                 }

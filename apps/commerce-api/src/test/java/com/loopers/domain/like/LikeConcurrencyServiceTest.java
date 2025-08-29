@@ -65,7 +65,6 @@ public class LikeConcurrencyServiceTest {
                     try {
                         likeService.like(command);
                     } catch (Exception e) {
-                        log.warn("좋아요 테스트 실패. command: {}", command, e);
                         exceptions.add(e);
                     } finally {
                         latch.countDown();

@@ -25,6 +25,7 @@ datasource:
     replicas:
       - host: localhost
         port: 6380
+        timeout: 2000ms
 
 ---
 spring.config.activate.on-profile: dev

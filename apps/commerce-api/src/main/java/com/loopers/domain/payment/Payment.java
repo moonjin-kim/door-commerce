@@ -2,8 +2,7 @@ package com.loopers.domain.payment;
 
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.Money;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,15 +15,35 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Payment extends BaseEntity {
-    private Long orderId;
+
+    @Column(nullable = false)
+    private String orderId;
+
+    @Column(nullable = false)
     private Long userId;
+
+    @Column(nullable = false)
     private Money paymentAmount;
+
+    @Column(nullable = true)
+    private String transactionKey;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private PaymentStatus status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private PaymentType paymentType;
+
+    @Column(nullable = false)
     private LocalDateTime paymentDate;
 
+    @Column(nullable = true)
+    private String failureReason;
+
     protected Payment(
-            Long orderId,
+            String orderId,
             Long userId,
             Long paymentAmount,
             PaymentStatus status,
@@ -47,18 +66,39 @@ public class Payment extends BaseEntity {
         this.status = status;
         this.paymentType = paymentType;
         this.paymentDate = paymentDate;
+        this.transactionKey = null;
     }
 
     public static Payment create(
             PaymentCommand.Pay command
     ) {
+
         return new Payment(
                 command.orderId(),
                 command.userId(),
                 command.amount(),
-                PaymentStatus.COMPLETED,
-                PaymentType.of(command.method()),
+                PaymentStatus.PENDING,
+                PaymentType.of(command.method().name()),
                 LocalDateTime.now()
         );
+    }
+
+    public void complete(String transactionKey) {
+        if (this.status != PaymentStatus.PENDING) {
+            throw new IllegalStateException("결제 상태가 PENDING이 아닙니다.");
+        }
+        if (transactionKey == null || transactionKey.isBlank()) {
+            throw new IllegalArgumentException("트랜잭션 키는 null이거나 빈 문자열일 수 없습니다.");
+        }
+        this.transactionKey = transactionKey;
+        this.status = PaymentStatus.COMPLETED;
+    }
+
+    public void fail(String reason) {
+        if (this.status != PaymentStatus.PENDING) {
+            throw new IllegalStateException("결제 상태가 PENDING이 아닙니다.");
+        }
+        this.status = PaymentStatus.FAILED;
+        this.failureReason = reason;
     }
 }
