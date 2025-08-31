@@ -1,10 +1,12 @@
 rootProject.name = "door-commerce"
 
 include(
+    ":apps:commerce-streamer",
     ":apps:commerce-api",
     ":apps:pg-simulator",
     ":modules:jpa",
     ":modules:redis",
+    ":modules:kafka",
     ":supports:jackson",
     ":supports:logging",
     ":supports:monitoring",
@@ -30,3 +32,5 @@ pluginManagement {
         }
     }
 }
+include("modules:kafka")
+findProject(":modules:kafka")?.name = "kafka"
