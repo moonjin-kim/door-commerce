@@ -26,7 +26,7 @@ public class DataCenterListener {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    void handle(OrderEvent.RequestPayment event) {
+    void handle(OrderEvent.CreateComplete event) {
         log.info("결제 요청 {}", event);
     }
 

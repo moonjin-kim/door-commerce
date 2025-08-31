@@ -16,7 +16,7 @@ public class PaymentListener {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    void handle(OrderEvent.RequestPayment event) {
+    void handle(OrderEvent.CreateComplete event) {
         paymentFacade.requestPayment(PaymentCriteria.RequestPayment.from(
                 event
         ));

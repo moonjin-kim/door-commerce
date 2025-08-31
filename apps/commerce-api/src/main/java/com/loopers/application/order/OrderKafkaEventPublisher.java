@@ -2,36 +2,36 @@ package com.loopers.application.order;
 
 import com.loopers.domain.order.OrderEvent;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 @RequiredArgsConstructor
-public class OrderApplicationEventPublisher implements OrderEventPublisher {
-    private final ApplicationEventPublisher applicationEventPublisher;
+public class OrderKafkaEventPublisher implements OrderEventPublisher{
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
     public void publish(OrderEvent.CreateComplete event) {
-        applicationEventPublisher.publishEvent(event);
+        kafkaTemplate.send("order.create-complete", event);
     }
 
     @Override
     public void publish(OrderEvent.ConsumeStockCommand event) {
-        applicationEventPublisher.publishEvent(event);
+        kafkaTemplate.send("order.consume-stock", event);
     }
 
     @Override
     public void publish(OrderEvent.RollbackStockCommand event) {
-        applicationEventPublisher.publishEvent(event);
+        kafkaTemplate.send("order.rollback-stock", event);
     }
 
     @Override
     public void publish(OrderEvent.Complete event) {
-        applicationEventPublisher.publishEvent(event);
+        kafkaTemplate.send("order.complete", event);
     }
 
     @Override
     public void publish(OrderEvent.Cancel event) {
-        applicationEventPublisher.publishEvent(event);
+        kafkaTemplate.send("order.cancel", event);
     }
 }

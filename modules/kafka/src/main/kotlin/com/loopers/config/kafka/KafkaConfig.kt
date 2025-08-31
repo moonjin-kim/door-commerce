@@ -19,7 +19,7 @@ import java.util.HashMap
 
 @EnableKafka
 @Configuration
-class KafkaConfig {
+open class KafkaConfig {
     companion object {
         const val BATCH_LISTENER = "BATCH_LISTENER_DEFAULT"
 
@@ -32,7 +32,7 @@ class KafkaConfig {
     }
 
     @Bean
-    fun producerFactory(
+    open fun producerFactory(
         kafkaProperties: KafkaProperties,
     ): ProducerFactory<Any, Any> {
         val props: Map<String, Any> = HashMap(kafkaProperties.buildProducerProperties())
@@ -40,7 +40,7 @@ class KafkaConfig {
     }
 
     @Bean
-    fun consumerFactory(
+    open fun consumerFactory(
         kafkaProperties: KafkaProperties,
     ): ConsumerFactory<Any, Any> {
         val props: Map<String, Any> = HashMap(kafkaProperties.buildConsumerProperties())
@@ -48,17 +48,17 @@ class KafkaConfig {
     }
 
     @Bean
-    fun kafkaTemplate(producerFactory: ProducerFactory<Any, Any>): KafkaTemplate<Any, Any> {
+    open fun kafkaTemplate(producerFactory: ProducerFactory<Any, Any>): KafkaTemplate<Any, Any> {
         return KafkaTemplate(producerFactory)
     }
 
     @Bean
-    fun jsonMessageConverter(objectMapper: ObjectMapper): ByteArrayJsonMessageConverter {
+    open fun jsonMessageConverter(objectMapper: ObjectMapper): ByteArrayJsonMessageConverter {
         return ByteArrayJsonMessageConverter(objectMapper)
     }
 
     @Bean(BATCH_LISTENER)
-    fun defaultBatchListenerContainerFactory(
+    open fun defaultBatchListenerContainerFactory(
         kafkaProperties: KafkaProperties,
         converter: ByteArrayJsonMessageConverter,
     ): ConcurrentKafkaListenerContainerFactory<*, *> {
