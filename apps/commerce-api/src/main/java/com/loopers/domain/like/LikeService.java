@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -19,12 +20,15 @@ public class LikeService {
     @Transactional
     public void like(LikeCommand.Like command) {
         if (likeRepository.existsBy(command.userId(), command.productId())) {
-            System.out.println("이미 좋아요가 존재합니다. userId=" + command.userId() + ", productId=" + command.productId());
+            log.info("이미 좋아요가 존재합니다. userId={}, productId={}", command.userId(), command.productId());
             return;
         }
+        String name = TransactionSynchronizationManager.getCurrentTransactionName();
+        log.info("Like transaction ID {}", name);
 
         likeRepository.save(com.loopers.domain.like.Like.create(command));
 
+        log.info("좋아요가 저장되었습니다. userId={}, productId={}", command.userId(), command.productId());
         eventPublisher.publish(LikeEvent.Like.of(command.productId()));
     }
 

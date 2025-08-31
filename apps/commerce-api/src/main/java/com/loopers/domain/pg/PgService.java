@@ -26,11 +26,7 @@ public class PgService {
     }
 
     public PgInfo.FindByOrderId findByOrderId(String orderId, Long userId) {
-
         PgResponse.FindByOrderId responses = pgProcess.findByOrderId(orderId, userId);
-        for (PgResponse.Transactional response : responses.transactions()) {
-            System.out.println(response);
-        }
 
         return PgInfo.FindByOrderId.from(responses);
     }

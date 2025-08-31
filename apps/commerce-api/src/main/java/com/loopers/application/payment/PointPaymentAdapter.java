@@ -30,7 +30,7 @@ public class PointPaymentAdapter implements PaymentMethod {
     @Transactional
     @Override
     public PaymentInfo.Pay pay(PaymentCriteria.RequestPayment criteria) {
-        PaymentInfo.Pay paymentInfo = paymentService.createPayment(PaymentCommand.Pay.of(
+        paymentService.createPayment(PaymentCommand.Pay.of(
                 criteria.orderId(),
                 criteria.userId(),
                 criteria.amount(),
@@ -38,20 +38,18 @@ public class PointPaymentAdapter implements PaymentMethod {
         ));
 
         try {
-            Point point = pointService.using(PointCommand.Using.of(
+            pointService.using(PointCommand.Using.of(
                     criteria.userId(),
                     criteria.orderId(),
                     criteria.amount()
             ));
             String transactionKey = UuidCreator.getTimeOrdered().toString();
-            paymentInfo = paymentService.paymentComplete(criteria.orderId(), transactionKey);
+            return paymentService.paymentComplete(criteria.orderId(), transactionKey);
 
         } catch (Exception e) {
             log.error("포인트 결제가 실패하였습니다. orderId: {}", criteria.orderId(), e);
-            paymentInfo = paymentService.paymentFail(criteria.orderId(), e.getMessage());
+            return paymentService.paymentFail(criteria.orderId(), e.getMessage());
 
         }
-
-        return paymentInfo;
     }
 }
