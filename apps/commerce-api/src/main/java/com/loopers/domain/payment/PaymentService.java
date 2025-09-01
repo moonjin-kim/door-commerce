@@ -34,7 +34,7 @@ public class PaymentService {
 
         PaymentInfo.Pay paymentInfo = PaymentInfo.Pay.from(paymentRepository.save(payment));
 
-        eventPublisher.publish(PaymentEvent.Success.of(orderId));
+        eventPublisher.publish(PaymentEvent.Success.from(payment));
 
         return paymentInfo;
     }
@@ -47,7 +47,7 @@ public class PaymentService {
 
         PaymentInfo.Pay paymentInfo = PaymentInfo.Pay.from(paymentRepository.save(payment));
 
-        eventPublisher.publish(PaymentEvent.Failed.of(orderId));
+        eventPublisher.publish(PaymentEvent.Failed.from(payment));
 
         return paymentInfo;
     }

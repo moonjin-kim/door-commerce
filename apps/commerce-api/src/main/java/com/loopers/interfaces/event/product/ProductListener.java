@@ -1,14 +1,19 @@
 package com.loopers.interfaces.event.product;
 
+import com.loopers.config.kafka.KafkaConfig;
 import com.loopers.domain.like.LikeEvent;
+import com.loopers.domain.order.OrderEvent;
 import com.loopers.domain.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
+
+import java.util.List;
 
 @Component
 @Slf4j
@@ -16,15 +21,17 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class ProductListener {
     private final ProductService productService;
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    void handle(LikeEvent.Like event) {
-        productService.increaseLikeCount(event.productId());
+    @KafkaListener(topics = "like.like", groupId = "product-listener", containerFactory = KafkaConfig.BATCH_LISTENER)
+    public void handleConsumeStock(List<LikeEvent.Like> events) {
+        for (LikeEvent.Like event : events) {
+            productService.increaseLikeCount(event.productId());
+        }
     }
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    void handle(LikeEvent.UnLike event) {
-        productService.decreaseLikeCount(event.productId());
+    @KafkaListener(topics = "like.unlike", groupId = "product-listener", containerFactory = KafkaConfig.BATCH_LISTENER)
+    public void handleUnlike(List<LikeEvent.UnLike> events) {
+        for (LikeEvent.UnLike event : events) {
+            productService.decreaseLikeCount(event.productId());
+        }
     }
 }
