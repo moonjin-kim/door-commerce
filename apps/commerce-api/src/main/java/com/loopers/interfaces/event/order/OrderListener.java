@@ -19,17 +19,15 @@ import java.util.List;
 public class OrderListener {
     private final OrderFacade orderFacade;
 
-    @KafkaListener(topics = "payment.success", groupId = "order-listener", containerFactory = KafkaConfig.BATCH_LISTENER)
-    void handle(List<PaymentEvent.Success> events) {
-        for (PaymentEvent.Success event : events) {
-            orderFacade.completeOrder(event.orderId());
-        }
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    void handle(PaymentEvent.Success event) {
+        orderFacade.completeOrder(event.orderId());
     }
 
-    @KafkaListener(topics = "payment.failed", groupId = "order-listener", containerFactory = KafkaConfig.BATCH_LISTENER)
-    void handleFailedEvent(List<PaymentEvent.Failed> events) {
-        for (PaymentEvent.Failed event : events) {
-            orderFacade.cancelOrder(event.orderId());
-        }
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    void handle(PaymentEvent.Failed event) {
+        orderFacade.cancelOrder(event.orderId());
     }
 }

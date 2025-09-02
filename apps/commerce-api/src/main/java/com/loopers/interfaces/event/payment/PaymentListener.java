@@ -18,10 +18,9 @@ import java.util.List;
 public class PaymentListener {
     private final PaymentFacade paymentFacade;
 
-    @KafkaListener(topics = "order.create-complete", groupId = "payment-listener", containerFactory = KafkaConfig.BATCH_LISTENER)
-    void handle(List<OrderEvent.CreateComplete> events) {
-        for (OrderEvent.CreateComplete event : events) {
-            paymentFacade.requestPayment(PaymentCriteria.RequestPayment.from(event));
-        }
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    void handle(OrderEvent.CreateComplete event) {
+        paymentFacade.requestPayment(PaymentCriteria.RequestPayment.from(event));
     }
 }

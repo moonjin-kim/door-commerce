@@ -66,8 +66,11 @@ subprojects {
 
         // Testcontainers
         testImplementation("org.springframework.boot:spring-boot-testcontainers")
+        testImplementation("org.springframework.boot:spring-boot-starter-test")
         testImplementation("org.testcontainers:testcontainers")
         testImplementation("org.testcontainers:junit-jupiter")
+
+        testImplementation("org.springframework.boot:spring-boot-starter-test") // 기본 test
 
         // feignClient
         implementation("org.springframework.cloud:spring-cloud-starter-openfeign")

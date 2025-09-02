@@ -1,5 +1,6 @@
 server:
   shutdown: graceful
+  port: 8081
   tomcat:
     threads:
       max: 200 # 최대 워커 스레드 수 (default : 200)

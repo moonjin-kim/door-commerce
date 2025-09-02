@@ -1,11 +1,3 @@
-plugins {
-    val kotlinVersion = "2.0.20"
-
-    id("org.jetbrains.kotlin.jvm") version(kotlinVersion)
-    id("org.jetbrains.kotlin.kapt") version(kotlinVersion)
-    id("org.jetbrains.kotlin.plugin.jpa") version(kotlinVersion)
-}
-
 dependencies {
     // add-ons
     implementation(project(":modules:jpa"))
@@ -18,9 +10,12 @@ dependencies {
     // web
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${project.properties["springDocOpenApiVersion"]}")
 
     // querydsl
-    kapt("com.querydsl:querydsl-apt::jakarta")
+    annotationProcessor("com.querydsl:querydsl-apt::jakarta")
+    annotationProcessor("jakarta.persistence:jakarta.persistence-api")
+    annotationProcessor("jakarta.annotation:jakarta.annotation-api")
 
     // test-fixtures
     testImplementation(testFixtures(project(":modules:jpa")))

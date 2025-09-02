@@ -27,6 +27,7 @@ public class ProductFacade {
     private final BrandService brandService;
     private final LikeService likeService;
 
+
     public ProductResult.ProductDetail getBy(Long productId, Long userId) {
         Product product = productService.getBy(productId).orElseThrow(() -> {
             throw new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 상품입니다.");

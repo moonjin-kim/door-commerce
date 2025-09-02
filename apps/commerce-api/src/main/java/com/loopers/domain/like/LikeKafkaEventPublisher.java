@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 public class LikeKafkaEventPublisher implements LikeEventPublisher {
     private final KafkaTemplate<Object, Object> kafkaTemplate;

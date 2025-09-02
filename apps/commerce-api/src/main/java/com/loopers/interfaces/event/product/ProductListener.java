@@ -21,17 +21,15 @@ import java.util.List;
 public class ProductListener {
     private final ProductService productService;
 
-    @KafkaListener(topics = "like.like", groupId = "product-listener", containerFactory = KafkaConfig.BATCH_LISTENER)
-    public void handleConsumeStock(List<LikeEvent.Like> events) {
-        for (LikeEvent.Like event : events) {
-            productService.increaseLikeCount(event.productId());
-        }
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleLike(LikeEvent.Like event) {
+        productService.increaseLikeCount(event.productId());
     }
 
-    @KafkaListener(topics = "like.unlike", groupId = "product-listener", containerFactory = KafkaConfig.BATCH_LISTENER)
-    public void handleUnlike(List<LikeEvent.UnLike> events) {
-        for (LikeEvent.UnLike event : events) {
-            productService.decreaseLikeCount(event.productId());
-        }
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleUnlike(LikeEvent.UnLike event) {
+        productService.decreaseLikeCount(event.productId());
     }
 }
