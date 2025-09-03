@@ -16,8 +16,8 @@ public class ProductMetricCommand {
     }
 
     public record StockChange(Long productId, LocalDate date, Long quantity) {
-        public static LikeChange of(Long productId, LocalDate date, Long quantity) {
-            return new LikeChange(productId, date, quantity);
+        public static StockChange of(Long productId, LocalDate date, Long quantity) {
+            return new StockChange(productId, date, quantity);
         }
     }
 

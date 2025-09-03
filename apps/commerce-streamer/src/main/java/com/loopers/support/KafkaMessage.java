@@ -3,6 +3,7 @@ package com.loopers.support;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.loopers.interfaces.consumer.product.LikeMessage;
+import com.loopers.interfaces.consumer.product.StockMessage;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,6 +24,8 @@ public class KafkaMessage<T> {
     )
     @JsonSubTypes({
             @JsonSubTypes.Type(value = LikeMessage.V1.Changed.class, name = LikeMessage.V1.Type.CHANGED),
+            @JsonSubTypes.Type(value = StockMessage.V1.Changed.class, name = StockMessage.V1.Type.CHANGED),
+            @JsonSubTypes.Type(value = StockMessage.V1.Out.class, name = StockMessage.V1.Type.OUT),
     })
     private T payload;
 

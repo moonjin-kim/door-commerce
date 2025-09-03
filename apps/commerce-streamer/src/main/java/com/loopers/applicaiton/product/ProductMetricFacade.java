@@ -1,8 +1,9 @@
 package com.loopers.applicaiton.product;
 
+import com.loopers.domain.event_hendler.EventHandlerService;
 import com.loopers.domain.product.ProductMetricService;
 import com.loopers.interfaces.consumer.product.LikeMessage;
-import com.loopers.support.KafkaMessage;
+import com.loopers.interfaces.consumer.product.StockMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,8 +13,21 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class ProductMetricFacade {
     private final ProductMetricService productMetricService;
+    private final EventHandlerService eventHandlerService;
 
-    public void updateLikeCount(LikeMessage.V1.Changed message, LocalDateTime publishedAt, String eventId) {
+    public void updateLikeCount(LikeMessage.V1.Changed message, LocalDateTime publishedAt, String eventId, String groupId) {
+        if (eventHandlerService.existEventBy(eventId, groupId)) {
+            return;
+        }
+        eventHandlerService.save(eventId, groupId);
         productMetricService.updateLikeCount(message.toCommand(publishedAt.toLocalDate()));
+    }
+
+    public void updateOrderQuantity(StockMessage.V1.Changed message, LocalDateTime publishedAt, String eventId, String groupId) {
+        if (eventHandlerService.existEventBy(eventId, groupId)) {
+            return;
+        }
+        eventHandlerService.save(eventId, groupId);
+        productMetricService.updateOrderQuantity(message.toCommand(publishedAt.toLocalDate()));
     }
 }

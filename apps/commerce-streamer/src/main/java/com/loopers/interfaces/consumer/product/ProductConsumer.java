@@ -13,13 +13,26 @@ public class ProductConsumer {
     private final ProductMetricFacade productMetricFacade;
 
     @KafkaListener(topics = LikeMessage.TOPIC.CHANGED, groupId = GROUP_ID)
-    public void onMessage(KafkaMessage<?> msg) {
+    public void onMessageLike(KafkaMessage<?> msg) {
         switch (msg.getEventType()) {
             case LikeMessage.V1.Type.CHANGED -> {
                 LikeMessage.V1.Changed payload = (LikeMessage.V1.Changed) msg.getPayload();
-                productMetricFacade.updateLikeCount(payload, msg.getPublishedAt(), msg.getEventId());
+                productMetricFacade.updateLikeCount(payload, msg.getPublishedAt(), msg.getEventId(), GROUP_ID);
             }
             default -> {
+                //todo: dlq에 보내기
+                throw new IllegalArgumentException("Unknown event type: " + msg.getEventType());
+            }
+        }
+    }
+
+    @KafkaListener(topics = StockMessage.TOPIC.CHANGE, groupId = GROUP_ID)
+    public void onMessageStock(KafkaMessage<?> msg) {
+        switch (msg.getEventType()) {
+            case StockMessage.V1.Type.CHANGED -> {
+                StockMessage.V1.Changed payload = (StockMessage.V1.Changed) msg.getPayload();
+                productMetricFacade.updateOrderQuantity(payload, msg.getPublishedAt(), msg.getEventId(), GROUP_ID);
+            } default -> {
                 //todo: dlq에 보내기
                 throw new IllegalArgumentException("Unknown event type: " + msg.getEventType());
             }

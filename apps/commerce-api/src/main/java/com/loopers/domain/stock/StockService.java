@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class StockService {
     private final StockRepository stockRepository;
+    private final StockEventPublisher stockEventPublisher;
 
     @Transactional
     public void consume(StockCommand.Consume command) {
@@ -23,7 +24,11 @@ public class StockService {
                 );
 
         stock.decrease(command.quantity());
+        if(stock.isStockOut()) {
+            stockEventPublisher.publish(StockEvent.Out.of(command.productId()));
+        }
 
+        stockEventPublisher.publish(StockEvent.Consumed.of(command.productId(), command.quantity()));
     }
 
     @Transactional
@@ -34,6 +39,7 @@ public class StockService {
                 );
 
         stock.increase(command.quantity());
+        stockEventPublisher.publish(StockEvent.Consumed.of(command.productId(), command.quantity()));
     }
 
 

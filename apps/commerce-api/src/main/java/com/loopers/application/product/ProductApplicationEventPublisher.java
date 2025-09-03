@@ -1,6 +1,5 @@
 package com.loopers.application.product;
 
-import com.loopers.domain.product.ProductEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -11,7 +10,7 @@ public class ProductApplicationEventPublisher implements ProductEventPublisher {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
-    public void handle(ProductEvent.Inquiry event) {
+    public void handle(ProductEvent.View event) {
         applicationEventPublisher.publishEvent(event);
     }
 }
