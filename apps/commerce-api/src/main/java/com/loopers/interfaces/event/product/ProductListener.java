@@ -4,6 +4,7 @@ import com.loopers.config.kafka.KafkaConfig;
 import com.loopers.domain.like.LikeEvent;
 import com.loopers.domain.order.OrderEvent;
 import com.loopers.domain.product.ProductService;
+import com.loopers.domain.stock.StockEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -31,5 +32,11 @@ public class ProductListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleUnlike(LikeEvent.UnLike event) {
         productService.decreaseLikeCount(event.productId());
+    }
+
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handle(StockEvent.Out event) {
+        productService.soldOut(event.productId());
     }
 }

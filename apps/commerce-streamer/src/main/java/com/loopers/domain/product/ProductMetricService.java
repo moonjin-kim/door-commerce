@@ -37,7 +37,7 @@ public class ProductMetricService {
     }
 
     @Transactional
-    public void updateVieCount(ProductMetricCommand.ViewChange command) {
+    public void updateViewCount(ProductMetricCommand.ViewChange command) {
         ProductMetric productMetric = productMetricRepository.findBy(command.productId(), command.date())
                 .orElseGet(() -> this.save(ProductMetric.create(command.productId(), command.date())));
 

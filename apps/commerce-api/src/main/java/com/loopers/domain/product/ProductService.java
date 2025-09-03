@@ -39,6 +39,14 @@ public class ProductService {
         product.decreaseLikeCount();
     }
 
+    @Transactional
+    public void soldOut(Long productId) {
+        Product product = productRepository.findBy(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
+
+        product.soldOut();
+    }
+
     public Optional<Product> getBy(Long id) {
         Optional<Product> cachedProduct = cacheRepository.get(
                 CommerceCache.ProductCache.INSTANCE,

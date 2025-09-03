@@ -26,6 +26,7 @@ public class ProductFacade {
     private final ProductService productService;
     private final BrandService brandService;
     private final LikeService likeService;
+    private final ProductEventPublisher productEventPublisher;
 
 
     public ProductResult.ProductDetail getBy(Long productId, Long userId) {
@@ -43,6 +44,8 @@ public class ProductFacade {
         );
 
         LikeInfo.GetLikeCount likeCount = likeService.getLikeCount(productId);
+
+        productEventPublisher.handle(ProductEvent.View.of(productId));
 
         return ProductResult.ProductDetail.of(
                 product,

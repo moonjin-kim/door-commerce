@@ -64,6 +64,10 @@ public class Product extends BaseEntity {
         );
     }
 
+    public void soldOut() {
+        this.status = ProductStatus.SOLD_OUT;
+    }
+
     public void increaseLikeCount() {
         this.likeCount++;
     }

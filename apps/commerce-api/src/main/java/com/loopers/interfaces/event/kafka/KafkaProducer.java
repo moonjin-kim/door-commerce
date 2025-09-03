@@ -1,5 +1,6 @@
 package com.loopers.interfaces.event.kafka;
 
+import com.loopers.application.product.ProductEvent;
 import com.loopers.domain.like.LikeEvent;
 import com.loopers.domain.stock.StockEvent;
 import com.loopers.support.kafka.KafkaMessage;
@@ -98,6 +99,23 @@ public class KafkaProducer {
         );
         kafkaTemplate.send(
                 StockMessage.V1.TOPIC.CHANGE,
+                String.valueOf(event.productId()),
+                message
+        );
+    }
+
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handle(ProductEvent.View event) {
+        KafkaMessage<ProductMessage.V1.Viewed> message = KafkaMessage.of(
+                UUID.randomUUID().toString(),
+                ProductMessage.V1.VERSION,
+                LocalDateTime.now(),
+                ProductMessage.V1.Type.VIEW,
+                ProductMessage.V1.Viewed.of(event.productId())
+        );
+        kafkaTemplate.send(
+                ProductMessage.V1.TOPIC.VIEW,
                 String.valueOf(event.productId()),
                 message
         );

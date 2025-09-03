@@ -1,7 +1,7 @@
 package com.loopers.interfaces.consumer.product;
 
 import com.loopers.applicaiton.product.ProductMetricFacade;
-import com.loopers.support.KafkaMessage;
+import com.loopers.support.event.KafkaMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -32,6 +32,19 @@ public class ProductConsumer {
             case StockMessage.V1.Type.CHANGED -> {
                 StockMessage.V1.Changed payload = (StockMessage.V1.Changed) msg.getPayload();
                 productMetricFacade.updateOrderQuantity(payload, msg.getPublishedAt(), msg.getEventId(), GROUP_ID);
+            } default -> {
+                //todo: dlq에 보내기
+                throw new IllegalArgumentException("Unknown event type: " + msg.getEventType());
+            }
+        }
+    }
+
+    @KafkaListener(topics = ProductMessage.TOPIC.VIEW, groupId = GROUP_ID)
+    public void onMessageView(KafkaMessage<?> msg) {
+        switch (msg.getEventType()) {
+            case ProductMessage.V1.Type.VIEW -> {
+                ProductMessage.V1.Viewed payload = (ProductMessage.V1.Viewed) msg.getPayload();
+                productMetricFacade.updateViewCount(payload, msg.getPublishedAt(), msg.getEventId(), GROUP_ID);
             } default -> {
                 //todo: dlq에 보내기
                 throw new IllegalArgumentException("Unknown event type: " + msg.getEventType());
