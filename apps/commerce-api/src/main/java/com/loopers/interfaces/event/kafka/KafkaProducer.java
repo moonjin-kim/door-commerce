@@ -2,6 +2,7 @@ package com.loopers.interfaces.event.kafka;
 
 import com.loopers.domain.like.LikeEvent;
 import com.loopers.domain.order.OrderEvent;
+import com.loopers.domain.product.ProductEvent;
 import com.loopers.support.kafka.KafkaMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -21,16 +22,16 @@ public class KafkaProducer {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handle(LikeEvent.Like event) {
-        KafkaMessage<LikeEvent.Like> message = KafkaMessage.of(
+        KafkaMessage<LikeMessage.V1.Changed> message = KafkaMessage.of(
                 UUID.randomUUID().toString(),
-                "v1",
+                LikeMessage.V1.VERSION,
                 LocalDateTime.now(),
-                "Like",
-                event
+                LikeMessage.V1.Type.LIKE,
+                LikeMessage.V1.Changed.like(event.productId(), event.userId())
         );
         kafkaTemplate.send(
-                "like.likeChange",
-                event.productId(),
+                LikeMessage.V1.TOPIC.LIKE,
+                String.valueOf(event.productId()),
                 message
         );
     }
@@ -38,16 +39,16 @@ public class KafkaProducer {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handle(LikeEvent.UnLike event) {
-        KafkaMessage<LikeEvent.UnLike> message = KafkaMessage.of(
+        KafkaMessage<LikeMessage.V1.Changed> message = KafkaMessage.of(
                 UUID.randomUUID().toString(),
-                "v1",
+                LikeMessage.V1.VERSION,
                 LocalDateTime.now(),
-                "UnLike",
-                event
+                LikeMessage.V1.Type.LIKE,
+                LikeMessage.V1.Changed.unlike(event.productId(), event.userId())
         );
         kafkaTemplate.send(
-                "like.likeChange",
-                event.productId(),
+                LikeMessage.V1.TOPIC.LIKE,
+                String.valueOf(event.productId()),
                 message
         );
     }
@@ -59,12 +60,29 @@ public class KafkaProducer {
                 UUID.randomUUID().toString(),
                 "v1",
                 LocalDateTime.now(),
-                "UnLike",
+                "ORDER_COMPLETE",
                 event
         );
         kafkaTemplate.send(
                 "like.likeChange",
                 event.orderId(),
+                message
+        );
+    }
+
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    void handle(ProductEvent.Inquiry event) {
+        KafkaMessage<ProductEvent.Inquiry> message = KafkaMessage.of(
+                UUID.randomUUID().toString(),
+                "v1",
+                LocalDateTime.now(),
+                "INQUIRY",
+                event
+        );
+        kafkaTemplate.send(
+                "product.stockChange",
+                event.productId(),
                 message
         );
     }

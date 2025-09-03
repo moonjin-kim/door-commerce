@@ -23,6 +23,7 @@ public class StockService {
                 );
 
         stock.decrease(command.quantity());
+
     }
 
     @Transactional
