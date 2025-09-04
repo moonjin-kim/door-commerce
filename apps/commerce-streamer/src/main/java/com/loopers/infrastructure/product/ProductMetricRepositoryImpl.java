@@ -14,13 +14,11 @@ public class ProductMetricRepositoryImpl implements ProductMetricRepository {
     private final ProductMetricJpaRepository productMetricJpaRepository;
     @Override
     public ProductMetric save(ProductMetric productMetric) {
-//        return productMetric;
         return productMetricJpaRepository.save(productMetric);
     }
 
     @Override
     public Optional<ProductMetric> findBy(Long productId, LocalDate date) {
-//        return Optional.empty();
         return productMetricJpaRepository.findByProductIdAndBucket(productId, date);
     }
 }

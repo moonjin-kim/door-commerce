@@ -18,10 +18,12 @@ public class ConsumeTemplate {
     ) {
         // 멱등
         if (!handled.tryHandle(msg.getEventId(), groupId)) {
+
+            System.out.println("ConsumeTemplate.tryHandle called" + msg.getEventId() + ", " + groupId);
             return; // 이미 처리됨 → 조용히 스킵
         }
+        System.out.println("ConsumeTemplate.consume: " + msg.getEventId() + ", " + groupId);
         // 실제 비즈니스
         domainHandler.run();
-        // @Transactional에 의해 커밋됨 (Listener쪽에서 ACK)
     }
 }
