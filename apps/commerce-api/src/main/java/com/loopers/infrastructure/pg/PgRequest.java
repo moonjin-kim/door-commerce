@@ -1,6 +1,6 @@
 package com.loopers.infrastructure.pg;
 
-import com.loopers.application.order.payment.PaymentCriteria;
+import com.loopers.application.payment.PaymentCriteria;
 import com.loopers.domain.pg.CardType;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
@@ -64,7 +64,7 @@ public class PgRequest {
             );
         }
 
-        public static Pay from(PaymentCriteria.Pay command, String callbackUrl) {
+        public static Pay from(PaymentCriteria.RequestPayment command, String callbackUrl) {
             return new Pay(
                     String.valueOf(command.orderId()),
                     CardType.valueOf(command.cardType().name()),

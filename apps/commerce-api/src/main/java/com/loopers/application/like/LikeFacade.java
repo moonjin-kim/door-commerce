@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-@Transactional
 public class LikeFacade {
 
     private final LikeService likeService;
@@ -30,24 +29,18 @@ public class LikeFacade {
 
     @Transactional
     public String like(LikeCriteria.Like like) {
-        Product product = productService.getBy(like.productId()).orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 상품입니다."));
+        productService.getBy(like.productId()).orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 상품입니다."));
 
-        LikeInfo.LikeResult likeResult = likeService.like(like.toCommand());
-        if (likeResult.isSuccess()) {
-            product.increaseLikeCount();
-        }
+        likeService.like(like.toCommand());
         return "좋아요에 성공했습니다";
     }
 
 
     @Transactional
     public String unLike(LikeCriteria.UnLike like) {
-        Product product = productService.getBy(like.productId()).orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 상품입니다."));
+        productService.getBy(like.productId()).orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 상품입니다."));
 
-        LikeInfo.UnLikeResult unLikeResult = likeService.unlike(like.toCommand());
-        if (unLikeResult.isSuccess()) {
-            product.increaseLikeCount();
-        }
+        likeService.unlike(like.toCommand());
         return "좋아요에 성공했습니다";
     }
 

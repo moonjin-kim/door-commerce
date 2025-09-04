@@ -1,6 +1,6 @@
 package com.loopers.application.order;
 
-import com.loopers.application.order.payment.PaymentMethodType;
+import com.loopers.application.payment.PaymentMethodType;
 import com.loopers.domain.pg.CardType;
 import com.loopers.domain.order.OrderCommand;
 

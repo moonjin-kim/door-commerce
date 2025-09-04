@@ -2,10 +2,7 @@ package com.loopers.domain.like;
 
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
-import com.loopers.domain.point.Point;
-import com.loopers.domain.point.PointCommand;
-import com.loopers.domain.user.User;
-import com.loopers.fixture.UserFixture;
+import com.loopers.infrastructure.comman.CommonApplicationPublisher;
 import com.loopers.infrastructure.like.LikeJpaRepository;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
@@ -14,29 +11,27 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import org.springframework.test.context.event.RecordApplicationEvents;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
+@RecordApplicationEvents
 class LikeServiceTest {
     @MockitoSpyBean
     private LikeJpaRepository likeJpaRepository;
+    @MockitoBean
+    private LikeEventPublisher eventPublisher;
     @Autowired
     private LikeService likeService;
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
+
 
     @AfterEach
     void tearDown() {
@@ -46,7 +41,7 @@ class LikeServiceTest {
     @DisplayName("좋아요를 생성할 때")
     @Nested
     class AddLike {
-        @DisplayName("UserId와 ProductId에 대해서좋아요가 존재하지 않으면 좋아요를 추가하고 성공 결과를 반환한다.")
+        @DisplayName("UserId와 ProductId에 대해서좋아요가 존재하지 않으면 좋아요를 추가한다.")
         @Test
         void addLike_whenLikeNotExist() {
             //given
@@ -55,32 +50,56 @@ class LikeServiceTest {
             var command = LikeCommand.Like.of(userId, productId);
 
             //when
-            LikeInfo.LikeResult result = likeService.like(command);
+            likeService.like(command);
 
             //then
             boolean foundLike = likeJpaRepository.existsByUserIdAndProductId(command.userId(), command.productId());
             assertAll(
-                () -> assertThat(result.isSuccess()).isTrue(),
                 () -> assertThat(foundLike).isTrue(),
                 ()-> verify(likeJpaRepository, times(1)).save(any(Like.class))
             );
         }
 
-        @DisplayName("UserId와 ProductId에 대해서좋아요가 존재하면 좋아요를 추가하지 않고 좋아요 실패를 반환한다.")
+        @DisplayName("UserId와 ProductId에 대해서좋아요가 존재하지 않으면 좋아요 수 추가 이벤트를 발행한다.")
         @Test
-        void failLike_whenLikeIsExist() {
+        void publishEvent_whenLikeNotExist() {
             //given
             Long userId = 1L;
             Long productId = 1L;
             var command = LikeCommand.Like.of(userId, productId);
-            likeJpaRepository.save(Like.create(command));
+            doNothing().when(eventPublisher).publish(any(LikeEvent.Like.class));
 
             //when
-            LikeInfo.LikeResult result = likeService.like(command);
+            likeService.like(command);
 
             //then
+            boolean foundLike = likeJpaRepository.existsByUserIdAndProductId(command.userId(), command.productId());
             assertAll(
-                    () -> assertThat(result.isSuccess()).isFalse()
+                    () -> assertThat(foundLike).isTrue(),
+                    () -> verify(eventPublisher).publish(any(LikeEvent.Like.class))
+            );
+        }
+
+        @DisplayName("UserId와 ProductId에 대해서 좋아요가 존재하면 아무 동작도 하지 않는다")
+        @Test
+        void doNothing_whenLikeIsExist() {
+            //given
+            Long userId = 1L;
+            Long productId = 1L;
+            var command = LikeCommand.Like.of(userId, productId);
+            likeJpaRepository.save(com.loopers.domain.like.Like.create(command));
+            doNothing().when(eventPublisher).publish(any(LikeEvent.Like.class));
+
+            //when
+            likeService.like(command);
+
+            //then
+            Long likeCounts = likeJpaRepository.countByProductId(command.productId());
+            assertThat(likeCounts).isEqualTo(1L);
+
+            assertAll(
+                    () -> assertThat(likeCounts).isEqualTo(1L),
+                    () -> verify(eventPublisher, never()).publish(any(LikeEvent.Like.class))
             );
         }
     }
@@ -94,38 +113,62 @@ class LikeServiceTest {
             //given
             Long userId = 1L;
             Long productId = 1L;
-            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, productId)));
+            likeJpaRepository.save(com.loopers.domain.like.Like.create(LikeCommand.Like.of(userId, productId)));
             LikeCommand.UnLike command = LikeCommand.UnLike.of(userId, productId);
 
+            doNothing().when(eventPublisher).publish(any(LikeEvent.UnLike.class));
+
             //when
-            LikeInfo.UnLikeResult result = likeService.unlike(command);
+            likeService.unlike(command);
 
             //then
             boolean foundLike = likeJpaRepository.existsByUserIdAndProductId(userId, productId);
             assertAll(
-                    () -> assertThat(result.isSuccess()).isTrue(),
                     () -> assertThat(foundLike).isFalse(),
-                    ()-> verify(likeJpaRepository, times(1)).deleteByUserIdAndProductId(userId, productId)
+                    ()-> verify(likeJpaRepository, times(1)).deleteByUserIdAndProductId(userId, productId),
+                    () -> verify(eventPublisher).publish(any(LikeEvent.UnLike.class))
             );
         }
 
-        @DisplayName("UserId와 ProductId에 대해서좋아요가 존재하면 좋아요를 추가하지 않고 좋아요 실패를 반환한다.")
+        @DisplayName("UserId와 ProductId에 대해서 좋아요가 존재하면 좋아요를 삭제하고 성공 결과를 반환한다.")
         @Test
-        void failLike_whenLikeIsExist() {
+        void PublishUnlikeEvent_whenLikeNotExist() {
+            //given
+            Long userId = 1L;
+            Long productId = 1L;
+            likeJpaRepository.save(com.loopers.domain.like.Like.create(LikeCommand.Like.of(userId, productId)));
+            LikeCommand.UnLike command = LikeCommand.UnLike.of(userId, productId);
+
+            doNothing().when(eventPublisher).publish(any(LikeEvent.UnLike.class));
+
+            //when
+            likeService.unlike(command);
+
+            //then
+            boolean foundLike = likeJpaRepository.existsByUserIdAndProductId(userId, productId);
+            assertAll(
+                    () -> assertThat(foundLike).isFalse(),
+                    ()-> verify(likeJpaRepository, times(1)).deleteByUserIdAndProductId(userId, productId),
+                    () -> verify(eventPublisher, times(1)).publish(any(LikeEvent.UnLike.class))
+            );
+        }
+
+        @DisplayName("UserId와 ProductId에 대해서 좋아요가 존재하지 않으면 아무 동작을 하지 않는다")
+        @Test
+        void doNothing_whenLikeIsNotExist() {
             //given
             Long userId = 1L;
             Long productId = 1L;
             LikeCommand.UnLike command = LikeCommand.UnLike.of(userId, productId);
 
             //when
-            LikeInfo.UnLikeResult result = likeService.unlike(command);
 
             //then
             boolean foundLike = likeJpaRepository.existsByUserIdAndProductId(userId, productId);
             assertAll(
-                    () -> assertThat(result.isSuccess()).isFalse(),
                     () -> assertThat(foundLike).isFalse(),
-                    ()-> verify(likeJpaRepository, times(0)).delete(any(Like.class))
+                    ()-> verify(likeJpaRepository, never()).delete(any(Like.class)),
+                    () -> verify(eventPublisher, never()).publish(any(LikeEvent.UnLike.class))
             );
         }
     }
@@ -138,10 +181,10 @@ class LikeServiceTest {
         void searchLikes() {
             //given
             Long userId = 1L;
-            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, 1L)));
-            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, 2L)));
-            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, 3L)));
-            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, 4L)));
+            likeJpaRepository.save(com.loopers.domain.like.Like.create(LikeCommand.Like.of(userId, 1L)));
+            likeJpaRepository.save(com.loopers.domain.like.Like.create(LikeCommand.Like.of(userId, 2L)));
+            likeJpaRepository.save(com.loopers.domain.like.Like.create(LikeCommand.Like.of(userId, 3L)));
+            likeJpaRepository.save(com.loopers.domain.like.Like.create(LikeCommand.Like.of(userId, 4L)));
 
             PageRequest<LikeQuery.Search> pageRequest = PageRequest.of(
                     1,10, LikeQuery.Search.of(1L)
@@ -167,10 +210,10 @@ class LikeServiceTest {
         void searchLikes() {
             //given
             Long userId = 1L;
-            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, 1L)));
-            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, 2L)));
-            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, 3L)));
-            likeJpaRepository.save(Like.create(LikeCommand.Like.of(userId, 4L)));
+            likeJpaRepository.save(com.loopers.domain.like.Like.create(LikeCommand.Like.of(userId, 1L)));
+            likeJpaRepository.save(com.loopers.domain.like.Like.create(LikeCommand.Like.of(userId, 2L)));
+            likeJpaRepository.save(com.loopers.domain.like.Like.create(LikeCommand.Like.of(userId, 3L)));
+            likeJpaRepository.save(com.loopers.domain.like.Like.create(LikeCommand.Like.of(userId, 4L)));
 
             //when
             Long result = likeService.getUserLikeCount(LikeQuery.SearchCount.of(userId));

@@ -2,36 +2,42 @@ package com.loopers.domain.like;
 
 import com.loopers.domain.PageRequest;
 import com.loopers.domain.PageResponse;
-import jakarta.persistence.PersistenceException;
-import jakarta.persistence.RollbackException;
+import com.loopers.infrastructure.comman.CommonApplicationPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.tool.schema.spi.CommandAcceptanceException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class LikeService {
     private final LikeRepository likeRepository;
+    private final LikeEventPublisher eventPublisher;
 
     // 예시: 만약 PersistenceException이 발생했다면
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public LikeInfo.LikeResult like(LikeCommand.Like command) {
+    @Transactional
+    public void like(LikeCommand.Like command) {
         if (likeRepository.existsBy(command.userId(), command.productId())) {
-            return LikeInfo.LikeResult.fail();
+            log.info("이미 좋아요가 존재합니다. userId={}, productId={}", command.userId(), command.productId());
+            return;
         }
+        String name = TransactionSynchronizationManager.getCurrentTransactionName();
+        log.info("Like transaction ID {}", name);
 
-        try {
-            likeRepository.save(Like.create(command));
-            return LikeInfo.LikeResult.success();
-        } catch (DataIntegrityViolationException e) {
-            // 어떤 예외가 잡혔는지 로그로 확인 (2단계 진단을 위해)
-            log.warn("데이터 중복으로 '좋아요' 저장 실패. command: {}", command, e);
-            return LikeInfo.LikeResult.fail();
+        likeRepository.save(com.loopers.domain.like.Like.create(command));
+
+        log.info("좋아요가 저장되었습니다. userId={}, productId={}", command.userId(), command.productId());
+        eventPublisher.publish(LikeEvent.Like.of(command.productId()));
+    }
+
+    @Transactional
+    public void unlike(LikeCommand.UnLike command) {
+        if (likeRepository.existsBy(command.userId(), command.productId())) {
+            likeRepository.delete(command.userId(), command.productId());
+
+            eventPublisher.publish(LikeEvent.UnLike.of(command.productId()));
         }
     }
 
@@ -39,16 +45,6 @@ public class LikeService {
         boolean exists = likeRepository.existsBy(command.userId(), command.productId());
 
         return LikeInfo.IsLiked.of(exists);
-    }
-
-    @Transactional
-    public LikeInfo.UnLikeResult unlike(LikeCommand.UnLike command) {
-        if (likeRepository.existsBy(command.userId(), command.productId())) {
-            likeRepository.delete(command.userId(), command.productId());
-            return LikeInfo.UnLikeResult.success();
-        }
-
-        return LikeInfo.UnLikeResult.fail();
     }
 
     @Transactional(readOnly = true)
