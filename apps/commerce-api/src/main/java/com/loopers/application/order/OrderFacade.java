@@ -10,7 +10,6 @@ import com.loopers.domain.order.OrderCommand;
 import com.loopers.domain.order.OrderService;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductService;
-import com.loopers.domain.stock.StockCommand;
 import com.loopers.domain.stock.StockService;
 import com.loopers.domain.user.UserService;
 import com.loopers.domain.order.OrderEvent;
@@ -84,7 +83,7 @@ public class OrderFacade {
 
         // 결제
         orderEventPublisher.publish(
-            OrderEvent.RequestPayment.of(
+            OrderEvent.CreateComplete.of(
                 order.getOrderId(),
                 order.getUserId(),
                 order.getFinalAmount().longValue(),

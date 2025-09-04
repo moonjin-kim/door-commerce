@@ -11,7 +11,7 @@ public class OrderApplicationEventPublisher implements OrderEventPublisher {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
-    public void publish(OrderEvent.RequestPayment event) {
+    public void publish(OrderEvent.CreateComplete event) {
         applicationEventPublisher.publishEvent(event);
     }
 

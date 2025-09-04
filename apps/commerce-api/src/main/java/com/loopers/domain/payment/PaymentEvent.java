@@ -1,15 +1,17 @@
 package com.loopers.domain.payment;
 
 public class PaymentEvent {
-    public record Success(String orderId) {
-        public static Success of(String orderId) {
-            return new Success(orderId);
+    public record Success(Long paymentId, String orderId, String type) {
+
+        public static Success from(Payment payment) {
+            return new Success(payment.getId(), payment.getOrderId(), payment.getPaymentType().name());
         }
     }
 
-    public record Failed(String orderId) {
-        public static Failed of(String orderId) {
-            return new Failed(orderId);
+    public record Failed(Long paymentId, String orderId) {
+
+        public static Failed from(Payment payment) {
+            return new Failed(payment.getId(), payment.getOrderId());
         }
     }
 
