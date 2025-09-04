@@ -5,10 +5,7 @@ import com.loopers.domain.product.ProductMetricCommand;
 import java.time.LocalDate;
 
 public class StockMessage {
-    public static class TOPIC {
-        public static final String CHANGE = "product.stock-changed";
-        public static final String OUT = "product.stock-out";
-    }
+    public static final String TOPIC = "stock-event";
 
     public static class V1 {
         public static final String VERSION = "v1";

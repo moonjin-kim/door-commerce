@@ -5,9 +5,7 @@ import com.loopers.domain.product.ProductMetricCommand;
 import java.time.LocalDate;
 
 public class LikeMessage {
-    public static final class TOPIC {
-        public static final String CHANGED = "product.likeChange";
-    }
+    public static final String TOPIC = "like-event";
 
     public static class V1 {
         public static final String VERSION = "V1";

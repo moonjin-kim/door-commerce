@@ -28,6 +28,17 @@ public class ProductFacade {
     private final LikeService likeService;
     private final ProductEventPublisher productEventPublisher;
 
+    public void increaseLikeCount(Long productId) {
+        productService.increaseLikeCount(productId);
+    }
+
+    public void decreaseLikeCount(Long productId) {
+        productService.decreaseLikeCount(productId);
+    }
+
+    public void soldOut(Long productId) {
+        productService.soldOut(productId);
+    }
 
     public ProductResult.ProductDetail getBy(Long productId, Long userId) {
         Product product = productService.getBy(productId).orElseThrow(() -> {

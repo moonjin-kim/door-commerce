@@ -8,13 +8,15 @@ import org.springframework.stereotype.Component;
 public class EventHandlerService {
     private final EventHandlerRepository eventHandlerRepository;
 
-    public boolean existEventBy(String eventId, String groupId) {
-        return eventHandlerRepository.existBy(eventId, groupId);
-    }
+    public boolean tryHandle(String eventId, String groupId) {
+        if(eventHandlerRepository.existBy(eventId, groupId)) {
+            return false;
+        }
 
-    public EventHandler save(String eventId, String groupId) {
-        return eventHandlerRepository.save(
+        eventHandlerRepository.save(
                 EventHandler.create(eventId, groupId)
         );
+        return true;
     }
+
 }

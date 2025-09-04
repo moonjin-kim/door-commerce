@@ -14,29 +14,16 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class ProductMetricFacade {
     private final ProductMetricService productMetricService;
-    private final EventHandlerService eventHandlerService;
 
-    public void updateLikeCount(LikeMessage.V1.Changed message, LocalDateTime publishedAt, String eventId, String groupId) {
-        if (eventHandlerService.existEventBy(eventId, groupId)) {
-            return;
-        }
-        eventHandlerService.save(eventId, groupId);
+    public void updateLikeCount(LikeMessage.V1.Changed message, LocalDateTime publishedAt) {
         productMetricService.updateLikeCount(message.toCommand(publishedAt.toLocalDate()));
     }
 
-    public void updateOrderQuantity(StockMessage.V1.Changed message, LocalDateTime publishedAt, String eventId, String groupId) {
-        if (eventHandlerService.existEventBy(eventId, groupId)) {
-            return;
-        }
-        eventHandlerService.save(eventId, groupId);
+    public void updateOrderQuantity(StockMessage.V1.Changed message, LocalDateTime publishedAt) {
         productMetricService.updateOrderQuantity(message.toCommand(publishedAt.toLocalDate()));
     }
 
-    public void updateViewCount(ProductMessage.V1.Viewed message, LocalDateTime publishedAt, String eventId, String groupId) {
-        if (eventHandlerService.existEventBy(eventId, groupId)) {
-            return;
-        }
-        eventHandlerService.save(eventId, groupId);
+    public void updateViewCount(ProductMessage.V1.Viewed message, LocalDateTime publishedAt) {
         productMetricService.updateViewCount(message.toCommand(publishedAt.toLocalDate()));
     }
 }

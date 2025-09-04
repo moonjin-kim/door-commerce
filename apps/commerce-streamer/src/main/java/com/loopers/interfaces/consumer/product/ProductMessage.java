@@ -3,9 +3,7 @@ package com.loopers.interfaces.consumer.product;
 import com.loopers.domain.product.ProductMetricCommand;
 
 public class ProductMessage {
-    public static class TOPIC {
-        static final String VIEW = "product.view";
-    }
+    public static final String TOPIC  = "product-event";
 
     public static class V1 {
         public static final String VERSION = "v1";
