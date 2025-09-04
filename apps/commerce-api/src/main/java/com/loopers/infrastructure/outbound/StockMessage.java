@@ -1,17 +1,14 @@
 package com.loopers.infrastructure.outbound;
 
 public class StockMessage {
-    public static class TOPIC {
-        public static final String CHANGE = "product.stock-changed";
-        public static final String OUT = "product.stock-out";
-    }
+    public static String TOPIC = "stock-event";
 
     public static class V1 {
         public static final String VERSION = "v1";
 
         public static class Type {
             public static final String CHANGE = "STOCK_CHANGED:V1";
-            public static final String OUT = "STOCK_OUT:V1";
+            public static final String SOLD_OUT = "STOCK_SOLD_OUT:V1";
         }
 
         public record Changed(Long productId, Integer quantity) {
@@ -24,9 +21,9 @@ public class StockMessage {
             }
         }
 
-        public record Out(Long productId) {
-            public static Out of(Long productId) {
-                return new Out(productId);
+        public record SoldOut(Long productId) {
+            public static SoldOut of(Long productId) {
+                return new SoldOut(productId);
             }
         }
     }

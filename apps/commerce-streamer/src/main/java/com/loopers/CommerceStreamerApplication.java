@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import java.util.TimeZone;
 
 @ConfigurationPropertiesScan
-@ComponentScan("com.loopers")
 @SpringBootApplication
 public class CommerceStreamerApplication {
 

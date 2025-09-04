@@ -46,6 +46,8 @@ public class CacheRedisRepository implements CacheRepository {
 
     @Override
     public void delete(CacheKey cache, String key) {
+
+        System.out.println("Deleting cache with key: " + cache.getKey(key));
         redisTemplate.delete(cache.getKey(key));
     }
 }

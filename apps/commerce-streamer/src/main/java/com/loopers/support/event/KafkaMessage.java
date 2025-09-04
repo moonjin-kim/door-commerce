@@ -26,7 +26,7 @@ public class KafkaMessage<T> {
     @JsonSubTypes({
             @JsonSubTypes.Type(value = LikeMessage.V1.Changed.class, name = LikeMessage.V1.Type.CHANGED),
             @JsonSubTypes.Type(value = StockMessage.V1.Changed.class, name = StockMessage.V1.Type.CHANGED),
-            @JsonSubTypes.Type(value = StockMessage.V1.Out.class, name = StockMessage.V1.Type.OUT),
+            @JsonSubTypes.Type(value = StockMessage.V1.SOLD_OUT.class, name = StockMessage.V1.Type.SOLD_OUT),
             @JsonSubTypes.Type(value = ProductMessage.V1.Viewed.class, name = ProductMessage.V1.Type.VIEW),
     })
     private T payload;

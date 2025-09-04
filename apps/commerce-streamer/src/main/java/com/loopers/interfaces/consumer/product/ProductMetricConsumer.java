@@ -43,7 +43,7 @@ public class ProductMetricConsumer {
                         productMetricFacade.updateOrderQuantity(payload, msg.getPublishedAt())
                 );
             }
-            case StockMessage.V1.Type.OUT -> {
+            case StockMessage.V1.Type.SOLD_OUT -> {
                 ack.acknowledge();
             }
             default -> {

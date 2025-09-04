@@ -23,7 +23,7 @@ public class AuditLog extends BaseEntity {
     LocalDateTime publishedAt;
     @Column(nullable = false)
     String eventType;
-    @Column(columnDefinition = "jsonb")
+    @Column(columnDefinition = "json")
     String payload;
 
     public AuditLog(String eventId, String version, LocalDateTime publishedAt, String eventType, String payload) {

@@ -12,7 +12,7 @@ public class StockMessage {
 
         public static class Type {
             public static final String CHANGED = "STOCK_CHANGED:V1";
-            public static final String OUT = "STOCK_OUT:V1";
+            public static final String SOLD_OUT = "STOCK_SOLD_OUT:V1";
         }
 
         public record Changed(Long productId, Integer quantity) {
@@ -22,9 +22,9 @@ public class StockMessage {
             }
         }
 
-        public record Out(Long productId) {
-            public static Out of(Long productId) {
-                return new Out(productId);
+        public record SOLD_OUT(Long productId) {
+            public static SOLD_OUT of(Long productId) {
+                return new SOLD_OUT(productId);
             }
         }
     }

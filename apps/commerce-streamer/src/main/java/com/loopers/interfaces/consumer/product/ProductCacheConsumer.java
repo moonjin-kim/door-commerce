@@ -1,7 +1,6 @@
 package com.loopers.interfaces.consumer.product;
 
 import com.loopers.applicaiton.product.ProductCacheFacade;
-import com.loopers.applicaiton.product.ProductMetricFacade;
 import com.loopers.support.event.ConsumeTemplate;
 import com.loopers.support.event.KafkaMessage;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +42,9 @@ public class ProductCacheConsumer {
 
                 template.consume(GROUP_ID, msg, () -> log.info("Received change: {}", msg.getPayload()));
             }
-            case StockMessage.V1.Type.OUT -> {
-                StockMessage.V1.Out payload = (StockMessage.V1.Out) msg.getPayload();
+            case StockMessage.V1.Type.SOLD_OUT -> {
+                System.out.println("Received out: " + msg.getPayload());
+                StockMessage.V1.SOLD_OUT payload = (StockMessage.V1.SOLD_OUT) msg.getPayload();
                 template.consume(GROUP_ID, msg, () ->
                         productCacheFacade.removeCache(payload.productId())
                 );

@@ -15,7 +15,7 @@ public class LikeMessage {
 
         public record Changed(Long productId, Long userId, Long delta) {
             public ProductMetricCommand.LikeChange toCommand(LocalDate date) {
-                return new ProductMetricCommand.LikeChange(productId, date, delta);
+                return ProductMetricCommand.LikeChange.of(productId, date, delta);
             }
         }
     }

@@ -1,5 +1,7 @@
 package com.loopers.interfaces.consumer.product;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.loopers.applicaiton.product.ProductMetricFacade;
 import com.loopers.domain.audit_log.AuditLogCommand;
 import com.loopers.domain.audit_log.AuditLogService;
@@ -18,9 +20,11 @@ public class AuditLogConsumer {
     private final String GROUP_ID = "audit-log";
     private final AuditLogService auditLogService;
     private final ConsumeTemplate template;
+    private final ObjectMapper objectMapper;
 
     @KafkaListener(topics = LikeMessage.TOPIC, groupId = GROUP_ID)
     public void onMessageLike(KafkaMessage<?> msg, Acknowledgment ack) {
+        String payloadJson = serializePayload(msg.getPayload());
         template.consume(GROUP_ID, msg, () ->
                 auditLogService.createAuditLog(AuditLogCommand.Save.of(
                         LikeMessage.TOPIC,
@@ -28,7 +32,7 @@ public class AuditLogConsumer {
                         msg.getVersion(),
                         msg.getPublishedAt(),
                         msg.getEventType(),
-                        msg.getPayload().toString()
+                        payloadJson
                 ))
         );
         ack.acknowledge();
@@ -36,6 +40,7 @@ public class AuditLogConsumer {
 
     @KafkaListener(topics = StockMessage.TOPIC, groupId = GROUP_ID)
     public void onMessageStock(KafkaMessage<?> msg, Acknowledgment ack) {
+        String payloadJson = serializePayload(msg.getPayload());
         template.consume(GROUP_ID, msg, () ->
                 auditLogService.createAuditLog(AuditLogCommand.Save.of(
                         StockMessage.TOPIC,
@@ -43,7 +48,7 @@ public class AuditLogConsumer {
                         msg.getVersion(),
                         msg.getPublishedAt(),
                         msg.getEventType(),
-                        msg.getPayload().toString()
+                        payloadJson
                 ))
         );
 
@@ -52,6 +57,7 @@ public class AuditLogConsumer {
 
     @KafkaListener(topics = ProductMessage.TOPIC, groupId = GROUP_ID)
     public void onMessageView(KafkaMessage<?> msg, Acknowledgment ack) {
+        String payloadJson = serializePayload(msg.getPayload());
         template.consume(GROUP_ID, msg, () ->
                 auditLogService.createAuditLog(AuditLogCommand.Save.of(
                         ProductMessage.TOPIC,
@@ -59,9 +65,18 @@ public class AuditLogConsumer {
                         msg.getVersion(),
                         msg.getPublishedAt(),
                         msg.getEventType(),
-                        msg.getPayload().toString()
+                        payloadJson
                 ))
         );
         ack.acknowledge();
+    }
+
+    private String serializePayload(Object payload) {
+        try {
+            return objectMapper.writeValueAsString(payload);
+        } catch (JsonProcessingException e) {
+            // 실패하면 최소한 빈 객체라도 넣도록 처리
+            return "{}";
+        }
     }
 }

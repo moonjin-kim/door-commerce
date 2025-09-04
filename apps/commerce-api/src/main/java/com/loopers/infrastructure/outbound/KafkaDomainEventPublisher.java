@@ -19,6 +19,7 @@ public class KafkaDomainEventPublisher implements OutboundEventPublisher {
 
     @Override
     public void publish(LikeEvent.Like event) {
+        System.out.println("Publishing LikeEvent.Like event to Kafka for productId: " + event.productId() + ", userId: " + event.userId());
         KafkaMessage<LikeMessage.V1.Changed> message = KafkaMessage.of(
                 UUID.randomUUID().toString(),
                 LikeMessage.V1.VERSION,
@@ -60,7 +61,7 @@ public class KafkaDomainEventPublisher implements OutboundEventPublisher {
                 StockMessage.V1.Changed.sale(event.productId(), event.quantity())
         );
         kafkaTemplate.send(
-                StockMessage.TOPIC.CHANGE,
+                StockMessage.TOPIC,
                 String.valueOf(event.productId()),
                 message
         );
@@ -76,7 +77,7 @@ public class KafkaDomainEventPublisher implements OutboundEventPublisher {
                 StockMessage.V1.Changed.cancel(event.productId(), event.quantity())
         );
         kafkaTemplate.send(
-                StockMessage.TOPIC.CHANGE,
+                StockMessage.TOPIC,
                 String.valueOf(event.productId()),
                 message
         );
@@ -84,15 +85,15 @@ public class KafkaDomainEventPublisher implements OutboundEventPublisher {
 
     @Override
     public void publish(ProductEvent.View event) {
-        KafkaMessage<StockMessage.V1.Out> message = KafkaMessage.of(
+        KafkaMessage<StockMessage.V1.SoldOut> message = KafkaMessage.of(
                 UUID.randomUUID().toString(),
                 StockMessage.V1.VERSION,
                 LocalDateTime.now(),
-                StockMessage.V1.Type.OUT,
-                StockMessage.V1.Out.of(event.productId())
+                StockMessage.V1.Type.SOLD_OUT,
+                StockMessage.V1.SoldOut.of(event.productId())
         );
         kafkaTemplate.send(
-                StockMessage.TOPIC.CHANGE,
+                StockMessage.TOPIC,
                 String.valueOf(event.productId()),
                 message
         );
@@ -100,15 +101,15 @@ public class KafkaDomainEventPublisher implements OutboundEventPublisher {
 
     @Override
     public void publish(StockEvent.Out event) {
-        KafkaMessage<ProductMessage.V1.Viewed> message = KafkaMessage.of(
+        KafkaMessage<StockMessage.V1.SoldOut> message = KafkaMessage.of(
                 UUID.randomUUID().toString(),
-                ProductMessage.V1.VERSION,
+                StockMessage.V1.VERSION,
                 LocalDateTime.now(),
-                ProductMessage.V1.Type.VIEW,
-                ProductMessage.V1.Viewed.of(event.productId())
+                StockMessage.V1.Type.SOLD_OUT,
+                StockMessage.V1.SoldOut.of(event.productId())
         );
         kafkaTemplate.send(
-                ProductMessage.TOPIC.VIEW,
+                StockMessage.TOPIC,
                 String.valueOf(event.productId()),
                 message
         );

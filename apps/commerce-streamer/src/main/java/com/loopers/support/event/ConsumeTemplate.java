@@ -17,7 +17,7 @@ public class ConsumeTemplate {
             Runnable domainHandler // 멱등 통과 후 수행할 도메인 처리
     ) {
         // 멱등
-        if (!handled.tryHandle(groupId, msg.getEventId())) {
+        if (!handled.tryHandle(msg.getEventId(), groupId)) {
             return; // 이미 처리됨 → 조용히 스킵
         }
         // 실제 비즈니스

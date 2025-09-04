@@ -2,7 +2,7 @@ package com.loopers.infrastructure.outbound;
 
 public class LikeMessage {
     public static final class TOPIC {
-        public static final String LIKE = "product.likeChange";
+        public static final String LIKE = "like-event";
     }
 
     public class V1 {

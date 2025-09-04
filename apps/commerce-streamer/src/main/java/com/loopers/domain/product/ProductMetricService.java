@@ -4,9 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.util.Optional;
-
 @Component
 @RequiredArgsConstructor
 public class ProductMetricService {
@@ -14,10 +11,6 @@ public class ProductMetricService {
 
     public ProductMetric save(ProductMetric productMetric) {
         return productMetricRepository.save(productMetric);
-    }
-
-    public Optional<ProductMetric> findBy(Long productId, LocalDate date) {
-        return productMetricRepository.findBy(productId, date);
     }
 
     @Transactional

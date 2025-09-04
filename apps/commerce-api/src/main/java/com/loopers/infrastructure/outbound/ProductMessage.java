@@ -1,9 +1,7 @@
 package com.loopers.infrastructure.outbound;
 
 public class ProductMessage {
-    public static class TOPIC {
-        public static final String VIEW = "product.view";
-    }
+    public static String TOPIC ="product-event";
 
     public static class V1 {
         public static final String VERSION = "v1";
