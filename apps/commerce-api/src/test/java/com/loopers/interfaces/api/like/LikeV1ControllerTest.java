@@ -215,7 +215,7 @@ class LikeV1ControllerTest extends E2ETestSupport {
             assertAll(
                     () -> assertFalse(like),
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertEquals("좋아요에 성공했습니다", response.getBody().data())
+                    () -> assertEquals("좋아요가 취소되었습니다.", response.getBody().data())
             );
         }
 
@@ -258,7 +258,7 @@ class LikeV1ControllerTest extends E2ETestSupport {
             assertAll(
                     () -> assertFalse(like),
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertEquals("좋아요에 성공했습니다", response.getBody().data())
+                    () -> assertEquals("좋아요가 취소되었습니다.", response.getBody().data())
             );
         }
 

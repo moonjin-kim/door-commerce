@@ -28,8 +28,8 @@ public class ProductMetricConsumer {
                 ack.acknowledge();
             }
             default -> {
-                //todo: dlq에 보내기
-                throw new IllegalArgumentException("Unknown event type: " + msg.getEventType());
+                template.consume(GROUP_ID, msg, () -> log.info("Not Support Type: {}", msg.getPayload()));
+                ack.acknowledge();
             }
         }
     }
@@ -43,12 +43,9 @@ public class ProductMetricConsumer {
                         productMetricFacade.updateOrderQuantity(payload, msg.getPublishedAt())
                 );
             }
-            case StockMessage.V1.Type.SOLD_OUT -> {
-                ack.acknowledge();
-            }
             default -> {
-                //todo: dlq에 보내기
-                throw new IllegalArgumentException("Unknown event type: " + msg.getEventType());
+                template.consume(GROUP_ID, msg, () -> log.info("Not Support Type: {}", msg.getPayload()));
+                ack.acknowledge();
             }
         }
     }
@@ -63,8 +60,8 @@ public class ProductMetricConsumer {
                 );
                 ack.acknowledge();
             } default -> {
-                //todo: dlq에 보내기
-                throw new IllegalArgumentException("Unknown event type: " + msg.getEventType());
+                template.consume(GROUP_ID, msg, () -> log.info("Not Support Type: {}", msg.getPayload()));
+                ack.acknowledge();
             }
         }
     }

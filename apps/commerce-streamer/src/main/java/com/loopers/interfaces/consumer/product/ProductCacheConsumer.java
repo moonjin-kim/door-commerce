@@ -28,20 +28,15 @@ public class ProductCacheConsumer {
                 ack.acknowledge();
             }
             default -> {
-                //todo: dlq에 보내기
-                throw new IllegalArgumentException("Unknown event type: " + msg.getEventType());
+                template.consume(GROUP_ID, msg, () -> log.info("Not Support Type: {}", msg.getPayload()));
+                ack.acknowledge();
             }
         }
-        ack.acknowledge();
     }
 
     @KafkaListener(topics = StockMessage.TOPIC, groupId = GROUP_ID)
     public void onMessageStock(KafkaMessage<?> msg, Acknowledgment ack) {
         switch (msg.getEventType()) {
-            case StockMessage.V1.Type.CHANGED -> {
-
-                template.consume(GROUP_ID, msg, () -> log.info("Received change: {}", msg.getPayload()));
-            }
             case StockMessage.V1.Type.SOLD_OUT -> {
                 System.out.println("Received out: " + msg.getPayload());
                 StockMessage.V1.SOLD_OUT payload = (StockMessage.V1.SOLD_OUT) msg.getPayload();
@@ -52,8 +47,8 @@ public class ProductCacheConsumer {
                 ack.acknowledge();
             }
             default -> {
-                //todo: dlq에 보내기
-                throw new IllegalArgumentException("Unknown event type: " + msg.getEventType());
+                template.consume(GROUP_ID, msg, () -> log.info("Not Support Type: {}", msg.getPayload()));
+                ack.acknowledge();
             }
         }
     }
