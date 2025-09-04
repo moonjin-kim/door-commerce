@@ -10,7 +10,7 @@ public class LikeMessage {
     public static class V1 {
         public static final String VERSION = "V1";
         public static final class Type {
-            public static final String CHANGED = "LIKE_CHANGED_V1";
+            public static final String CHANGED = "LIKE_CHANGED:V1";
         }
 
         public record Changed(Long productId, Long userId, Long delta) {

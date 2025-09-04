@@ -11,8 +11,8 @@ public class StockMessage {
         public static final String VERSION = "v1";
 
         public static class Type {
-            public static final String CHANGED = "STOCK_CHANGED";
-            public static final String OUT = "STOCK_OUT";
+            public static final String CHANGED = "STOCK_CHANGED:V1";
+            public static final String OUT = "STOCK_OUT:V1";
         }
 
         public record Changed(Long productId, Integer quantity) {

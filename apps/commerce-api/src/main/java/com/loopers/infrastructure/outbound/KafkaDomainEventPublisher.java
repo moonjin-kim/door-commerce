@@ -1,61 +1,57 @@
-package com.loopers.interfaces.event.kafka;
+package com.loopers.infrastructure.outbound;
 
+import com.loopers.application.outbound.OutboundEventPublisher;
 import com.loopers.application.product.ProductEvent;
 import com.loopers.domain.like.LikeEvent;
 import com.loopers.domain.stock.StockEvent;
 import com.loopers.support.kafka.KafkaMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class KafkaProducer {
+public class KafkaDomainEventPublisher implements OutboundEventPublisher {
     private final KafkaTemplate<Object, Object> kafkaTemplate;
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handle(LikeEvent.Like event) {
+    @Override
+    public void publish(LikeEvent.Like event) {
         KafkaMessage<LikeMessage.V1.Changed> message = KafkaMessage.of(
                 UUID.randomUUID().toString(),
                 LikeMessage.V1.VERSION,
                 LocalDateTime.now(),
-                LikeMessage.V1.Type.LIKE,
+                LikeMessage.V1.Type.CHANGED,
                 LikeMessage.V1.Changed.like(event.productId(), event.userId())
         );
         kafkaTemplate.send(
-                LikeMessage.V1.TOPIC.LIKE,
+                LikeMessage.TOPIC.LIKE,
                 String.valueOf(event.productId()),
                 message
         );
     }
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handle(LikeEvent.UnLike event) {
+    @Override
+    public void publish(LikeEvent.UnLike event) {
+
         KafkaMessage<LikeMessage.V1.Changed> message = KafkaMessage.of(
                 UUID.randomUUID().toString(),
                 LikeMessage.V1.VERSION,
                 LocalDateTime.now(),
-                LikeMessage.V1.Type.LIKE,
+                LikeMessage.V1.Type.CHANGED,
                 LikeMessage.V1.Changed.unlike(event.productId(), event.userId())
         );
         kafkaTemplate.send(
-                LikeMessage.V1.TOPIC.LIKE,
+                LikeMessage.TOPIC.LIKE,
                 String.valueOf(event.productId()),
                 message
         );
     }
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handle(StockEvent.Consumed event) {
+    @Override
+    public void publish(StockEvent.Consumed event) {
         KafkaMessage<StockMessage.V1.Changed> message = KafkaMessage.of(
                 UUID.randomUUID().toString(),
                 StockMessage.V1.VERSION,
@@ -64,15 +60,14 @@ public class KafkaProducer {
                 StockMessage.V1.Changed.sale(event.productId(), event.quantity())
         );
         kafkaTemplate.send(
-                StockMessage.V1.TOPIC.CHANGE,
+                StockMessage.TOPIC.CHANGE,
                 String.valueOf(event.productId()),
                 message
         );
     }
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handle(StockEvent.Rollback event) {
+    @Override
+    public void publish(StockEvent.Rollback event) {
         KafkaMessage<StockMessage.V1.Changed> message = KafkaMessage.of(
                 UUID.randomUUID().toString(),
                 StockMessage.V1.VERSION,
@@ -81,15 +76,14 @@ public class KafkaProducer {
                 StockMessage.V1.Changed.cancel(event.productId(), event.quantity())
         );
         kafkaTemplate.send(
-                StockMessage.V1.TOPIC.CHANGE,
+                StockMessage.TOPIC.CHANGE,
                 String.valueOf(event.productId()),
                 message
         );
     }
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handle(StockEvent.Out event) {
+    @Override
+    public void publish(ProductEvent.View event) {
         KafkaMessage<StockMessage.V1.Out> message = KafkaMessage.of(
                 UUID.randomUUID().toString(),
                 StockMessage.V1.VERSION,
@@ -98,15 +92,14 @@ public class KafkaProducer {
                 StockMessage.V1.Out.of(event.productId())
         );
         kafkaTemplate.send(
-                StockMessage.V1.TOPIC.CHANGE,
+                StockMessage.TOPIC.CHANGE,
                 String.valueOf(event.productId()),
                 message
         );
     }
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handle(ProductEvent.View event) {
+    @Override
+    public void publish(StockEvent.Out event) {
         KafkaMessage<ProductMessage.V1.Viewed> message = KafkaMessage.of(
                 UUID.randomUUID().toString(),
                 ProductMessage.V1.VERSION,
@@ -115,7 +108,7 @@ public class KafkaProducer {
                 ProductMessage.V1.Viewed.of(event.productId())
         );
         kafkaTemplate.send(
-                ProductMessage.V1.TOPIC.VIEW,
+                ProductMessage.TOPIC.VIEW,
                 String.valueOf(event.productId()),
                 message
         );

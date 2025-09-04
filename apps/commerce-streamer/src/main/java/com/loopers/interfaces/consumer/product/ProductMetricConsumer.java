@@ -32,7 +32,6 @@ public class ProductMetricConsumer {
                 throw new IllegalArgumentException("Unknown event type: " + msg.getEventType());
             }
         }
-        ack.acknowledge();
     }
 
     @KafkaListener(topics = StockMessage.TOPIC, groupId = GROUP_ID)
@@ -45,8 +44,6 @@ public class ProductMetricConsumer {
                 );
             }
             case StockMessage.V1.Type.OUT -> {
-                template.consume(GROUP_ID, msg, () -> log.info("Received out: {}", msg.getPayload()));
-
                 ack.acknowledge();
             }
             default -> {
