@@ -29,7 +29,7 @@ public class LikeService {
         likeRepository.save(com.loopers.domain.like.Like.create(command));
 
         log.info("좋아요가 저장되었습니다. userId={}, productId={}", command.userId(), command.productId());
-        eventPublisher.publish(LikeEvent.Like.of(command.productId()));
+        eventPublisher.publish(LikeEvent.Like.of(command.productId(), command.userId()));
     }
 
     @Transactional
@@ -37,7 +37,7 @@ public class LikeService {
         if (likeRepository.existsBy(command.userId(), command.productId())) {
             likeRepository.delete(command.userId(), command.productId());
 
-            eventPublisher.publish(LikeEvent.UnLike.of(command.productId()));
+            eventPublisher.publish(LikeEvent.UnLike.of(command.productId(), command.userId()));
         }
     }
 
