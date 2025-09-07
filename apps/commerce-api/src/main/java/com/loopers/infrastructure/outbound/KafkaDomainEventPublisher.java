@@ -19,7 +19,6 @@ public class KafkaDomainEventPublisher implements OutboundEventPublisher {
 
     @Override
     public void publish(LikeEvent.Like event) {
-        System.out.println("Publishing LikeEvent.Like event to Kafka for productId: " + event.productId() + ", userId: " + event.userId());
         KafkaMessage<LikeMessage.V1.Changed> message = KafkaMessage.of(
                 UUID.randomUUID().toString(),
                 LikeMessage.V1.VERSION,
@@ -36,7 +35,6 @@ public class KafkaDomainEventPublisher implements OutboundEventPublisher {
 
     @Override
     public void publish(LikeEvent.UnLike event) {
-
         KafkaMessage<LikeMessage.V1.Changed> message = KafkaMessage.of(
                 UUID.randomUUID().toString(),
                 LikeMessage.V1.VERSION,

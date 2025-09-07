@@ -38,7 +38,6 @@ public class ProductCacheConsumer {
     public void onMessageStock(KafkaMessage<?> msg, Acknowledgment ack) {
         switch (msg.getEventType()) {
             case StockMessage.V1.Type.SOLD_OUT -> {
-                System.out.println("Received out: " + msg.getPayload());
                 StockMessage.V1.SOLD_OUT payload = (StockMessage.V1.SOLD_OUT) msg.getPayload();
                 template.consume(GROUP_ID, msg, () ->
                         productCacheFacade.removeCache(payload.productId())
