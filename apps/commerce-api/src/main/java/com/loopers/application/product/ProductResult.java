@@ -36,9 +36,10 @@ public class ProductResult {
             String imageUrl,
             Long price,
             Long likeCount,
-            Boolean isLiked
+            Boolean isLiked,
+            Long rank
     ) {
-        public static ProductDetail of(Product product, Brand brand, Boolean isLiked, Long likeCount) {
+        public static ProductDetail of(Product product, Brand brand, Boolean isLiked, Long likeCount, Long rank) {
             return new ProductDetail(
                     product.getId(),
                     product.getBrandId(),
@@ -48,7 +49,8 @@ public class ProductResult {
                     product.getImageUrl(),
                     product.getPrice().longValue(),
                     likeCount,
-                    isLiked
+                    isLiked,
+                    rank
             );
         }
     }

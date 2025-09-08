@@ -19,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Slf4j
@@ -44,7 +46,7 @@ public class ProductFacade {
         productService.soldOut(productId);
     }
 
-    public ProductResult.ProductDetail getBy(Long productId, Long userId) {
+    public ProductResult.ProductDetail getBy(Long productId, Long userId, LocalDate date) {
         Product product = productService.getBy(productId).orElseThrow(() -> {
             throw new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 상품입니다.");
         });
@@ -60,13 +62,16 @@ public class ProductFacade {
 
         LikeInfo.GetLikeCount likeCount = likeService.getLikeCount(productId);
 
+        Long rank = rankingService.getRankBy(productId, String.valueOf(date));
+
         productEventPublisher.handle(ProductEvent.View.of(productId));
 
         return ProductResult.ProductDetail.of(
                 product,
                 brand,
                 likeInfo.isLiked(),
-                likeCount.count()
+                likeCount.count(),
+                rank
         );
     }
 
