@@ -21,7 +21,7 @@ public abstract class CacheKey {
      * 캐시의 이름으로 클래스의 간단한 이름을 사용합니다. (e.g., "UserProfileCache")
      */
     public String getName() {
-        return this.getClass().getSimpleName()+ "@" + version;
+        return this.getClass().getSimpleName();
     }
 
     public String getDescription() {
@@ -33,6 +33,6 @@ public abstract class CacheKey {
     }
 
     public String getKey(String key) {
-        return getName() + ":" + key;
+        return getName() + ":" + key + "@" + version;
     }
 }

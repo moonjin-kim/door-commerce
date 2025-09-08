@@ -7,7 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Component
@@ -47,5 +49,21 @@ public class CacheRedisRepository implements CacheRepository {
     @Override
     public void delete(CacheKey cache, String key) {
         redisTemplate.delete(cache.getKey(key));
+    }
+
+    @Override
+    public boolean zadd(CacheKey cache, String key, String member, double score) {
+        Boolean ok = redisTemplate.opsForZSet().add(cache.getKey(key), member, score);
+        return Boolean.TRUE.equals(ok);
+    }
+
+    @Override
+    public Set<String> zrevrange(CacheKey cache, String key, long start, long end) {
+        return redisTemplate.opsForZSet().reverseRange(cache.getKey(key), start, end);
+    }
+
+    @Override
+    public void expire(CacheKey cache, String key, Duration ttl) {
+        redisTemplate.expire(cache.getKey(key), ttl);
     }
 }

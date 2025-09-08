@@ -9,4 +9,17 @@ public class CommerceCache {
         }
         public static final ProductCache INSTANCE = new ProductCache();
     }
+
+    public static final class RankingCache extends CacheKey {
+        private RankingCache() {
+            super("상품 랭킹", Duration.ofHours(28), "v1");
+        }
+
+        @Override
+        public String getKey(String key) {
+            return "rank:all";
+        }
+
+        public static final RankingCache INSTANCE = new RankingCache();
+    }
 }
