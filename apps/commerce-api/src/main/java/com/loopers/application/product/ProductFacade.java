@@ -11,12 +11,15 @@ import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductCommand;
 import com.loopers.domain.product.ProductService;
 import com.loopers.domain.product.ProductView;
+import com.loopers.domain.ranking.RankingService;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class ProductFacade {
     private final BrandService brandService;
     private final LikeService likeService;
     private final ProductEventPublisher productEventPublisher;
+    private final RankingService rankingService;
 
     public void increaseLikeCount(Long productId) {
         productService.increaseLikeCount(productId);
@@ -65,7 +69,6 @@ public class ProductFacade {
                 likeCount.count()
         );
     }
-
 
     public PageResponse<ProductResult.ProductDto> search(PageRequest<ProductCriteria.Search> criteria) {
         PageRequest<ProductCommand.Search> searchCommand = criteria.map(ProductCriteria.Search::toCommand);
