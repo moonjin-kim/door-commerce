@@ -14,26 +14,32 @@ public class ProductMetricService {
     }
 
     @Transactional
-    public void updateLikeCount(ProductMetricCommand.LikeChange command) {
+    public ProductMetric updateLikeCount(ProductMetricCommand.LikeChange command) {
         ProductMetric productMetric = productMetricRepository.findBy(command.productId(), command.date())
                 .orElseGet(() -> this.save(ProductMetric.create(command.productId(), command.date())));
 
         productMetric.updateLikeCount(command.delta());
+
+        return productMetric;
     }
 
     @Transactional
-    public void updateOrderQuantity(ProductMetricCommand.StockChange likeChange) {
+    public ProductMetric updateOrderQuantity(ProductMetricCommand.StockChange likeChange) {
         ProductMetric productMetric = productMetricRepository.findBy(likeChange.productId(), likeChange.date())
                 .orElseGet(() -> this.save(ProductMetric.create(likeChange.productId(), likeChange.date())));
 
         productMetric.updateOrderQuantity(likeChange.quantity());
+
+        return productMetric;
     }
 
     @Transactional
-    public void updateViewCount(ProductMetricCommand.ViewChange command) {
+    public ProductMetric updateViewCount(ProductMetricCommand.ViewChange command) {
         ProductMetric productMetric = productMetricRepository.findBy(command.productId(), command.date())
                 .orElseGet(() -> this.save(ProductMetric.create(command.productId(), command.date())));
 
         productMetric.plusViewCount();
+
+        return productMetric;
     }
 }

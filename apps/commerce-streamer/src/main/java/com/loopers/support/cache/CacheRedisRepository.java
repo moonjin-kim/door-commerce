@@ -58,6 +58,17 @@ public class CacheRedisRepository implements CacheRepository {
     }
 
     @Override
+    public Long getRank(String key, String member) {
+        return redisTemplate.opsForZSet().reverseRank(key, member);  // 높은 점수가 0등부터 시작
+    }
+
+    @Override
+    public double getScoreBy(CacheKey cache, String key, String member) {
+        Double score = redisTemplate.opsForZSet().score(cache.getKey(key), member);
+        return (score != null) ? score : 0.0;
+    }
+
+    @Override
     public Set<String> zrevrange(CacheKey cache, String key, long start, long end) {
         return redisTemplate.opsForZSet().reverseRange(cache.getKey(key), start, end);
     }

@@ -22,6 +22,10 @@ public interface CacheRepository {
 
     boolean zadd(CacheKey cache, String key, String member, double score);
 
+    Long getRank(String key, String member);
+
+    double getScoreBy(CacheKey cache, String key, String member);
+
     Set<String> zrevrange(CacheKey cache, String key, long start, long end);
 
     /** TTL 설정 */

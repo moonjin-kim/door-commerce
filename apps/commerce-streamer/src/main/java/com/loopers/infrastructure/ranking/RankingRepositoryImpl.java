@@ -24,4 +24,9 @@ public class RankingRepositoryImpl implements RankingRepository {
     public Set<String> getRanking(String key, int start, int end) {
         return cacheRepository.zrevrange(CommerceCache.RankingCache.INSTANCE, key, start, end);
     }
+
+    @Override
+    public double getScoreBy(String key, String productId) {
+        return cacheRepository.getScoreBy(CommerceCache.RankingCache.INSTANCE, key, productId);
+    }
 }
