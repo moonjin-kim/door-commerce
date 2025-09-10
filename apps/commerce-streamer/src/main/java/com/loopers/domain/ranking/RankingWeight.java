@@ -44,4 +44,8 @@ public class RankingWeight extends BaseEntity {
     public double calculateScore(RankingCommand.UpdateProductScore command) {
         return command.likeCount() * likeWeight + command.orderQuantity() * orderWeight + command.viewCount() * viewWeight;
     }
+
+    public double calculateScore(RankingCommand.UpdateProductScores command) {
+        return command.likeCount() * likeWeight + command.orderQuantity() * orderWeight + command.viewCount() * viewWeight;
+    }
 }

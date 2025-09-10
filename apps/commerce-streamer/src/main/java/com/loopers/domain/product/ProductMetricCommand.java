@@ -21,9 +21,9 @@ public class ProductMetricCommand {
         }
     }
 
-    public record ViewChange(Long productId, LocalDate date) {
-        public static ViewChange of(Long productId, LocalDate date) {
-            return new ViewChange(productId, date);
+    public record ViewChange(Long productId, LocalDate date, Long delta) {
+        public static ViewChange of(Long productId, LocalDate date, Long delta) {
+            return new ViewChange(productId, date, delta);
         }
     }
 }

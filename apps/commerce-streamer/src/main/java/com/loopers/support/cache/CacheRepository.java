@@ -1,5 +1,7 @@
 package com.loopers.support.cache;
 
+import org.springframework.data.redis.core.ZSetOperations;
+
 import java.time.Duration;
 import java.util.Optional;
 import java.util.Set;
@@ -21,6 +23,7 @@ public interface CacheRepository {
     void delete(CacheKey cache, String key);
 
     boolean zadd(CacheKey cache, String key, String member, double score);
+    void zadd(CacheKey cache, String key, Set<ZSetOperations.TypedTuple<String>> scoreMembers);
 
     Long getRank(String key, String member);
 

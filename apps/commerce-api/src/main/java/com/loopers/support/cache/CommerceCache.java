@@ -31,7 +31,7 @@ public class CommerceCache {
 
         @Override
         public String getKey(String key) {
-            return "rank:all";
+            return "rank:all:" + key;
         }
 
         public static final RankingCache INSTANCE = new RankingCache();

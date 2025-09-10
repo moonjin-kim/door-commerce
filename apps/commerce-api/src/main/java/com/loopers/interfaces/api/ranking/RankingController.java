@@ -13,7 +13,7 @@ import org.springframework.data.domain.Pageable;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/ranking")
+@RequestMapping("/api/v1/rankings")
 public class RankingController implements RankingV1ApiSpec{
     private final RankingFacade rankingFacade;
 

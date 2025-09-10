@@ -43,7 +43,7 @@ class RankingServiceTest {
                     1L, 10L, 5L, 2L, java.time.LocalDate.now());
 
             IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-                rankingService.updateProductScores(command);
+                rankingService.updateProductScore(command);
             });
 
             assertEquals("Ranking weight not found", exception.getMessage());
@@ -61,7 +61,7 @@ class RankingServiceTest {
                     productId, 10L, 5L, 2L, now.toLocalDate());
 
             assertDoesNotThrow(() -> {
-                rankingService.updateProductScores(command);
+                rankingService.updateProductScore(command);
             });
             double score = rankingRepository.getScoreBy(String.valueOf(now.toLocalDate()), String.valueOf(productId));
 

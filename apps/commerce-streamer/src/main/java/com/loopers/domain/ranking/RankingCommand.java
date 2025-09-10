@@ -4,20 +4,28 @@ import com.loopers.domain.product.ProductMetric;
 
 import java.time.LocalDate;
 
+import static java.time.format.DateTimeFormatter.ofPattern;
+
 public class RankingCommand {
-    public record UpdateProductScore(Long productId, Long likeCount, Long orderQuantity, Long viewCount, LocalDate date) {
+    public record UpdateProductScore(Long productId, Long likeCount, Long orderQuantity, Long viewCount, String date) {
         static public UpdateProductScore of(Long productId, Long likeCount, Long orderQuantity, Long viewCount, LocalDate date) {
-            return new UpdateProductScore(productId, likeCount, orderQuantity, viewCount, date);
+            return new UpdateProductScore(productId, likeCount, orderQuantity, viewCount, date.format(ofPattern("yyyyMMdd")));
         }
 
         static public UpdateProductScore from(ProductMetric productMetric, LocalDate date) {
             return new UpdateProductScore(
-                productMetric.getId(),
+                productMetric.getProductId(),
                 productMetric.getLikeCount(),
                 productMetric.getOrderQuantity(),
                 productMetric.getViewCount(),
-                date
+                date.format(ofPattern("yyyyMMdd"))
             );
+        }
+    }
+
+    public record UpdateProductScores(Long productId, Long likeCount, Long orderQuantity, Long viewCount) {
+        static public UpdateProductScores from(ProductMetric productMetric) {
+            return new UpdateProductScores(productMetric.getProductId(), productMetric.getLikeCount(), productMetric.getOrderQuantity(), productMetric.getViewCount());
         }
     }
 }

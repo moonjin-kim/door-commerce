@@ -50,7 +50,7 @@ public class ProductResult {
                     product.getPrice().longValue(),
                     likeCount,
                     isLiked,
-                    rank
+                    rank != null ? rank + 1 : null
             );
         }
     }

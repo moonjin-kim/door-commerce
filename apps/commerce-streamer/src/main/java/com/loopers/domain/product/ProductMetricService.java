@@ -38,7 +38,7 @@ public class ProductMetricService {
         ProductMetric productMetric = productMetricRepository.findBy(command.productId(), command.date())
                 .orElseGet(() -> this.save(ProductMetric.create(command.productId(), command.date())));
 
-        productMetric.plusViewCount();
+        productMetric.updateViewCount(command.delta());
 
         return productMetric;
     }

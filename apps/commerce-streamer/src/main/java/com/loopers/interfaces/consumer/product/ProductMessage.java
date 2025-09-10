@@ -13,9 +13,6 @@ public class ProductMessage {
         }
 
         public record Viewed(Long productId) {
-            public ProductMetricCommand.ViewChange toCommand(java.time.LocalDate date) {
-                return new ProductMetricCommand.ViewChange(productId, date);
-            }
         }
     }
 }

@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -55,6 +57,11 @@ public class CacheRedisRepository implements CacheRepository {
     public boolean zadd(CacheKey cache, String key, String member, double score) {
         Boolean ok = redisTemplate.opsForZSet().add(cache.getKey(key), member, score);
         return Boolean.TRUE.equals(ok);
+    }
+
+    public void zadd(CacheKey cache, String key, Set<ZSetOperations.TypedTuple<String>> scoreMembers) {
+        // Redis의 ZSetOperations.add(key, map) 메서드를 사용하여 여러 튜플을 한 번에 추가합니다.
+        redisTemplate.opsForZSet().add(cache.getKey(key), scoreMembers);
     }
 
     @Override
