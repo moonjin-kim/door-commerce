@@ -5,13 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 @Slf4j
 @Component
@@ -51,37 +47,5 @@ public class CacheRedisRepository implements CacheRepository {
     @Override
     public void delete(CacheKey cache, String key) {
         redisTemplate.delete(cache.getKey(key));
-    }
-
-    @Override
-    public boolean zadd(CacheKey cache, String key, String member, double score) {
-        Boolean ok = redisTemplate.opsForZSet().add(cache.getKey(key), member, score);
-        return Boolean.TRUE.equals(ok);
-    }
-
-    public void zadd(CacheKey cache, String key, Set<ZSetOperations.TypedTuple<String>> scoreMembers) {
-        // Redis의 ZSetOperations.add(key, map) 메서드를 사용하여 여러 튜플을 한 번에 추가합니다.
-        redisTemplate.opsForZSet().add(cache.getKey(key), scoreMembers);
-    }
-
-    @Override
-    public Long getRank(String key, String member) {
-        return redisTemplate.opsForZSet().reverseRank(key, member);  // 높은 점수가 0등부터 시작
-    }
-
-    @Override
-    public double getScoreBy(CacheKey cache, String key, String member) {
-        Double score = redisTemplate.opsForZSet().score(cache.getKey(key), member);
-        return (score != null) ? score : 0.0;
-    }
-
-    @Override
-    public Set<String> zrevrange(CacheKey cache, String key, long start, long end) {
-        return redisTemplate.opsForZSet().reverseRange(cache.getKey(key), start, end);
-    }
-
-    @Override
-    public void expire(CacheKey cache, String key, Duration ttl) {
-        redisTemplate.expire(cache.getKey(key), ttl);
     }
 }

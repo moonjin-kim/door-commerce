@@ -21,17 +21,5 @@ public interface CacheRepository {
      * 캐시에서 특정 키의 값을 제거합니다.
      */
     void delete(CacheKey cache, String key);
-
-    boolean zadd(CacheKey cache, String key, String member, double score);
-    void zadd(CacheKey cache, String key, Set<ZSetOperations.TypedTuple<String>> scoreMembers);
-
-    Long getRank(String key, String member);
-
-    double getScoreBy(CacheKey cache, String key, String member);
-
-    Set<String> zrevrange(CacheKey cache, String key, long start, long end);
-
-    /** TTL 설정 */
-    void expire(CacheKey cache, String key, Duration ttl);
 }
 
