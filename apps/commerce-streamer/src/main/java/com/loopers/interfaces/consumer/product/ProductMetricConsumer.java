@@ -29,8 +29,10 @@ public class ProductMetricConsumer {
         // 모든 메시지를 단 한 번 순회
         messages.forEach(msg -> {
             if (msg.getEventType().equals(LikeMessage.V1.Type.CHANGED)) {
-                LikeMessage.V1.Changed payload = (LikeMessage.V1.Changed) msg.getPayload();
-                likePayloadsForBatch.add(payload);
+                template.consume(GROUP_ID, msg, () -> {
+                    LikeMessage.V1.Changed payload = (LikeMessage.V1.Changed) msg.getPayload();
+                    likePayloadsForBatch.add(payload);
+                });
             } else {
                 template.consume(GROUP_ID, msg, () -> log.info("Not Support Type: {}", msg.getPayload()));
             }
@@ -52,8 +54,10 @@ public class ProductMetricConsumer {
         // 모든 메시지를 단 한 번 순회
         messages.forEach(msg -> {
             if (msg.getEventType().equals(StockMessage.V1.Type.CHANGED)) {
-                StockMessage.V1.Changed payload = (StockMessage.V1.Changed) msg.getPayload();
-                likePayloadsForBatch.add(payload);
+                template.consume(GROUP_ID, msg, () -> {
+                    StockMessage.V1.Changed payload = (StockMessage.V1.Changed) msg.getPayload();
+                    likePayloadsForBatch.add(payload);
+                });
             } else {
                 template.consume(GROUP_ID, msg, () -> log.info("Not Support Type: {}", msg.getPayload()));
             }
@@ -75,8 +79,10 @@ public class ProductMetricConsumer {
         // 모든 메시지를 단 한 번 순회
         messages.forEach(msg -> {
             if (msg.getEventType().equals(ProductMessage.V1.Type.VIEW)) {
-                ProductMessage.V1.Viewed payload = (ProductMessage.V1.Viewed) msg.getPayload();
-                payloads.add(payload);
+                template.consume(GROUP_ID, msg, () -> {
+                    ProductMessage.V1.Viewed payload = (ProductMessage.V1.Viewed) msg.getPayload();
+                    payloads.add(payload);
+                });
             } else {
                 template.consume(GROUP_ID, msg, () -> log.info("Not Support Type: {}", msg.getPayload()));
             }
@@ -87,7 +93,6 @@ public class ProductMetricConsumer {
             productMetricFacade.updateViewCounts(payloads, LocalDate.now());
         }
 
-        messages.forEach(msg -> template.consume(GROUP_ID, msg, () -> {}));
         ack.acknowledge();
     }
 

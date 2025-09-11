@@ -27,5 +27,9 @@ public class RankingCommand {
         static public UpdateProductScores from(ProductMetric productMetric) {
             return new UpdateProductScores(productMetric.getProductId(), productMetric.getLikeCount(), productMetric.getOrderQuantity(), productMetric.getViewCount());
         }
+
+        static public UpdateProductScores of(Long productId, Long likeCount, Long orderQuantity, Long viewCount) {
+            return new UpdateProductScores(productId, likeCount, orderQuantity, viewCount);
+        }
     }
 }

@@ -20,15 +20,6 @@ public class RankingService {
     private final RankingWeightRepository rankingWeightRepository;
     private final RankingRepository rankingRepository;
 
-    public void updateProductScore(RankingCommand.UpdateProductScore command) {
-        RankingWeight rankingWeight = rankingWeightRepository.findBy(WEIGHT_KEY)
-            .orElseThrow(() -> new IllegalStateException("Ranking weight not found"));
-
-        double newScore = rankingWeight.calculateScore(command);
-
-        rankingRepository.updateProductRanking(CommerceCache.RankingCache.INSTANCE, command.date(), String.valueOf(command.productId()), newScore);
-    }
-
     public void updateProductScores(List<RankingCommand.UpdateProductScores> commands, LocalDate date) {
         RankingWeight rankingWeight = rankingWeightRepository.findBy(WEIGHT_KEY)
                 .orElseThrow(() -> new IllegalStateException("Ranking weight not found"));
