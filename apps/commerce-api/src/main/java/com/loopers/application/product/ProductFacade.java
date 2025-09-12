@@ -65,7 +65,6 @@ public class ProductFacade {
         LikeInfo.GetLikeCount likeCount = likeService.getLikeCount(productId);
 
         Long rank = rankingService.getRankBy(productId, date.format(ofPattern("yyyyMMdd")));
-        System.out.println("rank = " + rank);
 
         productEventPublisher.handle(ProductEvent.View.of(productId));
 
