@@ -24,6 +24,7 @@ public class RankingRedisRepository implements RankingRepository {
 
     @Override
     public Long getRank(CacheKey cache, String key, Long memberId) {
-        return redisTemplate.opsForZSet().reverseRank(cache.getKey(key), memberId);
+        if (memberId == null) return null;
+        return redisTemplate.opsForZSet().reverseRank(cache.getKey(key), String.valueOf(memberId));
     }
 }

@@ -50,8 +50,8 @@ public class RankingRedisRepository implements RankingRepository {
 
         redisTemplate.opsForZSet()
                 .unionAndStore(todayKey, Collections.emptyList(), tomorrowKey, Aggregate.SUM, Weights.of(weight));
-        // TTL 부여 (예: 30일 후 삭제)
-        redisTemplate.expire(tomorrowKey, Duration.ofDays(30));
+      
+        redisTemplate.expire(tomorrowKey, Duration.ofDays(2));
     }
 
     @Override
