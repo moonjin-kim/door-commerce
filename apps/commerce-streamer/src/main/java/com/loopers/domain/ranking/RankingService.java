@@ -37,6 +37,6 @@ public class RankingService {
     }
 
     public void createTomorrowRanking(LocalDate toDay) {
-        rankingRepository.createTomorrowRanking(CommerceCache.RankingCache.INSTANCE, toDay, 0.1);
+        rankingRepository.createTomorrowRanking(CommerceCache.RankingCache.INSTANCE, toDay, 0.01);
     }
 }
