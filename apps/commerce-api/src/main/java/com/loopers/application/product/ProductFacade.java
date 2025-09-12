@@ -11,12 +11,19 @@ import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductCommand;
 import com.loopers.domain.product.ProductService;
 import com.loopers.domain.product.ProductView;
+import com.loopers.domain.ranking.RankingService;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Set;
+
+import static java.time.format.DateTimeFormatter.ofPattern;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,6 +34,7 @@ public class ProductFacade {
     private final BrandService brandService;
     private final LikeService likeService;
     private final ProductEventPublisher productEventPublisher;
+    private final RankingService rankingService;
 
     public void increaseLikeCount(Long productId) {
         productService.increaseLikeCount(productId);
@@ -40,7 +48,7 @@ public class ProductFacade {
         productService.soldOut(productId);
     }
 
-    public ProductResult.ProductDetail getBy(Long productId, Long userId) {
+    public ProductResult.ProductDetail getBy(Long productId, Long userId, LocalDate date) {
         Product product = productService.getBy(productId).orElseThrow(() -> {
             throw new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 상품입니다.");
         });
@@ -56,16 +64,19 @@ public class ProductFacade {
 
         LikeInfo.GetLikeCount likeCount = likeService.getLikeCount(productId);
 
+        Long rank = rankingService.getRankBy(productId, date.format(ofPattern("yyyyMMdd")));
+        System.out.println("rank = " + rank);
+
         productEventPublisher.handle(ProductEvent.View.of(productId));
 
         return ProductResult.ProductDetail.of(
                 product,
                 brand,
                 likeInfo.isLiked(),
-                likeCount.count()
+                likeCount.count(),
+                rank
         );
     }
-
 
     public PageResponse<ProductResult.ProductDto> search(PageRequest<ProductCriteria.Search> criteria) {
         PageRequest<ProductCommand.Search> searchCommand = criteria.map(ProductCriteria.Search::toCommand);

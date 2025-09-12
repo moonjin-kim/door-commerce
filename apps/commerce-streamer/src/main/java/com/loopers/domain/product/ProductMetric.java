@@ -4,7 +4,6 @@ import com.loopers.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,8 +46,8 @@ public class ProductMetric extends BaseEntity {
         this.orderQuantity += quantity;
     }
 
-    public void plusViewCount() {
-        this.viewCount++;
+    public void updateViewCount(Long orderQuantity) {
+        this.viewCount += orderQuantity;
     }
 
 }

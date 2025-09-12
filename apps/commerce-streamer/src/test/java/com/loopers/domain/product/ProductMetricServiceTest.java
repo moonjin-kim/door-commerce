@@ -73,7 +73,7 @@ class ProductMetricServiceTest {
         LocalDate date = LocalDate.now();
         productMetricService.save(ProductMetric.create(productId, date));
 
-        ProductMetricCommand.ViewChange command = ProductMetricCommand.ViewChange.of(productId, date);
+        ProductMetricCommand.ViewChange command = ProductMetricCommand.ViewChange.of(productId, date, 1L);
         productMetricService.updateViewCount(command);
 
         ProductMetric updated = productMetricRepository.findBy(productId, date).orElseThrow();

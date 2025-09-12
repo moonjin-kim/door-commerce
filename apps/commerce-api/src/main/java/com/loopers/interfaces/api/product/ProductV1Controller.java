@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/products")
@@ -63,7 +65,7 @@ public class ProductV1Controller implements ProductV1ApiSpec{
             @RequestHeader(value = "X-USER-ID", required = false) Long userId,
             @PathVariable(value = "productId")Long brandId
     ) {
-        ProductResult.ProductDetail product = productFacade.getBy(brandId, userId);
+        ProductResult.ProductDetail product = productFacade.getBy(brandId, userId, LocalDate.now());
 
         return ApiResponse.success(
                 ProductV1Response.ProductDetail.of(product)
