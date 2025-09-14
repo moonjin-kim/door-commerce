@@ -94,7 +94,7 @@ class RankingServiceTest {
         @Test
         @DisplayName("랭킹 가중치가 있으면 여러 상품 점수가 갱신된다")
         void shouldUpdateMultipleProductScores() {
-            RankingWeight weight = RankingWeight.create("default", 0.2, 0.5, 0.3);
+            RankingWeight weight = RankingWeight.create(0.2, 0.5, 0.3);
             weightRepository.save("ranking:weight@v1", weight);
 
             List<RankingCommand.UpdateProductScores> commands = List.of(

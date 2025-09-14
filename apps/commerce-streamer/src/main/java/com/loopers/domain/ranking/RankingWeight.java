@@ -8,36 +8,23 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "ranking_weight")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class RankingWeight extends BaseEntity {
-    @Column(nullable = false, unique = true)
-    private String weightName;
-    @Column(nullable = false)
+public class RankingWeight {
     private Double likeWeight;
-    @Column(nullable = false)
     private Double orderWeight;
-    @Column(nullable = false)
     private Double viewWeight;
 
-    public RankingWeight(String weightName, Double likeWeight, Double orderWeight, Double viewWeight) {
+    public RankingWeight(Double likeWeight, Double orderWeight, Double viewWeight) {
         if(likeWeight < 0 || orderWeight < 0 || viewWeight < 0) {
             throw new IllegalArgumentException("Weights must be non-negative");
         }
-        if(weightName == null || weightName.isEmpty()) {
-            throw new IllegalArgumentException("Weight name must not be null or empty");
-        }
-        this.weightName = weightName;
         this.likeWeight = likeWeight;
         this.orderWeight = orderWeight;
         this.viewWeight = viewWeight;
     }
 
-    static public RankingWeight create(String weightName, Double likeWeight, Double orderWeight, Double viewWeight) {
-        return new RankingWeight(
-                weightName, likeWeight, orderWeight, viewWeight
+    static public RankingWeight create(Double likeWeight, Double orderWeight, Double viewWeight) {
+        return new RankingWeight(likeWeight, orderWeight, viewWeight
         );
     }
 
