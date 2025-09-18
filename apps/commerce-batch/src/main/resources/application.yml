@@ -29,11 +29,11 @@ spring:
         core-size: 8
         max-size: 16
         queue-capacity: 8
-    batch:
-      jdbc:
-        initialize-schema: never
-      job:
-        enabled: false
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
 
 ---
 spring:

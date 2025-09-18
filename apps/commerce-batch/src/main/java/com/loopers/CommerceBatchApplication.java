@@ -10,11 +10,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.TimeZone;
 
-@ConfigurationPropertiesScan
-@EnableFeignClients
-@EnableScheduling
-@EnableAsync
 @SpringBootApplication
+@EnableScheduling
 public class CommerceBatchApplication {
 
     @PostConstruct

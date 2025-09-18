@@ -25,16 +25,16 @@ public class ProductMetric extends BaseEntity {
     @Column(nullable = false)
     Long viewCount;
 
-    public ProductMetric(LocalDate bucket, Long productId, Long likeCount, Long orderQuantity, Long viewCount) {
-        this.aggDate = bucket;
+    public ProductMetric(LocalDate aggDate, Long productId, Long likeCount, Long orderQuantity, Long viewCount) {
+        this.aggDate = aggDate;
         this.productId = productId;
         this.likeCount = likeCount;
         this.orderQuantity = orderQuantity;
         this.viewCount = viewCount;
     }
 
-    public static ProductMetric create(Long productId, LocalDate bucket) {
-        return new ProductMetric(bucket, productId, 0L, 0L, 0L);
+    public static ProductMetric create(Long productId, LocalDate aggDate) {
+        return new ProductMetric(aggDate, productId, 0L, 0L, 0L);
     }
 
     public void updateLikeCount(Long delta) {
