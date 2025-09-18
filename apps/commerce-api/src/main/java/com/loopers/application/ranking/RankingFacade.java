@@ -22,11 +22,10 @@ public class RankingFacade {
     private final RankingService rankingService;
     private final ProductService productService;
 
-    public PageResponse<RankingV1Response.ProductDto> getRanking(String date, int page, int size) {
-        List<String> rankingPage = rankingService.getRanking(RankingCommand.GetRanking.of(date, page, size)).stream().toList();
+    public PageResponse<RankingV1Response.ProductDto> getRanking(RankingV1Request.GetRanking request, int page, int size) {
+        List<Long> rankingPage = rankingService.getRanking(request.toCommand(page, size));
 
         List<RankingV1Response.ProductDto> products = rankingPage.stream()
-                .map(Long::valueOf)
                 .map(productId -> productService.getBy(productId)
                         .map(RankingV1Response.ProductDto::from)
                         .orElse(null)

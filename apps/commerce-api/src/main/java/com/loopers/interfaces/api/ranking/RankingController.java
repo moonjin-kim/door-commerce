@@ -21,7 +21,7 @@ public class RankingController implements RankingV1ApiSpec{
     @Override
     public ApiResponse<PageResponse<RankingV1Response.ProductDto>> getRanking(Pageable pageable, RankingV1Request.GetRanking request) {
         return ApiResponse.success(
-                rankingFacade.getRanking(request.date(), pageable.getPageNumber(), pageable.getPageSize())
+                rankingFacade.getRanking(request, pageable.getPageNumber(), pageable.getPageSize())
         );
     }
 }
