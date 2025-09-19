@@ -24,7 +24,7 @@ public class RankingSchedules {
     }
 
     // 주간 랭킹 매주 월요일 새벽 1시 실행
-    @Scheduled(cron = "0 30 0 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 1 * * *", zone = "Asia/Seoul")
     public void runWeeklyRankingJob() throws Exception {
         jobLauncher.run(
                 weeklyRankingJob,
@@ -36,7 +36,7 @@ public class RankingSchedules {
     }
 
     // 월간 랭킹 매월 1일 새벽 2시 실행
-    @Scheduled(cron = "0 30 0 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 30 1 * * *", zone = "Asia/Seoul")
     public void runMonthlyRankingJob() throws Exception {
         jobLauncher.run(
                 monthlyRankingJob,
