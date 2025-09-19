@@ -24,7 +24,7 @@ public class WeeklyRankingBatchJob {
     private final PlatformTransactionManager transactionManager;
 
     @Bean
-    public Job weeklyRankingJob(@Qualifier("monthlyRankingStep") Step weeklyRankingStep) {
+    public Job weeklyRankingJob(@Qualifier("weeklyRankingStep") Step weeklyRankingStep) {
         return new JobBuilder("weeklyRankingJob", jobRepository)
                 .start(weeklyRankingStep)
                 .build();
