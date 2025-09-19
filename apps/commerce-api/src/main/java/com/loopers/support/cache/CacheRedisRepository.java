@@ -7,7 +7,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.time.Duration;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Component
@@ -47,5 +49,35 @@ public class CacheRedisRepository implements CacheRepository {
     @Override
     public void delete(CacheKey cache, String key) {
         redisTemplate.delete(cache.getKey(key));
+    }
+
+    @Override
+    public boolean zadd(CacheKey cache, String key, String member, double score) {
+        Boolean ok = redisTemplate.opsForZSet().add(cache.getKey(key), member, score);
+        return Boolean.TRUE.equals(ok);
+    }
+
+    @Override
+    public Long getRank(CacheKey cache, String key, String member) {
+        return redisTemplate.opsForZSet().reverseRank(cache.getKey(key), member);  // 높은 점수가 0등부터 시작
+    }
+
+    @Override
+    public double getScoreBy(CacheKey cache, String key, String member) {
+        Double score = redisTemplate.opsForZSet().score(cache.getKey(key), member);
+        return (score != null) ? score : 0.0;
+    }
+
+    @Override
+    public Set<String> zrevrange(CacheKey cache, String key, int page, int size) {
+        long start = (long) size * (page - 1);
+        long end = start + size - 1;
+
+        return redisTemplate.opsForZSet().reverseRange(cache.getKey(key), start, end);
+    }
+
+    @Override
+    public void expire(CacheKey cache, String key, Duration ttl) {
+        redisTemplate.expire(cache.getKey(key), ttl);
     }
 }

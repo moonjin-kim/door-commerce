@@ -54,4 +54,8 @@ public class Stock extends BaseEntity {
         }
         this.quantity += quantity;
     }
+
+    public boolean isStockOut() {
+        return this.quantity <= 0;
+    }
 }

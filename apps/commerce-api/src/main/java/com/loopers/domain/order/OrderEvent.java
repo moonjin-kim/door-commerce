@@ -4,7 +4,7 @@ import com.loopers.application.payment.PaymentMethodType;
 import com.loopers.domain.pg.CardType;
 
 public class OrderEvent {
-    public record RequestPayment(
+    public record CreateComplete(
         String orderId,
         Long userId,
         Long amount,
@@ -12,8 +12,8 @@ public class OrderEvent {
         String cardType,
         String cardNumber
     ) {
-        static public RequestPayment of(String orderId, Long userId, Long amount, PaymentMethodType methodType, CardType cardType, String cardNumber) {
-            return new RequestPayment(orderId, userId, amount, methodType.name(), cardType != null ? cardType.name() : null, cardNumber);
+        static public CreateComplete of(String orderId, Long userId, Long amount, PaymentMethodType methodType, CardType cardType, String cardNumber) {
+            return new CreateComplete(orderId, userId, amount, methodType.name(), cardType != null ? cardType.name() : null, cardNumber);
         }
     }
 

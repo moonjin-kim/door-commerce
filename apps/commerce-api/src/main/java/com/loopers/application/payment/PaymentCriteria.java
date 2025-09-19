@@ -36,7 +36,7 @@ public class PaymentCriteria {
             return new RequestPayment(orderId, userId, amount, PaymentType.of(method), null,null);
         }
 
-        static public RequestPayment from(OrderEvent.RequestPayment event) {
+        static public RequestPayment from(OrderEvent.CreateComplete event) {
             return new RequestPayment(
                     event.orderId(),
                     event.userId(),

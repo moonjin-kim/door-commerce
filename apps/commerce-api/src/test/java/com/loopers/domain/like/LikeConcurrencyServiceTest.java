@@ -111,7 +111,6 @@ public class LikeConcurrencyServiceTest {
                         var command = LikeCommand.Like.of(id, productId);
                         likeService.like(command);
                     } catch (Exception e) {
-                        System.out.println(e.getMessage());
                         exceptions.add(e);
                     } finally {
                         latch.countDown();

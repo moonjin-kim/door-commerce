@@ -24,19 +24,33 @@ public class ProductService {
     private final CacheRepository cacheRepository;
 
     @Transactional
-    public void increaseLikeCount(Long productId) {
+    public Product increaseLikeCount(Long productId) {
         Product product = productRepository.findBy(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
 
         product.increaseLikeCount();
+
+        return product;
     }
 
     @Transactional
-    public void decreaseLikeCount(Long productId) {
+    public Product decreaseLikeCount(Long productId) {
         Product product = productRepository.findBy(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
 
         product.decreaseLikeCount();
+
+        return product;
+    }
+
+    @Transactional
+    public Product soldOut(Long productId) {
+        Product product = productRepository.findBy(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
+
+        product.soldOut();
+
+        return product;
     }
 
     public Optional<Product> getBy(Long id) {

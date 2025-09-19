@@ -15,6 +15,7 @@ dependencies {
     runtimeOnly("com.mysql:mysql-connector-j")
 
     testImplementation("org.testcontainers:mysql")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     testFixturesImplementation("org.springframework.boot:spring-boot-starter-data-jpa")
     testFixturesImplementation("org.testcontainers:mysql")

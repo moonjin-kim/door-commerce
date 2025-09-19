@@ -28,6 +28,7 @@ public class Product extends BaseEntity {
     private Money price;
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
+    @Column()
     private Long likeCount;
 
     protected Product(
@@ -61,6 +62,10 @@ public class Product extends BaseEntity {
                 command.price(),
                 ProductStatus.SALE
         );
+    }
+
+    public void soldOut() {
+        this.status = ProductStatus.SOLD_OUT;
     }
 
     public void increaseLikeCount() {

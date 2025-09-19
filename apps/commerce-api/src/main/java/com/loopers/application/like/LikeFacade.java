@@ -41,7 +41,7 @@ public class LikeFacade {
         productService.getBy(like.productId()).orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 상품입니다."));
 
         likeService.unlike(like.toCommand());
-        return "좋아요에 성공했습니다";
+        return "좋아요가 취소되었습니다.";
     }
 
     public PageResponse<LikeResult.LikeProduct> search(PageRequest<LikeCriteria.Search> query) {

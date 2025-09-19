@@ -2,12 +2,16 @@ package com.loopers.interfaces.event.payment;
 
 import com.loopers.application.payment.PaymentCriteria;
 import com.loopers.application.payment.PaymentFacade;
+import com.loopers.config.kafka.KafkaConfig;
 import com.loopers.domain.order.OrderEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -16,9 +20,7 @@ public class PaymentListener {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    void handle(OrderEvent.RequestPayment event) {
-        paymentFacade.requestPayment(PaymentCriteria.RequestPayment.from(
-                event
-        ));
+    void handle(OrderEvent.CreateComplete event) {
+        paymentFacade.requestPayment(PaymentCriteria.RequestPayment.from(event));
     }
 }
