@@ -7,5 +7,5 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 public interface ProductMetricJpaRepository extends JpaRepository<ProductMetric, Long> {
-    Optional<ProductMetric> findByProductIdAndBucket(Long productId, LocalDate bucket);
+    Optional<ProductMetric> findByProductIdAndAggDate(Long productId, LocalDate bucket);
 }

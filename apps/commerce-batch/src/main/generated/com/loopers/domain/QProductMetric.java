@@ -1,4 +1,4 @@
-package com.loopers.domain.product;
+package com.loopers.domain;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -15,11 +15,11 @@ import com.querydsl.core.types.Path;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QProductMetric extends EntityPathBase<ProductMetric> {
 
-    private static final long serialVersionUID = 1682629999L;
+    private static final long serialVersionUID = -1296766162L;
 
     public static final QProductMetric productMetric = new QProductMetric("productMetric");
 
-    public final com.loopers.domain.QBaseEntity _super = new com.loopers.domain.QBaseEntity(this);
+    public final QBaseEntity _super = new QBaseEntity(this);
 
     public final DatePath<java.time.LocalDate> aggDate = createDate("aggDate", java.time.LocalDate.class);
 
