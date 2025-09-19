@@ -21,7 +21,7 @@ public class QProductMetric extends EntityPathBase<ProductMetric> {
 
     public final com.loopers.domain.QBaseEntity _super = new com.loopers.domain.QBaseEntity(this);
 
-    public final DatePath<java.time.LocalDate> bucket = createDate("bucket", java.time.LocalDate.class);
+    public final DatePath<java.time.LocalDate> aggDate = createDate("aggDate", java.time.LocalDate.class);
 
     //inherited
     public final DateTimePath<java.time.ZonedDateTime> createdAt = _super.createdAt;
