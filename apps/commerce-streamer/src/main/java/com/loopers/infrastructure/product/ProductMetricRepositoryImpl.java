@@ -18,7 +18,7 @@ public class ProductMetricRepositoryImpl implements ProductMetricRepository {
     }
 
     @Override
-    public Optional<ProductMetric> findBy(Long productId, LocalDate date) {
-        return productMetricJpaRepository.findByProductIdAndBucket(productId, date);
+    public Optional<ProductMetric> findBy(Long productId, LocalDate aggDate) {
+        return productMetricJpaRepository.findByProductIdAndAggDate(productId, aggDate);
     }
 }

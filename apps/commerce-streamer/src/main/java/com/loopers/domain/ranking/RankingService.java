@@ -22,7 +22,7 @@ public class RankingService {
 
     public void updateProductScores(List<RankingCommand.UpdateProductScores> commands, LocalDate date) {
         RankingWeight rankingWeight = rankingWeightRepository.findBy(WEIGHT_KEY)
-                .orElseThrow(() -> new IllegalStateException("Ranking weight not found"));
+                .orElse(getDefaultWeight());
 
         Set<ZSetOperations.TypedTuple<String>> scoreTuple = commands.stream()
                 .map(command -> {
@@ -38,5 +38,9 @@ public class RankingService {
 
     public void createTomorrowRanking(LocalDate toDay) {
         rankingRepository.createTomorrowRanking(CommerceCache.RankingCache.INSTANCE, toDay, 0.01);
+    }
+
+    private RankingWeight getDefaultWeight() {
+        return RankingWeight.create(0.2, 0.7, 0.1);
     }
 }

@@ -10,6 +10,7 @@ import com.loopers.interfaces.consumer.product.ProductMessage;
 import com.loopers.interfaces.consumer.product.StockMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,6 +27,7 @@ public class ProductMetricFacade {
     private final ProductMetricService productMetricService;
     private final RankingService rankingService;
 
+    @Transactional
     public void updateViewCounts(List<ProductMessage.V1.Viewed> likeMessages, LocalDate today) {
         Map<Long, Long> aggregatedLikes = likeMessages.stream()
                 .collect(Collectors.groupingBy(

@@ -65,12 +65,12 @@ class RankingServiceTest {
 
             Double score101 = redisTemplate.opsForZSet().score(tomorrowKey, "101");
             Double score102 = redisTemplate.opsForZSet().score(tomorrowKey, "102");
-            assertThat(score101).isEqualTo(10.0 * 0.1);
-            assertThat(score102).isEqualTo(20.0 * 0.1);
+            assertThat(score101).isEqualTo(10.0 * 0.01);
+            assertThat(score102).isEqualTo(20.0 * 0.01);
 
             // TTL 확인 (30일)
             Long ttl = redisTemplate.getExpire(tomorrowKey);
-            assertThat(ttl).isGreaterThanOrEqualTo(Duration.ofDays(29).getSeconds());
+            assertThat(ttl).isGreaterThanOrEqualTo(Duration.ofDays(2).getSeconds());
         }
     }
 
@@ -78,7 +78,7 @@ class RankingServiceTest {
     @Nested
     class UpdateProductScores {
         @Test
-        @DisplayName("랭킹 가중치가 없으면 예외 발생")
+        @DisplayName("랭킹 가중치가 없으면 기본 가중치로 점수가 집계된다")
         void shouldThrowExceptionWhenWeightNotFound() {
             List<RankingCommand.UpdateProductScores> commands = List.of(
                     RankingCommand.UpdateProductScores.of(1L, 10L, 5L, 2L),
@@ -86,15 +86,19 @@ class RankingServiceTest {
             );
             LocalDate date = LocalDate.now();
 
-            assertThrows(IllegalStateException.class, () -> {
-                rankingService.updateProductScores(commands, date);
-            });
+            rankingService.updateProductScores(commands, date);
+
+            double score1 = rankingRepository.getScoreBy(CommerceCache.RankingCache.INSTANCE, date.format(ofPattern("yyyyMMdd")), "1");
+            double score2 = rankingRepository.getScoreBy(CommerceCache.RankingCache.INSTANCE, date.format(ofPattern("yyyyMMdd")), "2");
+
+            assertThat(score1).isEqualTo(10L * 0.2 + 5L * 0.7 + 2L * 0.1);
+            assertThat(score2).isEqualTo(20L * 0.2 + 10L * 0.7 + 5L * 0.1);
         }
 
         @Test
         @DisplayName("랭킹 가중치가 있으면 여러 상품 점수가 갱신된다")
         void shouldUpdateMultipleProductScores() {
-            RankingWeight weight = RankingWeight.create("default", 0.2, 0.5, 0.3);
+            RankingWeight weight = RankingWeight.create(0.2, 0.5, 0.3);
             weightRepository.save("ranking:weight@v1", weight);
 
             List<RankingCommand.UpdateProductScores> commands = List.of(

@@ -12,7 +12,7 @@ public class CommerceCache {
 
     public static final class RankingCache extends CacheKey {
         private RankingCache() {
-            super("상품 랭킹", Duration.ofHours(28), "v1");
+            super("상품 랭킹", Duration.ofHours(48), "v1");
         }
 
         @Override
